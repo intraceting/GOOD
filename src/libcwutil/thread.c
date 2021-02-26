@@ -118,7 +118,7 @@ void cw_specific_destroy(cw_specific_t *ctx)
     if (!ctx)
         return;
 
-    if(atomic_load(&ctx->status)!=CW_SPECIFIC_STATUS_SYNCHING)
+    if(atomic_load(&ctx->status)!=CW_SPECIFIC_STATUS_STABLE)
         return;
 
     pthread_key_delete(ctx->key);
@@ -133,7 +133,7 @@ void* cw_specific_value(cw_specific_t*ctx)
     atomic_int status_expected = CW_SPECIFIC_STATUS_UNKNOWN;
 
     if (!ctx)
-        return;
+        return NULL;
 
     /*多线程初始化，这里要保护一下。*/
     if(atomic_compare_exchange_strong(&ctx->status,&status_expected,CW_SPECIFIC_STATUS_SYNCHING))

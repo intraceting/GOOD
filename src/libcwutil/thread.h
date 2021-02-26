@@ -9,19 +9,21 @@
 
 /**/
 #include <errno.h>
-#include <stdint.h>
 #include <stdatomic.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 #include <pthread.h>
 
-/**
- * 
-*/
+/**/
 __BEGIN_DECLS
 
 /**
  * 互斥量、事件
  * 
- * @note 如果需要支持跨进程特性，需要让下面的结构体数据运行在共享内存中。
+ * @note 如果需要支持跨进程特性，需要让结构体数据运行在共享内存中。
 */
 typedef struct _cw_mutex
 {
@@ -193,9 +195,10 @@ void* cw_specific_default_alloc(size_t s);
 */
 void cw_specific_default_free(void* m);
 
-/**
- * 
-*/
+
+/**/
 __END_DECLS
+
+
 
 #endif // CWHEEL_THREAD_H
