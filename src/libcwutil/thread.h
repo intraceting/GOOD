@@ -65,21 +65,15 @@ typedef struct _cw_specific
     */
     atomic_int status;
     /**
-     * 未知的
-     * 
-     * @note KEY未创建或出错。
+     * KEY未创建或出错。
     */
 #define CW_SPECIFIC_STATUS_UNKNOWN      0
     /**
-     * 稳定的
-     * 
-     * @note KEY创建成功。
+     * KEY创建成功。
      */
 #define CW_SPECIFIC_STATUS_STABLE       1
     /**
-     * 同步中
-     * 
-     * @note KEY正在创建。
+     * KEY正在创建。
      */
 #define CW_SPECIFIC_STATUS_SYNCHING     2
 
