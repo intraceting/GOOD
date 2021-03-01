@@ -15,9 +15,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <stdarg.h>
 #include <pthread.h>
 
-/**/
+/**
+ * 
+*/
 __BEGIN_DECLS
 
 /**
@@ -51,6 +54,8 @@ typedef struct _cw_mutex
 
 /**
  * 私有数据
+ * 
+ * @note 多线程共享KEY，但VALUE是线程私有。
 */
 typedef struct _cw_specific
 {
@@ -59,9 +64,24 @@ typedef struct _cw_specific
      * 
     */
     atomic_int status;
-#define CW_SPECIFIC_STATUS_UNKNOWN      0 /*未知的*/
-#define CW_SPECIFIC_STATUS_STABLE       1 /*稳定的*/
-#define CW_SPECIFIC_STATUS_SYNCHING     2 /*同步中*/
+    /**
+     * 未知的
+     * 
+     * @note KEY未创建或出错。
+    */
+#define CW_SPECIFIC_STATUS_UNKNOWN      0
+    /**
+     * 稳定的
+     * 
+     * @note KEY创建成功。
+     */
+#define CW_SPECIFIC_STATUS_STABLE       1
+    /**
+     * 同步中
+     * 
+     * @note KEY正在创建。
+     */
+#define CW_SPECIFIC_STATUS_SYNCHING     2
 
     /**
      * 私有数据KEY
@@ -95,9 +115,17 @@ typedef struct _cw_specific
 
 /**
  * 线程句柄和返回值
+ * 
+ * 
 */
 typedef struct _cw_thread_t
 {
+    /**
+     * 属性
+     * 
+    */
+    pthread_attr_t attr;
+
     /**
      * 句柄
      * 
@@ -106,6 +134,7 @@ typedef struct _cw_thread_t
 
     /**
      * 返回值
+     * 
     */
     void* result;
 
@@ -121,12 +150,13 @@ typedef struct _cw_thread_t
 */
 void cw_mutex_destroy(cw_mutex_t *ctx);
 
-
 /**
  * 初始化互斥量
  * 
  * @see pthread_cond_init()
  * @see pthread_mutex_init()
+ * 
+ * @note 在调用此函数前需先初始化属性。
 */
 void cw_mutex_init(cw_mutex_t *ctx);
 
@@ -145,9 +175,9 @@ void cw_mutex_init(cw_mutex_t *ctx);
  * @see pthread_mutexattr_setpshared()
  * @see pthread_mutexattr_setrobust()
  * @see pthread_mutex_init()
+ * @see cw_mutex_init()
 */
 void cw_mutex_init2(cw_mutex_t *ctx, int shared);
-
 
 /**
  * 互斥量加锁
@@ -187,7 +217,7 @@ int cw_mutex_wait(cw_mutex_t *ctx, int64_t timeout);
 /**
  * 发出事件通知
  * 
- * @param broadcast 0 通知一个等待线程，!0 通知所有的等待线程。
+ * @param broadcast 0 通知一个等待线程，!0 通知所有等待线程。
  * 
  * @return 0 成功；!0 出错。
  * 
@@ -232,7 +262,6 @@ void* cw_specific_default_alloc(size_t s);
  * 
  * @see free()
  * 
- * @note 如果私有数据无法自动释放，则需要在线程退出前调用，否则会有内存泄漏问题。
 */
 void cw_specific_default_free(void* m);
 
@@ -242,25 +271,62 @@ void cw_specific_default_free(void* m);
  * @return 0 成功；!0 出错。
  * 
  * @see pthread_create()
+ * @see pthread_attr_getdetachstate()
+ * @see pthread_attr_destroy()
  * 
 */
-int cw_thread_create(cw_thread_t *ctx,
-                     const pthread_attr_t *attr,
-                     void *(*routine)(void *user),
-                     void *user);
+int cw_thread_create(cw_thread_t *ctx,void *(*routine)(void *user),void *user);
 
 /**
- * 等待线程结束
+ * 创建线程
+ * 
+ * @param joinable 0 线程结束后自回收资源，!0 线程结束后需要调用者回收资源。
+ * @param routine 线程函数
+ * @param user 线程用户指针
+ * 
+ * @return 0 成功；!0 出错。
+ * 
+ * @see pthread_attr_init()
+ * @see pthread_attr_setdetachstate()
+ * @see cw_thread_create()
+ * 
+*/
+int cw_thread_create2(cw_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user);
+
+/**
+ * 等待线程结束并回收资源
  * 
  * @return 0 成功；!0 出错。
  * 
  * @see pthread_attr_getdetachstate()
  * @see pthread_join()
  * 
+ * @note 当线程被已经分离或已经分离模式创建的，直接返回。
 */
 int cw_thread_join(cw_thread_t* ctx);
 
-/**/
+/**
+ * 设置当前线程名字
+ * 
+ * @see pthread_setname_np()
+ * 
+ * @note 最大支持16个字节(Bytes)。
+ * 
+*/
+int cw_thread_setname(const char* fmt,...);
+
+/**
+ * 获取当前线程名字
+ * 
+ * @see pthread_getname_np()
+ * 
+*/
+int cw_thread_getname(char name[16]);
+
+
+/**
+ * 
+*/
 __END_DECLS
 
 

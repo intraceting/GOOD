@@ -216,10 +216,28 @@ void cw_specific_default_free(void *m)
         free(m);
 }
 
-int cw_thread_create(cw_thread_t *ctx,
-                     const pthread_attr_t *attr,
-                     void *(*routine)(void *user),
-                     void *user)
+int cw_thread_create(cw_thread_t *ctx,void *(*routine)(void *user),void *user)
+{
+    int err = -1;
+    int detachstate;
+  
+    if (!ctx)
+        return err;
+
+    if(!routine)
+        return err = -EINVAL;
+
+    err = pthread_create(&ctx->handle,&ctx->attr,routine,user);
+
+    pthread_attr_getdetachstate(&ctx->attr,&detachstate);
+    
+    if (detachstate == PTHREAD_CREATE_JOINABLE)
+        pthread_attr_destroy(&ctx->attr);
+
+    return err;
+}
+
+int cw_thread_create2(cw_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user)
 {
     int err = -1;
   
@@ -229,7 +247,10 @@ int cw_thread_create(cw_thread_t *ctx,
     if(!routine)
         return err = -EINVAL;
 
-    err = pthread_create(&ctx->handle,attr,routine,user);
+    pthread_attr_init(&ctx->attr);
+    pthread_attr_setdetachstate(&ctx->attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
+
+    err = cw_thread_create(ctx,routine,user);
 
     return err;
 }
@@ -238,23 +259,50 @@ int cw_thread_join(cw_thread_t *ctx)
 {
     int err = -1;
     int detachstate;
-    pthread_attr_t attr;
 
     if (!ctx)
         return err;
 
-    err = pthread_getattr_np(ctx->handle, &attr);
-    if (err != 0)
-        return err;
-
-    err = pthread_attr_getdetachstate(&attr,&detachstate);
+    err = pthread_attr_getdetachstate(&ctx->attr,&detachstate);
     if (err != 0)
         return err;
 
     if (detachstate == PTHREAD_CREATE_JOINABLE)
     {
         err = pthread_join(ctx->handle, &ctx->result);
+
+        pthread_attr_destroy(&ctx->attr);
     }
 
     return err;
+}
+
+int cw_thread_setname(const char* fmt,...)
+{
+    int err = -1;
+    char name[16] = {0};
+
+    if(!fmt || !fmt[0])
+        return err;
+
+    va_list vaptr;
+    va_start(vaptr, fmt);
+    snprintf(name,16,fmt,vaptr);
+    va_end(vaptr);
+
+    err = pthread_setname_np(pthread_self(),name);
+
+    return err;
+}
+
+int cw_thread_getname(char name[16])
+{
+    int err = -1;
+
+    if(!name)
+        return err;
+
+    err = pthread_getname_np(pthread_self(),name,16);
+
+    return err; 
 }
