@@ -19,7 +19,16 @@ void cw_mutex_destroy(cw_mutex_t *ctx)
     memset(ctx,0,sizeof(*ctx));
 }
 
-void cw_mutex_init(cw_mutex_t* ctx,int shared)
+void cw_mutex_init(cw_mutex_t *ctx)
+{
+    if (!ctx)
+        return;
+
+    pthread_cond_init(&ctx->cond, &ctx->condattr);
+    pthread_mutex_init(&ctx->mutex, &ctx->mutexattr);
+}
+
+void cw_mutex_init2(cw_mutex_t* ctx,int shared)
 {
     if (!ctx)
         return;
@@ -27,12 +36,12 @@ void cw_mutex_init(cw_mutex_t* ctx,int shared)
     pthread_condattr_init(&ctx->condattr);
     pthread_condattr_setclock(&ctx->condattr, CLOCK_MONOTONIC);
     pthread_condattr_setpshared(&ctx->condattr,(shared?PTHREAD_PROCESS_SHARED:PTHREAD_PROCESS_PRIVATE));
-    pthread_cond_init(&ctx->cond, &ctx->condattr);
 
     pthread_mutexattr_init(&ctx->mutexattr);
     pthread_mutexattr_setpshared(&ctx->mutexattr,(shared?PTHREAD_PROCESS_SHARED:PTHREAD_PROCESS_PRIVATE));
     pthread_mutexattr_setrobust(&ctx->mutexattr,PTHREAD_MUTEX_ROBUST);
-    pthread_mutex_init(&ctx->mutex,&ctx->mutexattr);
+
+    cw_mutex_init(ctx);
 }
 
 int cw_mutex_lock(cw_mutex_t *ctx, int try)

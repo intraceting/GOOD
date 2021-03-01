@@ -31,14 +31,17 @@ typedef struct _cw_mutex
      * 事件属性
     */
     pthread_condattr_t condattr;
+
     /**
      * 事件
     */
     pthread_cond_t cond;
+
     /**
      * 互斥量属性
     */
     pthread_mutexattr_t mutexattr;
+
     /**
      * 互斥量
     */
@@ -63,14 +66,15 @@ typedef struct _cw_specific
     /**
      * 私有数据KEY
      * 
-     * @see pthread_key_create()
     */
     pthread_key_t key;
+
     /**
      * 私有数据大小
      * 
     */
     size_t size;
+
     /**
      * 申请私有数据
      * 
@@ -78,6 +82,7 @@ typedef struct _cw_specific
      * 
     */
     void *(*alloc_cb)(size_t s);
+
     /**
      * 释放私有数据
      * 
@@ -89,16 +94,18 @@ typedef struct _cw_specific
 } cw_specific_t;
 
 /**
- * 
+ * 线程句柄和返回值
 */
 typedef struct _cw_thread_t
 {
     /**
+     * 句柄
      * 
     */
     pthread_t handle;
+
     /**
-     * 
+     * 返回值
     */
     void* result;
 
@@ -114,8 +121,17 @@ typedef struct _cw_thread_t
 */
 void cw_mutex_destroy(cw_mutex_t *ctx);
 
+
 /**
- * 创建互斥量属性
+ * 初始化互斥量
+ * 
+ * @see pthread_cond_init()
+ * @see pthread_mutex_init()
+*/
+void cw_mutex_init(cw_mutex_t *ctx);
+
+/**
+ * 初始化互斥量及属性
  * 
  * @param shared 0 私有，!0 共享。
  * 
@@ -130,7 +146,8 @@ void cw_mutex_destroy(cw_mutex_t *ctx);
  * @see pthread_mutexattr_setrobust()
  * @see pthread_mutex_init()
 */
-void cw_mutex_init(cw_mutex_t *ctx, int shared);
+void cw_mutex_init2(cw_mutex_t *ctx, int shared);
+
 
 /**
  * 互斥量加锁

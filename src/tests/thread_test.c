@@ -29,7 +29,7 @@ void* specific_cb(void* args)
 int main(int argc, char **argv)
 {
     cw_mutex_t m;
-    cw_mutex_init(&m,1);
+    cw_mutex_init2(&m,1);
 
     cw_mutex_lock(&m,0);
 
