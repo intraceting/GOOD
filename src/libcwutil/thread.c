@@ -115,15 +115,20 @@ int cw_mutex_signal(cw_mutex_t* ctx,int broadcast)
 
 void cw_specific_destroy(cw_specific_t *ctx)
 {
+    void * value = NULL;
+
     if (!ctx)
         return;
 
     if(atomic_load(&ctx->status)!=CW_SPECIFIC_STATUS_STABLE)
         return;
+    
+    value = pthread_getspecific(ctx->key);
+    pthread_setspecific(ctx->key,NULL);
 
-    pthread_key_delete(ctx->key);
+    /*这里只释放私有数据，KEY是多线程共享，而且系统在进程结束时会自动回收，因此不用处理。*/
+    ctx->free_cb(value);
 
-    memset(ctx,0,sizeof(*ctx));
 }
 
 void* cw_specific_value(cw_specific_t*ctx)
@@ -188,4 +193,44 @@ void cw_specific_default_free(void *m)
 {
     if (m)
         free(m);
+}
+
+int cw_thread_create(cw_thread_t* ctx,int joinable)
+{
+    int err = -1;
+
+    if(!ctx)
+        return err;
+
+    pthread_attr_init(&ctx->attr);
+    pthread_attr_setdetachstate(&ctx->attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
+
+    err = pthread_create(&ctx->handle,&ctx->attr,ctx->routine_cb,ctx->user);
+
+    if(!joinable)
+        pthread_attr_destroy(&ctx->attr);
+
+    return err;
+}
+
+int cw_thread_join(cw_thread_t *ctx)
+{
+    int err = -1;
+    int detachstate = -1;
+
+    if (!ctx)
+        return err;
+
+    err = pthread_attr_getdetachstate(&ctx->attr, &detachstate);
+    if (err != 0)
+        return err;
+
+    if (detachstate == PTHREAD_CREATE_JOINABLE)
+    {
+        err = pthread_join(ctx->handle, &ctx->result);
+
+        pthread_attr_destroy(&ctx->attr);
+    }
+
+    return err;
 }

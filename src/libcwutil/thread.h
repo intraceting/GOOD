@@ -73,16 +73,47 @@ typedef struct _cw_specific
     /**
      * 申请私有数据
      * 
-     * @see malloc()
+     * @see cw_specific_default_alloc()
+     * 
     */
     void *(*alloc_cb)(size_t s);
     /**
      * 释放私有数据
      * 
-     * @see free()
+     * @see cw_specific_default_free()
+     * 
+     * @note 如果私有数据无法自动释放，需要自定义此回调函数。
     */
     void (*free_cb)(void* m);
 } cw_specific_t;
+
+/**
+ * 
+*/
+typedef struct _cw_thread_t
+{
+    /**
+     * 
+    */
+    pthread_attr_t attr;
+    /**
+     * 
+    */
+    pthread_t handle;
+    /**
+     * 
+    */
+    void* result;
+    /**
+     * 
+    */
+    void *(*routine_cb)(void *user);
+    /**
+     * 
+    */
+    void *user;
+
+} cw_thread_t;
 
 /**
  * 销毁互斥量及属性
@@ -162,9 +193,11 @@ int cw_mutex_signal(cw_mutex_t *ctx, int broadcast);
 /**
  * 销毁私有数据
  * 
- * @note 如果私有数据无法自动释放，则需要在线程退出前调用，否则会有内存泄漏问题。
+ * @note 如果私有数据无法自动释放，则需要在线程退出前调用此函数。
  * 
  * @see pthread_key_delete()
+ * @see pthread_setspecific()
+ * @see pthread_getspecific()
 */
 void cw_specific_destroy(cw_specific_t*ctx);
 
@@ -191,10 +224,34 @@ void* cw_specific_default_alloc(size_t s);
 /**
  * 私有数据默认释放函数
  * 
- * @see free
+ * @see free()
+ * 
+ * @note 如果私有数据无法自动释放，则需要在线程退出前调用，否则会有内存泄漏问题。
 */
 void cw_specific_default_free(void* m);
 
+/**
+ * 创建线程
+ * 
+ * @param joinable  0 线程结束后自动释放资源，!0 调用者负责释放资源。
+ * 
+ * @see pthread_attr_init()
+ * @see pthread_attr_setdetachstate()
+ * @see pthread_create()
+ * @see pthread_attr_destroy();
+*/
+int cw_thread_create(cw_thread_t* ctx,int joinable);
+
+/**
+ * 等待线程结束
+ * 
+ * 
+ * @see pthread_attr_getdetachstate()
+ * @see pthread_join()
+ * @see pthread_attr_destroy()
+ * 
+*/
+int cw_thread_join(cw_thread_t* ctx);
 
 /**/
 __END_DECLS
