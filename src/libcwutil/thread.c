@@ -258,7 +258,7 @@ int cw_thread_create2(cw_thread_t *ctx,int joinable,void *(*routine)(void *user)
 int cw_thread_join(cw_thread_t *ctx)
 {
     int err = -1;
-    int detachstate;
+    int detachstate = -1;
 
     if (!ctx)
         return err;
