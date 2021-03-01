@@ -37,10 +37,9 @@ int main(int argc, char **argv)
 
     cw_mutex_destroy(&m);
 
-    pthread_t p ;
-    pthread_create(&p,NULL,specific_cb,NULL);
-    void *pret = NULL;
-    pthread_join(p,&pret);
+    cw_thread_t p;
+    cw_thread_create(&p,NULL,specific_cb,NULL);
+    cw_thread_join(&p);
 
     return 0;
 }

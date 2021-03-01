@@ -68,6 +68,7 @@ typedef struct _cw_specific
     pthread_key_t key;
     /**
      * 私有数据大小
+     * 
     */
     size_t size;
     /**
@@ -95,23 +96,11 @@ typedef struct _cw_thread_t
     /**
      * 
     */
-    pthread_attr_t attr;
-    /**
-     * 
-    */
     pthread_t handle;
     /**
      * 
     */
     void* result;
-    /**
-     * 
-    */
-    void *(*routine_cb)(void *user);
-    /**
-     * 
-    */
-    void *user;
 
 } cw_thread_t;
 
@@ -126,7 +115,7 @@ typedef struct _cw_thread_t
 void cw_mutex_destroy(cw_mutex_t *ctx);
 
 /**
- * 创建互斥量及属性
+ * 创建互斥量属性
  * 
  * @param shared 0 私有，!0 共享。
  * 
@@ -233,22 +222,23 @@ void cw_specific_default_free(void* m);
 /**
  * 创建线程
  * 
- * @param joinable  0 线程结束后自动释放资源，!0 调用者负责释放资源。
+ * @return 0 成功；!0 出错。
  * 
- * @see pthread_attr_init()
- * @see pthread_attr_setdetachstate()
  * @see pthread_create()
- * @see pthread_attr_destroy();
+ * 
 */
-int cw_thread_create(cw_thread_t* ctx,int joinable);
+int cw_thread_create(cw_thread_t *ctx,
+                     const pthread_attr_t *attr,
+                     void *(*routine)(void *user),
+                     void *user);
 
 /**
  * 等待线程结束
  * 
+ * @return 0 成功；!0 出错。
  * 
  * @see pthread_attr_getdetachstate()
  * @see pthread_join()
- * @see pthread_attr_destroy()
  * 
 */
 int cw_thread_join(cw_thread_t* ctx);

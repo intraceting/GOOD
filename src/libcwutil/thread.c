@@ -15,6 +15,8 @@ void cw_mutex_destroy(cw_mutex_t *ctx)
     pthread_cond_destroy(&ctx->cond);
     pthread_mutexattr_destroy(&ctx->mutexattr);
     pthread_mutex_destroy(&ctx->mutex);
+
+    memset(ctx,0,sizeof(*ctx));
 }
 
 void cw_mutex_init(cw_mutex_t* ctx,int shared)
@@ -74,15 +76,25 @@ int cw_mutex_unlock(cw_mutex_t* ctx)
 int cw_mutex_wait(cw_mutex_t* ctx,int64_t timeout)
 {
     int err = -1;
-    struct timespec sys_ts = {0};
-    struct timespec out_ts = {0};
+    struct timespec sys_ts;
+    struct timespec out_ts;
+    __clockid_t condclock;
 
     if (!ctx)
         return err;
 
     if(timeout>=0)
     {
-        clock_gettime(CLOCK_MONOTONIC, &sys_ts);
+        err = pthread_condattr_getclock(&ctx->condattr, &condclock);
+        if (err != 0)
+            return err;
+
+        if (condclock == CLOCK_MONOTONIC)
+            clock_gettime(CLOCK_MONOTONIC, &sys_ts);
+        else if (condclock == CLOCK_REALTIME)
+            clock_gettime(CLOCK_REALTIME, &sys_ts);
+        else
+            return err = -EINVAL;
 
         out_ts.tv_sec = sys_ts.tv_sec + (timeout / 1000);
         out_ts.tv_nsec = sys_ts.tv_nsec + (timeout % 1000);
@@ -195,20 +207,20 @@ void cw_specific_default_free(void *m)
         free(m);
 }
 
-int cw_thread_create(cw_thread_t* ctx,int joinable)
+int cw_thread_create(cw_thread_t *ctx,
+                     const pthread_attr_t *attr,
+                     void *(*routine)(void *user),
+                     void *user)
 {
     int err = -1;
-
-    if(!ctx)
+  
+    if (!ctx)
         return err;
 
-    pthread_attr_init(&ctx->attr);
-    pthread_attr_setdetachstate(&ctx->attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
+    if(!routine)
+        return err = -EINVAL;
 
-    err = pthread_create(&ctx->handle,&ctx->attr,ctx->routine_cb,ctx->user);
-
-    if(!joinable)
-        pthread_attr_destroy(&ctx->attr);
+    err = pthread_create(&ctx->handle,attr,routine,user);
 
     return err;
 }
@@ -216,20 +228,23 @@ int cw_thread_create(cw_thread_t* ctx,int joinable)
 int cw_thread_join(cw_thread_t *ctx)
 {
     int err = -1;
-    int detachstate = -1;
+    int detachstate;
+    pthread_attr_t attr;
 
     if (!ctx)
         return err;
 
-    err = pthread_attr_getdetachstate(&ctx->attr, &detachstate);
+    err = pthread_getattr_np(ctx->handle, &attr);
+    if (err != 0)
+        return err;
+
+    err = pthread_attr_getdetachstate(&attr,&detachstate);
     if (err != 0)
         return err;
 
     if (detachstate == PTHREAD_CREATE_JOINABLE)
     {
         err = pthread_join(ctx->handle, &ctx->result);
-
-        pthread_attr_destroy(&ctx->attr);
     }
 
     return err;
