@@ -216,7 +216,28 @@ void cw_specific_default_free(void *m)
         free(m);
 }
 
-int cw_thread_create(cw_thread_t *ctx,void *(*routine)(void *user),void *user)
+int cw_thread_create(cw_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user)
+{
+    int err = -1;
+    pthread_attr_t attr;
+  
+    if (!ctx)
+        return err;
+
+    if(!routine)
+        return err = -EINVAL;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
+
+    err = pthread_create(&ctx->handle,&attr,routine,user);
+
+    pthread_attr_destroy(&attr);
+
+    return err;
+}
+
+int cw_thread_create2(cw_thread_t *ctx,void *(*routine)(void *user),void *user)
 {
     int err = -1;
     int detachstate;
@@ -227,30 +248,7 @@ int cw_thread_create(cw_thread_t *ctx,void *(*routine)(void *user),void *user)
     if(!routine)
         return err = -EINVAL;
 
-    err = pthread_create(&ctx->handle,&ctx->attr,routine,user);
-
-    pthread_attr_getdetachstate(&ctx->attr,&detachstate);
-    
-    if (detachstate == PTHREAD_CREATE_JOINABLE)
-        pthread_attr_destroy(&ctx->attr);
-
-    return err;
-}
-
-int cw_thread_create2(cw_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user)
-{
-    int err = -1;
-  
-    if (!ctx)
-        return err;
-
-    if(!routine)
-        return err = -EINVAL;
-
-    pthread_attr_init(&ctx->attr);
-    pthread_attr_setdetachstate(&ctx->attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
-
-    err = cw_thread_create(ctx,routine,user);
+    err = cw_thread_create(ctx,1,routine,user);
 
     return err;
 }
@@ -258,21 +256,24 @@ int cw_thread_create2(cw_thread_t *ctx,int joinable,void *(*routine)(void *user)
 int cw_thread_join(cw_thread_t *ctx)
 {
     int err = -1;
+    pthread_attr_t attr;
     int detachstate = -1;
 
     if (!ctx)
         return err;
 
-    err = pthread_attr_getdetachstate(&ctx->attr,&detachstate);
+    err = pthread_getattr_np(ctx->handle,&attr);
     if (err != 0)
         return err;
 
-    if (detachstate == PTHREAD_CREATE_JOINABLE)
-    {
-        err = pthread_join(ctx->handle, &ctx->result);
+    err = pthread_attr_getdetachstate(&attr,&detachstate);
+    if (err != 0)
+        return err;
+    
+    pthread_attr_destroy(&attr);
 
-        pthread_attr_destroy(&ctx->attr);
-    }
+    if (detachstate == PTHREAD_CREATE_JOINABLE)
+        err = pthread_join(ctx->handle, &ctx->result);
 
     return err;
 }

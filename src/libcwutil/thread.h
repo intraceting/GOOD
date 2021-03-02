@@ -115,12 +115,6 @@ typedef struct _cw_specific
 typedef struct _cw_thread_t
 {
     /**
-     * 属性
-     * 
-    */
-    pthread_attr_t attr;
-
-    /**
      * 句柄
      * 
     */
@@ -262,18 +256,6 @@ void cw_specific_default_free(void* m);
 /**
  * 创建线程
  * 
- * @return 0 成功；!0 出错。
- * 
- * @see pthread_create()
- * @see pthread_attr_getdetachstate()
- * @see pthread_attr_destroy()
- * 
-*/
-int cw_thread_create(cw_thread_t *ctx,void *(*routine)(void *user),void *user);
-
-/**
- * 创建线程
- * 
  * @param joinable 0 线程结束后自回收资源，!0 线程结束后需要调用者回收资源。
  * @param routine 线程函数
  * @param user 线程用户指针
@@ -282,10 +264,21 @@ int cw_thread_create(cw_thread_t *ctx,void *(*routine)(void *user),void *user);
  * 
  * @see pthread_attr_init()
  * @see pthread_attr_setdetachstate()
+ * @see pthread_attr_destroy()
+ * @see pthread_create()
+ * 
+*/
+int cw_thread_create(cw_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user);
+
+/**
+ * 创建线程
+ * 
+ * @return 0 成功；!0 出错。
+ * 
  * @see cw_thread_create()
  * 
 */
-int cw_thread_create2(cw_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user);
+int cw_thread_create2(cw_thread_t *ctx,void *(*routine)(void *user),void *user);
 
 /**
  * 等待线程结束并回收资源
