@@ -64,14 +64,17 @@ typedef struct _good_specific
      * 
     */
     atomic_int status;
+
     /**
      * KEY未创建或出错。
     */
 #define GOOD_SPECIFIC_STATUS_UNKNOWN      0
+
     /**
      * KEY创建成功。
      */
 #define GOOD_SPECIFIC_STATUS_STABLE       1
+
     /**
      * KEY正在创建。
      */

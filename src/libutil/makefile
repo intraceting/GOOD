@@ -50,7 +50,8 @@ LINK_FLAGS += `pkg-config --libs ${PROJECT_NAME}-depend`
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
 #
 OBJ_FILES = \
-	${OBJ_PATH}/thread.o
+	${OBJ_PATH}/thread.o \
+	${OBJ_PATH}/buffer.o
 
 #
 all: ${PROJECT_NAME}

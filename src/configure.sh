@@ -107,18 +107,23 @@ PKG_FLAGS="${PKG_FLAGS} -DHAVE_UNIXODBC"
 fi
 
 #
-HAVE_UNIXODBC=$(CheckHavePackage "libsqlite3-dev|sqlite-devel")
-if [ ${HAVE_UNIXODBC} -ge 1 ];then
+HAVE_SQLITE=$(CheckHavePackage "libsqlite3-dev|sqlite-devel")
+if [ ${HAVE_SQLITE} -ge 1 ];then
 PKG_FLAGS="${PKG_FLAGS} -DHAVE_SQLITE $(pkg-config --cflags sqlite3)"
 PKG_LIBS="${PKG_LIBS} $(pkg-config --libs sqlite3)"
 fi
 
 #
-HAVE_UNIXODBC=$(CheckHavePackage "libssl-dev|openssl-devel")
-if [ ${HAVE_UNIXODBC} -ge 1 ];then
+HAVE_OPENSSL=$(CheckHavePackage "libssl-dev|openssl-devel")
+if [ ${HAVE_OPENSSL} -ge 1 ];then
 PKG_FLAGS="${PKG_FLAGS} -DHAVE_OPENSSL $(pkg-config --cflags openssl)"
 PKG_LIBS="${PKG_LIBS}  $(pkg-config --libs openssl)"
 fi
+
+#
+echo "HAVE_UNIXODBC=${HAVE_UNIXODBC}"
+echo "HAVE_SQLITE=${HAVE_SQLITE}"
+echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
 
 #
 echo "Name: libcwutil dependent item" > ${LIBUTIL_DEPEND_PC}

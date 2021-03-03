@@ -45,17 +45,21 @@ LINK_FLAGS += `pkg-config --libs libutil`
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
-#
-OBJ_FILES = \
-	${OBJ_PATH}/thread_test.o
 
 #
 all: ${PROJECT_NAME}
-#
-${PROJECT_NAME}: $(BUILD_PATH)/thread_test.exe
 
 #
-$(BUILD_PATH)/thread_test.exe: $(OBJ_FILES)
+${PROJECT_NAME}: \
+	$(BUILD_PATH)/thread_test.exe \
+	$(BUILD_PATH)/buffer_test.exe
+#
+$(BUILD_PATH)/thread_test.exe: ${OBJ_PATH}/thread_test.o 
+	mkdir -p $(BUILD_PATH)
+	rm -f $@
+	$(CCC) $^ $(LINK_FLAGS) -o "$@"
+#
+$(BUILD_PATH)/buffer_test.exe: ${OBJ_PATH}/buffer_test.o 
 	mkdir -p $(BUILD_PATH)
 	rm -f $@
 	$(CCC) $^ $(LINK_FLAGS) -o "$@"
