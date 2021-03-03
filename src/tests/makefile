@@ -38,10 +38,10 @@ endif
 CCC_FLAGS += -D_GNU_SOURCE
 
 #
-CCC_FLAGS += `pkg-config --cflags libcwutil`
+CCC_FLAGS += `pkg-config --cflags libutil`
 
 #
-LINK_FLAGS += `pkg-config --libs libcwutil`
+LINK_FLAGS += `pkg-config --libs libutil`
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/

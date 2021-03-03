@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 #
 function CheckPackageToolName()
@@ -61,7 +61,7 @@ DATE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
 HOST_PLATFORM=$(uname -m)
 TARGET_PLATFORM=$(uname -m)
 BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
-
+PC_PATH=${BUILD_PATH}/pkgconfig/
 #
 while getopts "b:p:?" ARGKEY 
 do
@@ -88,11 +88,14 @@ fi
 echo "HOST_PLATFORM=${HOST_PLATFORM}"
 echo "TARGET_PLATFORM=${TARGET_PLATFORM}"
 echo "BUILD_PATH=${BUILD_PATH}"
-
+echo "PC_PATH=${PC_PATH}"
 
 #
-LIBCWUTIL_DEPEND_PC=${BUILD_PATH}/libcwutil-depend.pc
-LIBCWUTIL_PC=${BUILD_PATH}/libcwutil.pc
+mkdir -p "${PC_PATH}"
+
+#
+LIBUTIL_DEPEND_PC=${PC_PATH}/libutil-depend.pc
+LIBUTIL_PC=${PC_PATH}/libutil.pc
 
 #
 PKG_LIBS="-ldl -pthread -lrt -lc -lm"
@@ -118,20 +121,20 @@ PKG_LIBS="${PKG_LIBS}  $(pkg-config --libs openssl)"
 fi
 
 #
-echo "Name: libcwutil dependent item" > ${LIBCWUTIL_DEPEND_PC}
-echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBCWUTIL_DEPEND_PC}
-echo "Version: ${DATE_TIME}" >> ${LIBCWUTIL_DEPEND_PC}
-echo "Cflags: ${PKG_FLAGS}" >> ${LIBCWUTIL_DEPEND_PC}
-echo "Libs: ${PKG_LIBS}" >> ${LIBCWUTIL_DEPEND_PC}
+echo "Name: libcwutil dependent item" > ${LIBUTIL_DEPEND_PC}
+echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBUTIL_DEPEND_PC}
+echo "Version: ${DATE_TIME}" >> ${LIBUTIL_DEPEND_PC}
+echo "Cflags: ${PKG_FLAGS}" >> ${LIBUTIL_DEPEND_PC}
+echo "Libs: ${PKG_LIBS}" >> ${LIBUTIL_DEPEND_PC}
 
 #
 PKG_FLAGS="${PKG_FLAGS} -I${SHELL_PWD}"
-PKG_LIBS="${PKG_LIBS} -lcwutil"
+PKG_LIBS="${PKG_LIBS} -lgood_util"
 PKG_LIBS="${PKG_LIBS} -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/"
 
 #
-echo "Name: libcwutil" > ${LIBCWUTIL_PC}
-echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBCWUTIL_PC}
-echo "Version: ${DATE_TIME}" >> ${LIBCWUTIL_PC}
-echo "Cflags: ${PKG_FLAGS}" >> ${LIBCWUTIL_PC}
-echo "Libs: ${PKG_LIBS}" >> ${LIBCWUTIL_PC}
+echo "Name: libutil" > ${LIBUTIL_PC}
+echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBUTIL_PC}
+echo "Version: ${DATE_TIME}" >> ${LIBUTIL_PC}
+echo "Cflags: ${PKG_FLAGS}" >> ${LIBUTIL_PC}
+echo "Libs: ${PKG_LIBS}" >> ${LIBUTIL_PC}
