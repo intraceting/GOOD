@@ -1,5 +1,5 @@
 /*
- * This file is part of CWheel.
+ * This file is part of GOOD.
  * 
  * MIT License
  * 
