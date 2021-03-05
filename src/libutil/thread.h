@@ -18,6 +18,9 @@
 #include <stdarg.h>
 #include <pthread.h>
 
+/**/
+#include "buffer.h"
+
 /**
  * 
 */
@@ -243,15 +246,14 @@ void* good_specific_value(good_specific_t*ctx);
 /**
  * 私有数据默认申请函数
  * 
- * @see malloc()
- * @see memset()
+ * @see good_buffer_alloc2()
 */
 void* good_specific_default_alloc(size_t s);
 
 /**
  * 私有数据默认释放函数
  * 
- * @see free()
+ * @see good_buffer_unref()
  * 
 */
 void good_specific_default_free(void* m);

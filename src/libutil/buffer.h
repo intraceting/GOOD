@@ -23,9 +23,22 @@ size_t good_buffer_size(void *buf);
 /**
  * 申请缓存
  * 
+ * @param size 大小
+ * @param clean_cb 清理回调函数
+ * @param opaque 私有指针
+ * 
  * @return 失败返回 NULL(0)，成功返回缓存指针。
 */
-void* good_buffer_alloc(size_t size);
+void *good_buffer_alloc(size_t size, void (*clean_cb)(void *buf, void *opaque), void *opaque);
+
+/**
+ * 申请缓存
+ * 
+ * @return 失败返回 NULL(0)，成功返回缓存指针。
+ * 
+ * @see good_buffer_alloc()
+*/
+void* good_buffer_alloc2(size_t size);
 
 /**
  * 缓存引用
@@ -38,6 +51,8 @@ void *good_buffer_refer(void *buf);
  * 缓存释放
  * 
  * @note 当缓存引用计数为0时才会释放缓存。
+ * 
+ * @note 如果清理函数被定义，则在释放前调用清理函数。
 */
 void good_buffer_unref(void **buf);
 

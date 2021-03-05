@@ -7,13 +7,22 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
+#include <string.h>
 #include "libutil/buffer.h"
 
+void clean(void *buf, void *opaque)
+{
+    size_t len = good_buffer_size(buf);
 
+    printf("%lu,%s\n",len,(char*)buf);
+
+    memset(buf,0,len);
+}
 
 int main(int argc, char **argv)
 {
-    void* p = good_buffer_alloc(1000);
+    //void* p = good_buffer_alloc(1000,clean,NULL);
+    void* p = good_buffer_alloc2(1000);
 
     // void* p2 = good_buffer_refer(p);
 

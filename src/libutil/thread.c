@@ -202,18 +202,12 @@ void* good_specific_value(good_specific_t*ctx)
 
 void* good_specific_default_alloc(size_t s)
 {
-    void* m = malloc(s);
-
-    if(m)
-        memset(m,0,s);
-
-    return m;
+    return good_buffer_alloc2(s);
 }
 
 void good_specific_default_free(void *m)
 {
-    if (m)
-        free(m);
+    good_buffer_unref(&m);
 }
 
 int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user)
