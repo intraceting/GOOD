@@ -46,50 +46,48 @@ uint8_t *good_endian_swap(uint8_t *dst, int len)
     return dst;
 }
 
-uint16_t good_endian_ntoh16(uint16_t num)
+uint8_t* good_endian_ntoh(uint8_t* dst,int len)
 {
     if(good_endian_check(0))
-        return *((uint16_t*)good_endian_swap((uint8_t*)&num,sizeof(num)));
+        return good_endian_swap(dst,len);
+    
+    return dst;
+}
 
-    return num;
+uint16_t good_endian_ntoh16(uint16_t num)
+{
+    return *((uint16_t*)good_endian_ntoh((uint8_t*)&num,sizeof(num)));
 }
 
 uint32_t good_endian_ntoh32(uint32_t num)
 {
-    if(good_endian_check(0))
-        return *((uint32_t*)good_endian_swap((uint8_t*)&num,sizeof(num)));
-
-    return num;
+    return *((uint32_t*)good_endian_ntoh((uint8_t*)&num,sizeof(num)));
 }
 
 uint64_t good_endian_ntoh64(uint64_t num)
 {
-    if(good_endian_check(0))
-        return *((uint64_t*)good_endian_swap((uint8_t*)&num,sizeof(num)));
+    return *((uint64_t*)good_endian_ntoh((uint8_t*)&num,sizeof(num)));
+}
 
-    return num;
+uint8_t* good_endian_hton(uint8_t* dst,int len)
+{
+    if (good_endian_check(0))
+        return good_endian_swap(dst,len);
+
+    return dst;
 }
 
 uint16_t good_endian_hton16(uint16_t num)
 {
-    if (good_endian_check(0))
-        return *((uint16_t *)good_endian_swap((uint8_t *)&num, sizeof(num)));
-
-    return num;
+    return *((uint16_t *)good_endian_hton((uint8_t *)&num, sizeof(num)));
 }
 
 uint32_t good_endian_hton32(uint32_t num)
 {
-    if (good_endian_check(0))
-        return *((uint32_t *)good_endian_swap((uint8_t *)&num, sizeof(num)));
-
-    return num;
+    return *((uint32_t *)good_endian_hton((uint8_t *)&num, sizeof(num)));
 }
 
 uint64_t good_endian_hton64(uint64_t num)
 {
-    if (good_endian_check(0))
-        return *((uint64_t *)good_endian_swap((uint8_t *)&num, sizeof(num)));
-
-    return num;
+    return *((uint64_t *)good_endian_hton((uint8_t *)&num, sizeof(num)));
 }
