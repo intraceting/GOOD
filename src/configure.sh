@@ -4,7 +4,7 @@ function CheckSystemName()
 # $1 System Name
 {
 	SYS_NAME=$1
-#	lsb_release -i | grep -iE "${SYS_NAME}" |wc -l
+#	lsb_release -is | grep -iE "${SYS_NAME}" |wc -l
 	if [ -s /etc/redhat-release ]
 	then
 		cat /etc/redhat-release | grep -iE "${SYS_NAME}" |wc -l
