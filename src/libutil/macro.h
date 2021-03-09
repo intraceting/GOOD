@@ -35,4 +35,8 @@
 #define GOOD_INTEGER_SWAP(A,B)  ({(A)^=(B);(B)^=(A);(A)^=(B);})
 
 
+
+
+
+
 #endif //GOOD_UTIL_MACRO_H

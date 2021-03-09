@@ -44,6 +44,7 @@ void* good_buffer_alloc2(size_t size);
  * 缓存引用
  * 
  * @return 失败返回 NULL(0)，成功返回缓存指针。
+ * 
 */
 void *good_buffer_refer(void *buf);
 

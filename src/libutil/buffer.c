@@ -48,10 +48,12 @@ typedef struct _good_buffer
 
 size_t good_buffer_size(void *buf)
 {
+    good_buffer_t *buf_p = NULL;
+
     if (!buf)
         return 0;
 
-    good_buffer_t *buf_p = GOOD_PTR2PTR(good_buffer_t, buf, -sizeof(good_buffer_t));
+    buf_p = GOOD_PTR2PTR(good_buffer_t, buf, -sizeof(good_buffer_t));
 
     assert(buf_p->magic == GOOD_BUFFER_MAGIC);
 
@@ -60,10 +62,12 @@ size_t good_buffer_size(void *buf)
 
 void *good_buffer_alloc(size_t size, void (*clean_cb)(void *buf, void *opaque), void *opaque)
 {
+    good_buffer_t *buf_p = NULL;
+
     if (size <= 0)
         return NULL;
 
-    good_buffer_t *buf_p = (good_buffer_t *)calloc(1, sizeof(good_buffer_t) + size);
+    buf_p = (good_buffer_t *)calloc(1, sizeof(good_buffer_t) + size);
 
     if (!buf_p)
         return NULL;
@@ -85,24 +89,28 @@ void *good_buffer_alloc2(size_t size)
 
 void *good_buffer_refer(void *buf)
 {
+    good_buffer_t *buf_p = NULL;
+
     if (!buf)
         return NULL;
 
-    good_buffer_t *buf_p = GOOD_PTR2PTR(good_buffer_t, buf, -sizeof(good_buffer_t));
+    buf_p = GOOD_PTR2PTR(good_buffer_t, buf, -sizeof(good_buffer_t));
 
     assert(buf_p->magic == GOOD_BUFFER_MAGIC);
 
-    atomic_fetch_add_explicit(&buf_p->refcount, 1, memory_order_relaxed);
+    assert(atomic_fetch_add_explicit(&buf_p->refcount, 1, memory_order_acq_rel) > 0);
 
     return buf;
 }
 
 void good_buffer_unref(void **buf)
 {
+    good_buffer_t *buf_p = NULL;
+
     if (!buf || !*buf)
         return;
 
-    good_buffer_t *buf_p = GOOD_PTR2PTR(good_buffer_t, *buf, -sizeof(good_buffer_t));
+    buf_p = GOOD_PTR2PTR(good_buffer_t, *buf, -sizeof(good_buffer_t));
 
     assert(buf_p->magic == GOOD_BUFFER_MAGIC);
 
