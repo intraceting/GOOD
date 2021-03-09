@@ -1,33 +1,44 @@
 #!/bin/bash
+#
+function CheckSystemName()
+# $1 System Name
+{
+	SYS_NAME=$1
+#	lsb_release -i | grep -iE "${SYS_NAME}" |wc -l
+	if [ -s /etc/redhat-release ]
+	then
+		cat /etc/redhat-release | grep -iE "${SYS_NAME}" |wc -l
+	else
+		cat /etc/issue | grep -iE "${SYS_NAME}" |wc -l
+	fi
+}
 
 #
-function CheckPackageToolName()
+function CheckPackageKitName()
 {
-    #
-    SYSNAME=$(lsb_release -is)
-    #
-    if [ ${SYSNAME} == "CentOS" ] || [ ${SYSNAME} == "RedHat" ] || [ ${SYSNAME} == "Red Hat" ] || [ ${SYSNAME} == "Amazon" ]
-    then
-        echo "RPM"
-    elif [ ${SYSNAME} == "Ubuntu" ] || [ ${SYSNAME} == "Debian" ]
-    then
-        echo "DEB"
-    else 
-        echo ""
-    fi
+	if [ $(CheckSystemName "Ubuntu|Debian") -ge 1 ]
+	then
+		echo "DEB"
+	elif [ $(CheckSystemName "CentOS|Red Hat|RedHat|Amazon|Oracle") -ge 1 ]
+	then
+		echo "RPM"
+	else
+		echo ""
+	fi
 }
 
 #
 function CheckHavePackage()
 # $1 name(aaaa|bbbb|ccccc|ddddd)
 {
+	#
+	SYS_CONF=$(CheckPackageKitName)
 	#用“|”分割包名字
 	OLD_IFS="$IFS"
 	IFS="|"
 	DEP_NAMES=($1)
 	IFS="$OLD_IFS"
 	#
-	SYS_CONF=$(CheckPackageToolName)
 	DEP_HAVE=""
     HAVE_NUM=0
 	#
@@ -36,10 +47,10 @@ function CheckHavePackage()
 		#
 		if [ ${SYS_CONF} == "RPM" ]
 		then 
-			DEP_HAVE=$(rpm -qa |grep -i ${DEP_NAME} | wc -l )
+			DEP_HAVE=$(rpm -qa |grep ${DEP_NAME} | wc -l )
 		elif [ ${SYS_CONF} == "DEB" ]
 		then
-			DEP_HAVE=$(dpkg -l |grep -i ${DEP_NAME} | wc -l )
+			DEP_HAVE=$(dpkg -l |grep ${DEP_NAME} | wc -l )
 		else
 			exit 22;
 		fi
@@ -117,7 +128,7 @@ fi
 HAVE_OPENSSL=$(CheckHavePackage "libssl-dev|openssl-devel")
 if [ ${HAVE_OPENSSL} -ge 1 ];then
 PKG_FLAGS="${PKG_FLAGS} -DHAVE_OPENSSL $(pkg-config --cflags openssl)"
-PKG_LIBS="${PKG_LIBS}  $(pkg-config --libs openssl)"
+PKG_LIBS="${PKG_LIBS} $(pkg-config --libs openssl)"
 fi
 
 #
