@@ -24,7 +24,7 @@ typedef struct _good_buffer
     /**
     * 引用计数
     */
-    atomic_int refcount;
+    int refcount;
 
     /**
      * 缓存大小

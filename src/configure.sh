@@ -109,6 +109,7 @@ LIBUTIL_DEPEND_PC=${PC_PATH}/libutil-depend.pc
 LIBUTIL_PC=${PC_PATH}/libutil.pc
 
 #
+PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 PKG_LIBS="-ldl -pthread -lrt -lc -lm"
 
 #
