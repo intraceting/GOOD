@@ -7,7 +7,7 @@
 #include "tree.h"
 
 
-good_tree_t *good_tree_father(good_tree_t *root)
+good_tree_t *good_tree_father(const good_tree_t *root)
 {
     if (!root)
         return NULL;
@@ -15,7 +15,7 @@ good_tree_t *good_tree_father(good_tree_t *root)
     return root->chain[GOOD_TREE_CHAIN_FATHER];
 }
 
-good_tree_t *good_tree_prev(good_tree_t *root)
+good_tree_t *good_tree_prev(const good_tree_t *root)
 {
     if (!root)
         return NULL;
@@ -23,7 +23,7 @@ good_tree_t *good_tree_prev(good_tree_t *root)
     return root->chain[GOOD_TREE_CHAIN_PREV];
 }
 
-good_tree_t *good_tree_next(good_tree_t *root)
+good_tree_t *good_tree_next(const good_tree_t *root)
 {
     if (!root)
         return NULL;
@@ -31,7 +31,7 @@ good_tree_t *good_tree_next(good_tree_t *root)
     return root->chain[GOOD_TREE_CHAIN_NEXT];
 }
 
-good_tree_t *good_tree_head(good_tree_t *root)
+good_tree_t *good_tree_head(const good_tree_t *root)
 {
     if (!root)
         return NULL;
@@ -39,7 +39,7 @@ good_tree_t *good_tree_head(good_tree_t *root)
     return root->chain[GOOD_TREE_CHAIN_HEAD];
 }
 
-good_tree_t *good_tree_tail(good_tree_t *root)
+good_tree_t *good_tree_tail(const good_tree_t *root)
 {
     if (!root)
         return NULL;
@@ -207,7 +207,7 @@ void good_tree_push_head(good_tree_t *root, good_tree_t *node)
     good_tree_insert(root, node, good_tree_head(root));
 }
 
-void good_tree_push_back(good_tree_t *root, good_tree_t *node)
+void good_tree_push_tail(good_tree_t *root, good_tree_t *node)
 {
     if (!root || !node)
         return;
@@ -215,7 +215,7 @@ void good_tree_push_back(good_tree_t *root, good_tree_t *node)
     good_tree_insert(root, node, NULL);
 }
 
-void good_tree_clear(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque)
+void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque)
 {
     good_tree_t *root_p = NULL;
     good_tree_t *node = NULL;
@@ -227,7 +227,7 @@ void good_tree_clear(good_tree_t **root,void (*free_cb)(good_tree_t *node, void 
     root_p = *root;
 
     /*
-     * 先从树节点断开关系链，以防清理到父节点关系链。 
+     * 断开关系链，以防清理到父节点关系链。 
     */
     good_tree_detach(root_p);
 
@@ -274,13 +274,18 @@ void good_tree_clear(good_tree_t **root,void (*free_cb)(good_tree_t *node, void 
      * 删除自己
     */
     if(free_cb)
-        free_cb(root_p,opaque);
+        free_cb(*root,opaque);
     else 
-        good_buffer_unref((void **)&root_p);
+        good_buffer_unref((void **)root);
 
     /*Must be set NULL(0)*/
     *root = NULL;
 
+}
+
+void good_tree_free2(good_tree_t **root)
+{
+    good_tree_free(root,NULL,0);
 }
 
 good_tree_t *good_tree_alloc(size_t size)
@@ -302,4 +307,45 @@ good_tree_t *good_tree_alloc(size_t size)
     }
 
     return node;
+}
+
+void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
+{
+    good_tree_t *node = NULL;
+    good_tree_t *child = NULL;
+    size_t deep = 1;// begin 1
+
+    if (!root || !it || !it->dump_cb)
+        return;
+
+    it->dump_cb(0,root,it->opaque);
+
+    it->stack[0] = NULL;
+    node = good_tree_head(root);
+
+    while(node)
+    {
+        it->dump_cb(deep,node,it->opaque);
+
+        child = good_tree_head(node);
+
+        if(child)
+        {
+            assert(it->stack_size > deep);
+
+            it->stack[deep++] = node;
+
+            node = child;
+        }
+        else
+        {
+            node = good_tree_next(node);
+
+            while (!node && deep > 1)
+            {
+                node = it->stack[--deep];
+                node = good_tree_next(node);
+            }
+        }
+    }
 }

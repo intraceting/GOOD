@@ -8,6 +8,7 @@
 #ifndef GOOD_UTIL_TREE_H
 #define GOOD_UTIL_TREE_H
 
+#include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <assert.h>
@@ -64,31 +65,62 @@ typedef struct _good_tree
 
 }good_tree_t;
 
+/**
+ * 迭代器
+*/
+typedef struct _good_tree_iterator
+{
+    /**
+     * @note Must be 0.
+    */
+    int flags;
+
+    /**
+     * 栈高度
+    */
+    size_t stack_size;
+
+    /**
+     * 栈
+    */
+    good_tree_t **stack;
+
+    /**
+     * 回显
+    */
+    void (*dump_cb)(size_t deep,const good_tree_t *node, void *opaque);
+
+    /**
+     * dump_cb() 环境指针
+    */
+    void *opaque;
+
+} good_tree_iterator;
 
 /**
  * 父
 */
-good_tree_t *good_tree_father(good_tree_t *root);
+good_tree_t *good_tree_father(const good_tree_t *root);
 
 /**
  * 兄长
 */
-good_tree_t *good_tree_prev(good_tree_t *root);
+good_tree_t *good_tree_prev(const good_tree_t *root);
 
 /**
  * 小弟
 */
-good_tree_t *good_tree_next(good_tree_t *root);
+good_tree_t *good_tree_next(const good_tree_t *root);
 
 /**
  * 大娃
 */
-good_tree_t *good_tree_head(good_tree_t *root);
+good_tree_t *good_tree_head(const good_tree_t *root);
 
 /**
  * 么娃
 */
-good_tree_t *good_tree_tail(good_tree_t *root);
+good_tree_t *good_tree_tail(const good_tree_t *root);
 
 /**
  * 节点分离
@@ -124,7 +156,7 @@ void good_tree_push_head(good_tree_t *root, good_tree_t *node);
 /**
  * 推送（插入）小弟
 */
-void good_tree_push_back(good_tree_t *root, good_tree_t *node);
+void good_tree_push_tail(good_tree_t *root, good_tree_t *node);
 
 /**
  * 删除节点
@@ -139,12 +171,29 @@ void good_tree_push_back(good_tree_t *root, good_tree_t *node);
 void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque);
 
 /**
+ * 删除节点
+ * 
+ * @note 包括所有子节点。
+ * 
+ * @see good_tree_free()
+*/
+void good_tree_free2(good_tree_t **root);
+
+/**
  * 申请节点
  * 
  * @see good_buffer_alloc()
 */
 good_tree_t *good_tree_alloc(size_t size);
 
+/**
+ * 遍历
+ * 
+ * @param it 迭代器
+ * 
+ * 
+*/
+void good_tree_traversal(const good_tree_t *root,good_tree_iterator* it);
 
 
 #endif //GOOD_UTIL_TREE_H
