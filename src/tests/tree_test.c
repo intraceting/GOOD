@@ -19,8 +19,6 @@ void dump(size_t deep, const good_tree_t *node, void *opaque)
     }
     else
     {
-        int num = *GOOD_PTR2PTR(int, node->data, 0);
-
         for (size_t i = 0; i < deep - 1; i++)
         {
             if ((i + 1 == deep - 1) && !good_tree_next(good_tree_father(node)))
@@ -34,9 +32,9 @@ void dump(size_t deep, const good_tree_t *node, void *opaque)
         }
 
         if(good_tree_next(node))
-            printf("   ├── %d\n", num);
+            printf("   ├── %lu\n", node->code);
         else 
-            printf("   └── %d\n", num);
+            printf("   └── %lu\n", node->code);
     }
 }
 
@@ -64,55 +62,55 @@ int main(int argc, char **argv)
 
     good_tree_t *n = good_tree_alloc(sizeof(int));
 
-    *GOOD_PTR2PTR(int, n->data, 0) = 1;
+    n->code = 1;
 
     good_tree_push_head(d, n);
 
     good_tree_t *n2 = n = good_tree_alloc(1000);
 
-    *GOOD_PTR2PTR(int, n->data, 0) = 2;
+    n->code = 2;
 
     good_tree_push_head(d, n);
 
     n = good_tree_alloc(1000);
 
-    *GOOD_PTR2PTR(int, n->data, 0) = 3;
+    n->code = 3;
 
     good_tree_push_head(d, n);
 
     good_tree_t *m = good_tree_alloc(sizeof(int));
 
-    *GOOD_PTR2PTR(int, m->data, 0) = 4;
+    m->code = 4;
 
     good_tree_push_tail(n, m);
 
     m = good_tree_alloc(sizeof(int));
 
-    *GOOD_PTR2PTR(int, m->data, 0) = 5;
+    m->code  = 5;
 
     good_tree_push_tail(n, m);
 
     good_tree_t *m6 = m = good_tree_alloc(sizeof(int));
 
-    *GOOD_PTR2PTR(int, m->data, 0) = 6;
+    m->code  = 6;
 
     good_tree_push_tail(n, m);
 
     good_tree_t *k = good_tree_alloc(sizeof(int));
 
-    *GOOD_PTR2PTR(int, k->data, 0) = 7;
+    k->code = 7;
 
     good_tree_push_tail(m, k);
 
     k = good_tree_alloc(sizeof(int));
 
-    *GOOD_PTR2PTR(int, k->data, 0) = 8;
+    k->code = 8;
 
     good_tree_push_tail(m, k);
 
     good_tree_t *u = good_tree_alloc(sizeof(int));
 
-    *GOOD_PTR2PTR(int, u->data, 0) = 9;
+    u->code = 9;
 
     good_tree_insert(m, u, k);
 

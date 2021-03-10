@@ -52,6 +52,10 @@ typedef struct _good_tree
     */
 #define GOOD_TREE_CHAIN_TAIL    4
 
+    /**
+     * 
+    */
+    uintmax_t code;
 
     /**
      * 
