@@ -34,7 +34,7 @@ typedef struct _good_deque
 #define GOOD_DEQUE_CHAIN_NEXT 1
 
     /**
-    * 头
+    * 首
     */
 #define GOOD_DEQUE_CHAIN_HEAD 0
 
