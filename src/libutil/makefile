@@ -50,7 +50,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/thread.o \
 	${OBJ_PATH}/buffer.o \
 	${OBJ_PATH}/endian.o \
-	${OBJ_PATH}/tree.o
+	${OBJ_PATH}/tree.o \
+	${OBJ_PATH}/hashmap.o
 
 #
 all: ${PROJECT_NAME}
