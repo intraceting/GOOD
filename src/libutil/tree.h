@@ -103,32 +103,32 @@ typedef struct _good_tree_iterator
 } good_tree_iterator;
 
 /**
- * 返回父节点
+ * 父节点
 */
 good_tree_t *good_tree_father(const good_tree_t *self);
 
 /**
- * 返回兄弟节点
+ * 兄弟
  * 
  * @param elder 0 返回小弟，!0 返回兄长。
 */
 good_tree_t *good_tree_sibling(const good_tree_t *self,int elder);
 
 /**
- * 返回孩子节点
+ * 孩子
  * 
  * @param first 0 返回么娃，!0 返回大娃。
 */
 good_tree_t *good_tree_child(const good_tree_t *self,int first);
 
 /**
- * 折分节点
+ * 折分
  * 
 */
 void good_tree_detach(good_tree_t *self);
 
 /**
- * 插入节点
+ * 插入
  * 
  * @param father 父
  * @param child 孩子
@@ -138,7 +138,7 @@ void good_tree_detach(good_tree_t *self);
 void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *where);
 
 /**
- * 插入节点(大娃)
+ * 插入(大娃)
  * 
  * @param father 父
  * @param child 孩子
@@ -147,7 +147,7 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
 void good_tree_insert_first(good_tree_t *father, good_tree_t *child);
 
 /**
- * 插入节点(么娃)
+ * 插入(么娃)
  * 
  * @param father 父
  * @param child 孩子
@@ -156,7 +156,7 @@ void good_tree_insert_first(good_tree_t *father, good_tree_t *child);
 void good_tree_insert_least(good_tree_t *father, good_tree_t *child);
 
 /**
- * 删除节点
+ * 删除
  * 
  * @param free_cb NULL(0) 调用good_buffer_unref()直接删除节点，!NULL(0) 调用此函数执行删除操作。
  * @param opaque 环境指针
@@ -168,7 +168,7 @@ void good_tree_insert_least(good_tree_t *father, good_tree_t *child);
 void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque);
 
 /**
- * 删除节点
+ * 删除
  * 
  * @note 包括所有子节点。
  * 
@@ -177,14 +177,14 @@ void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *
 void good_tree_free2(good_tree_t **root);
 
 /**
- * 申请节点
+ * 申请
  * 
  * @see good_buffer_alloc()
 */
 good_tree_t *good_tree_alloc(size_t size);
 
 /**
- * 遍历节点
+ * 遍历
  * 
  * @param it 迭代器
  * 
