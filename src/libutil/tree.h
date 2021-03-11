@@ -96,7 +96,7 @@ typedef struct _good_tree_iterator
     void (*dump_cb)(size_t deep,const good_tree_t *node, void *opaque);
 
     /**
-     * dump_cb() 环境指针
+     * 环境指针
     */
     void *opaque;
 
