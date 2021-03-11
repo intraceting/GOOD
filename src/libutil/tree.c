@@ -7,57 +7,48 @@
 #include "tree.h"
 
 
-good_tree_t *good_tree_father(const good_tree_t *root)
+good_tree_t *good_tree_father(const good_tree_t *self)
 {
-    if (!root)
+    if (!self)
         return NULL;
 
-    return root->chain[GOOD_TREE_CHAIN_FATHER];
+    return self->chain[GOOD_TREE_CHAIN_FATHER];
 }
 
-good_tree_t *good_tree_prev(const good_tree_t *root)
+good_tree_t *good_tree_sibling(const good_tree_t *self,int elder)
 {
-    if (!root)
+    if (!self)
         return NULL;
 
-    return root->chain[GOOD_TREE_CHAIN_PREV];
+    if(elder)
+        return self->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
+    
+    return self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT];
 }
 
-good_tree_t *good_tree_next(const good_tree_t *root)
+
+good_tree_t *good_tree_child(const good_tree_t *self,int first)
 {
-    if (!root)
+    if (!self)
         return NULL;
 
-    return root->chain[GOOD_TREE_CHAIN_NEXT];
+    if(first)
+        return self->chain[GOOD_TREE_CHAIN_CHILD_FIRST];
+
+    return self->chain[GOOD_TREE_CHAIN_CHILD_LEAST];
 }
 
-good_tree_t *good_tree_head(const good_tree_t *root)
-{
-    if (!root)
-        return NULL;
-
-    return root->chain[GOOD_TREE_CHAIN_HEAD];
-}
-
-good_tree_t *good_tree_tail(const good_tree_t *root)
-{
-    if (!root)
-        return NULL;
-
-    return root->chain[GOOD_TREE_CHAIN_TAIL];
-}
-
-void good_tree_detach(good_tree_t *node)
+void good_tree_detach(good_tree_t *self)
 {
     good_tree_t *root = NULL;
 
-    if (!node)
+    if (!self)
         return;
 
     /*
      * 获取父节点
      */
-    root = node->chain[GOOD_TREE_CHAIN_FATHER];
+    root = self->chain[GOOD_TREE_CHAIN_FATHER];
 
     if (!root)
         return;
@@ -67,152 +58,122 @@ void good_tree_detach(good_tree_t *node)
      * 首<--->NODE
      * NODE<--->尾
      */
-    if (node->chain[GOOD_TREE_CHAIN_NEXT])
-        node->chain[GOOD_TREE_CHAIN_NEXT]->chain[GOOD_TREE_CHAIN_PREV] = node->chain[GOOD_TREE_CHAIN_PREV];
-    if (node->chain[GOOD_TREE_CHAIN_PREV])
-        node->chain[GOOD_TREE_CHAIN_PREV]->chain[GOOD_TREE_CHAIN_NEXT] = node->chain[GOOD_TREE_CHAIN_NEXT];
+    if (self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT])
+        self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT]->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = self->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
+    if (self->chain[GOOD_TREE_CHAIN_SIBLING_PREV])
+        self->chain[GOOD_TREE_CHAIN_SIBLING_PREV]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT];
 
     /*
      * NODE 是首?
     */
-    if (node == root->chain[GOOD_TREE_CHAIN_HEAD])
+    if (self == root->chain[GOOD_TREE_CHAIN_CHILD_FIRST])
     {
-        root->chain[GOOD_TREE_CHAIN_HEAD] = node->chain[GOOD_TREE_CHAIN_NEXT];
-        if (root->chain[GOOD_TREE_CHAIN_HEAD])
-            root->chain[GOOD_TREE_CHAIN_HEAD]->chain[GOOD_TREE_CHAIN_PREV] = NULL;
+        root->chain[GOOD_TREE_CHAIN_CHILD_FIRST] = self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT];
+        if (root->chain[GOOD_TREE_CHAIN_CHILD_FIRST])
+            root->chain[GOOD_TREE_CHAIN_CHILD_FIRST]->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = NULL;
     }
 
     /*
      * NODE 是尾?
     */
-    if (node == root->chain[GOOD_TREE_CHAIN_TAIL])
+    if (self == root->chain[GOOD_TREE_CHAIN_CHILD_LEAST])
     {
-        root->chain[GOOD_TREE_CHAIN_TAIL] = node->chain[GOOD_TREE_CHAIN_PREV];
-        if (root->chain[GOOD_TREE_CHAIN_TAIL])
-            root->chain[GOOD_TREE_CHAIN_TAIL]->chain[GOOD_TREE_CHAIN_NEXT] = NULL;
+        root->chain[GOOD_TREE_CHAIN_CHILD_LEAST] = self->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
+        if (root->chain[GOOD_TREE_CHAIN_CHILD_LEAST])
+            root->chain[GOOD_TREE_CHAIN_CHILD_LEAST]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = NULL;
     }
 
     /*
      * 打断与父节点的关系链，但同时保留子节点关系链。
     */
-    node->chain[GOOD_TREE_CHAIN_FATHER] = NULL;
-    node->chain[GOOD_TREE_CHAIN_NEXT] = NULL;
-    node->chain[GOOD_TREE_CHAIN_PREV] = NULL;
+    self->chain[GOOD_TREE_CHAIN_FATHER] = NULL;
+    self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = NULL;
+    self->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = NULL;
 }
 
-void good_tree_insert(good_tree_t *root, good_tree_t *node, good_tree_t *where)
+void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *where)
 {
-    if (!root || !node)
+    if (!father || !child)
         return;
 
     /* 
      * 绑定新父节点，并且打断旧的关系链。
     */
-    node->chain[GOOD_TREE_CHAIN_FATHER] = root;
-    node->chain[GOOD_TREE_CHAIN_NEXT] = NULL;
-    node->chain[GOOD_TREE_CHAIN_PREV] = NULL;
+    child->chain[GOOD_TREE_CHAIN_FATHER] = father;
+    child->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = NULL;
+    child->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = NULL;
 
     if (where)
     {
-        assert(root = where->chain[GOOD_TREE_CHAIN_FATHER]);
+        assert(father = where->chain[GOOD_TREE_CHAIN_FATHER]);
 
-        if (where == root->chain[GOOD_TREE_CHAIN_HEAD])
+        if (where == father->chain[GOOD_TREE_CHAIN_CHILD_FIRST])
         {
             /*
              * 添加到头节点之前。
             */
-            where->chain[GOOD_TREE_CHAIN_PREV] = node;
-            node->chain[GOOD_TREE_CHAIN_NEXT] = where;
+            where->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = child;
+            child->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = where;
 
             /* 
              * 新的头节点。
             */
-            root->chain[GOOD_TREE_CHAIN_HEAD] = node;
+            father->chain[GOOD_TREE_CHAIN_CHILD_FIRST] = child;
         }
         else
         {
             /*
              * 添加到节点之前
             */
-            where->chain[GOOD_TREE_CHAIN_PREV]->chain[GOOD_TREE_CHAIN_NEXT] = node;
-            node->chain[GOOD_TREE_CHAIN_PREV] = where->chain[GOOD_TREE_CHAIN_PREV];
-            node->chain[GOOD_TREE_CHAIN_NEXT] = where;
-            where->chain[GOOD_TREE_CHAIN_PREV] = node;
+            where->chain[GOOD_TREE_CHAIN_SIBLING_PREV]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = child;
+            child->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = where->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
+            child->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = where;
+            where->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = child;
         }
     }
     else
     {
-        if (root->chain[GOOD_TREE_CHAIN_TAIL])
+        if (father->chain[GOOD_TREE_CHAIN_CHILD_LEAST])
         {
             /*
              * 添加到尾节点之后。
             */
-            root->chain[GOOD_TREE_CHAIN_TAIL]->chain[GOOD_TREE_CHAIN_NEXT] = node;
-            node->chain[GOOD_TREE_CHAIN_PREV] = root->chain[GOOD_TREE_CHAIN_TAIL];
+            father->chain[GOOD_TREE_CHAIN_CHILD_LEAST]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = child;
+            child->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = father->chain[GOOD_TREE_CHAIN_CHILD_LEAST];
 
             /* 
              * 新的尾节点。
             */
-            root->chain[GOOD_TREE_CHAIN_TAIL] = node;
+            father->chain[GOOD_TREE_CHAIN_CHILD_LEAST] = child;
         }
         else
         {
             /*
              * 空链表，添加第一个节点。
             */
-            root->chain[GOOD_TREE_CHAIN_TAIL] = root->chain[GOOD_TREE_CHAIN_HEAD] = node;
+            father->chain[GOOD_TREE_CHAIN_CHILD_LEAST] = father->chain[GOOD_TREE_CHAIN_CHILD_FIRST] = child;
         }
     }
 }
 
-good_tree_t *good_tree_pop_head(good_tree_t *root)
+void good_tree_insert_first(good_tree_t *father, good_tree_t *child)
 {
-    good_tree_t *node = NULL;
+    good_tree_t* where = NULL;
 
-    if (!root)
-        return NULL;
-
-    node = good_tree_head(root);
-
-    if (!node)
-        return NULL;
-
-    good_tree_detach(node);
-
-    return node;
-}
-
-good_tree_t *good_tree_pop_tail(good_tree_t *root)
-{
-    good_tree_t *node = NULL;
-
-    if (!root)
-        return NULL;
-
-    node = good_tree_tail(root);
-
-    if (!node)
-        return NULL;
-
-    good_tree_detach(node);
-
-    return node;
-}
-
-void good_tree_push_head(good_tree_t *root, good_tree_t *node)
-{
-    if (!root || !node)
+    if (!father || !child)
         return;
 
-    good_tree_insert(root, node, good_tree_head(root));
+    where = good_tree_child(father,1);
+
+    good_tree_insert(father,child,where);
 }
 
-void good_tree_push_tail(good_tree_t *root, good_tree_t *node)
+void good_tree_insert_least(good_tree_t *father, good_tree_t *child)
 {
-    if (!root || !node)
+    if (!father || !child)
         return;
 
-    good_tree_insert(root, node, NULL);
+    good_tree_insert(father,child,NULL);
 }
 
 void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque)
@@ -233,11 +194,11 @@ void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *
 
     while (root_p)
     {
-        node = good_tree_tail(root_p);
+        node = good_tree_child(root_p,0);
 
         if (node)
         {
-            child = good_tree_tail(node);
+            child = good_tree_child(node,0);
 
             /*
              * 检测是否有子节点，如果有先清理子节点。
@@ -321,13 +282,13 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
     it->dump_cb(0,root,it->opaque);
 
     it->stack[0] = NULL;
-    node = good_tree_head(root);
+    node = good_tree_child(root,1);
 
     while(node)
     {
         it->dump_cb(deep,node,it->opaque);
 
-        child = good_tree_head(node);
+        child = good_tree_child(node,1);
 
         if(child)
         {
@@ -339,13 +300,52 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
         }
         else
         {
-            node = good_tree_next(node);
+            node = good_tree_sibling(node,0);
 
             while (!node && deep > 1)
             {
                 node = it->stack[--deep];
-                node = good_tree_next(node);
+                node = good_tree_sibling(node,0);
             }
         }
+    }
+}
+
+void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,...)
+{
+    va_list vaptr;
+    va_start(vaptr, fmt);
+
+    good_tree_vfprintf(fp,deep,node,fmt,vaptr);
+
+    va_end(vaptr);
+}
+
+void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args)
+{
+    if (deep <= 0)
+    {
+        vfprintf(fp,fmt,args);
+    }
+    else
+    {
+        for (size_t i = 0; i < deep - 1; i++)
+        {
+            if ((i + 1 == deep - 1) && !good_tree_sibling(good_tree_father(node),0))
+            {
+                fprintf(fp,"    ");
+            }
+            else
+            {
+                fprintf(fp,"   │");
+            }
+        }
+
+        if(good_tree_sibling(node,0))
+            fprintf(fp,"   ├── ");
+        else 
+            fprintf(fp,"   └── ");
+
+        vfprintf(fp,fmt,args);
     }
 }

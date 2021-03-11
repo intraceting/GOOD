@@ -38,7 +38,7 @@ good_tree_t* good_hashmap_lookup(good_tree_t* map,const void* key,int create)
 
     uint32_t code = map_p->hash_cb(key,map_p->ksize?map_p->ksize:strlen(key));
 
-    good_tree_t* node = good_tree_head(map);
+    good_tree_t* node = good_tree_child(map,1);
 
-    if(node->code <= code)
+    if(node->code <= code);
 }

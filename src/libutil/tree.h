@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <assert.h>
+#include <stdarg.h>
 
 #include "macro.h"
 #include "buffer.h"
@@ -30,27 +31,27 @@ typedef struct _good_tree
     /**
     * 父
     */
-#define GOOD_TREE_CHAIN_FATHER  0
+#define GOOD_TREE_CHAIN_FATHER          0
 
     /**
     * 兄长
     */
-#define GOOD_TREE_CHAIN_PREV    1
+#define GOOD_TREE_CHAIN_SIBLING_PREV    1
 
     /**
     * 小弟
     */
-#define GOOD_TREE_CHAIN_NEXT    2
+#define GOOD_TREE_CHAIN_SIBLING_NEXT    2
 
     /**
     * 大娃
     */
-#define GOOD_TREE_CHAIN_HEAD    3
+#define GOOD_TREE_CHAIN_CHILD_FIRST     3
 
     /**
     * 么娃
     */
-#define GOOD_TREE_CHAIN_TAIL    4
+#define GOOD_TREE_CHAIN_CHILD_LEAST     4
 
     /**
      * 
@@ -102,65 +103,57 @@ typedef struct _good_tree_iterator
 } good_tree_iterator;
 
 /**
- * 父
+ * 返回父节点
 */
-good_tree_t *good_tree_father(const good_tree_t *root);
+good_tree_t *good_tree_father(const good_tree_t *self);
 
 /**
- * 兄长
+ * 返回兄弟节点
+ * 
+ * @param elder 0 返回小弟，!0 返回兄长。
 */
-good_tree_t *good_tree_prev(const good_tree_t *root);
+good_tree_t *good_tree_sibling(const good_tree_t *self,int elder);
 
 /**
- * 小弟
+ * 返回孩子节点
+ * 
+ * @param first 0 返回么娃，!0 返回大娃。
 */
-good_tree_t *good_tree_next(const good_tree_t *root);
+good_tree_t *good_tree_child(const good_tree_t *self,int first);
 
 /**
- * 大娃
-*/
-good_tree_t *good_tree_head(const good_tree_t *root);
-
-/**
- * 么娃
-*/
-good_tree_t *good_tree_tail(const good_tree_t *root);
-
-/**
- * 节点分离
+ * 折分节点
  * 
 */
-void good_tree_detach(good_tree_t *node);
+void good_tree_detach(good_tree_t *self);
 
 /**
- * 节点插入
+ * 插入节点
  * 
- * @param root 根节点
- * @param node 新节点
- * @param where 插入点。 NULL(0) 新节点添加到末尾，!NULL(0) 新节点添加到'where'节点之前。
+ * @param father 父
+ * @param child 孩子
+ * @param where NULL(0) 'child'为小弟，!NULL(0) 'child'为兄长。
  * 
 */
-void good_tree_insert(good_tree_t *root, good_tree_t *node, good_tree_t *where);
+void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *where);
 
 /**
- * 弹出（分离）大娃
+ * 插入节点(大娃)
+ * 
+ * @param father 父
+ * @param child 孩子
+ * 
 */
-good_tree_t *good_tree_pop_head(good_tree_t *root);
+void good_tree_insert_first(good_tree_t *father, good_tree_t *child);
 
 /**
- * 弹出（分离）么娃
+ * 插入节点(么娃)
+ * 
+ * @param father 父
+ * @param child 孩子
+ * 
 */
-good_tree_t *good_tree_pop_tail(good_tree_t *root);
-
-/**
- * 推送（插入）兄长
-*/
-void good_tree_push_head(good_tree_t *root, good_tree_t *node);
-
-/**
- * 推送（插入）小弟
-*/
-void good_tree_push_tail(good_tree_t *root, good_tree_t *node);
+void good_tree_insert_least(good_tree_t *father, good_tree_t *child);
 
 /**
  * 删除节点
@@ -191,13 +184,30 @@ void good_tree_free2(good_tree_t **root);
 good_tree_t *good_tree_alloc(size_t size);
 
 /**
- * 遍历
+ * 遍历节点
  * 
  * @param it 迭代器
  * 
- * 
 */
 void good_tree_traversal(const good_tree_t *root,good_tree_iterator* it);
+
+/**
+ * 格式化输出
+ * 
+ * @note 不会在末尾添加'\n'(换行)字符。
+ * 
+ * @see fprintf()
+*/
+void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,...);
+
+/**
+ * 格式化输出
+ * 
+ * @note 不会在末尾添加'\n'(换行)字符。
+ * 
+ * @see vfprintf()
+*/
+void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args);
 
 
 #endif //GOOD_UTIL_TREE_H
