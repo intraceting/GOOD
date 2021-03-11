@@ -4,7 +4,7 @@
  * MIT License
  * 
  */
-#include "deuqe.h"
+#include "deque.h"
 
 good_deque_t *good_deque_scroll(good_deque_t *deque, good_deque_t *self,int front)
 {
