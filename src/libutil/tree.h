@@ -159,7 +159,7 @@ void good_tree_insert_least(good_tree_t *father, good_tree_t *child);
  * 删除节点
  * 
  * @param free_cb NULL(0) 调用good_buffer_unref()直接删除节点，!NULL(0) 调用此函数执行删除操作。
- * @param opaque free_cb() 环境指针
+ * @param opaque 环境指针
  * 
  * @note 包括所有子节点。
  * 

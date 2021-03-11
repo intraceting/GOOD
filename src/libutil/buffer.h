@@ -25,7 +25,7 @@ size_t good_buffer_size(void *buf);
  * 
  * @param size 大小
  * @param clean_cb 清理函数
- * @param opaque clean_cb() 环境指针
+ * @param opaque 环境指针
  * 
  * @return 失败返回 NULL(0)，成功返回缓存指针。
 */
