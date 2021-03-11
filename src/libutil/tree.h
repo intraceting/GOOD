@@ -156,25 +156,32 @@ void good_tree_insert_first(good_tree_t *father, good_tree_t *child);
 void good_tree_insert_least(good_tree_t *father, good_tree_t *child);
 
 /**
- * 删除
+ * 清理
  * 
  * @param free_cb NULL(0) 调用good_buffer_unref()直接删除节点，!NULL(0) 调用此函数执行删除操作。
  * @param opaque 环境指针
  * 
- * @note 包括所有子节点。
+ * @note 所有子节点，但不包括自身。
  * 
  * @see good_buffer_unref()
 */
-void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque);
+void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque);
+
+/**
+ * 清理
+ * 
+ * @see good_tree_clear()
+ */
+void good_tree_clear2(good_tree_t *root);
 
 /**
  * 删除
  * 
  * @note 包括所有子节点。
  * 
- * @see good_tree_free()
+ * @see good_buffer_unref()
 */
-void good_tree_free2(good_tree_t **root);
+void good_tree_free(good_tree_t **root);
 
 /**
  * 申请

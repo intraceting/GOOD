@@ -37,7 +37,7 @@ void dump(size_t deep, const good_tree_t *node, void *opaque)
     //         printf("   └── %lu\n", node->code);
     // }
 
-    good_tree_fprintf(stderr,deep,node,"%lu",node->code);
+    good_tree_fprintf(stderr,deep,node,"%lu\n",node->code);
 }
 
 void traversal(const good_tree_t *root)
@@ -127,7 +127,13 @@ int main(int argc, char **argv)
 
     traversal(d);
 
-    good_tree_free2(&d);
+    good_tree_clear2(m6);
+
+    traversal(d);
+
+    good_tree_clear2(d);
+
+    good_tree_free(&d);
 
     return 0;
 }

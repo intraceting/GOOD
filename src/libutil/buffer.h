@@ -34,8 +34,6 @@ void *good_buffer_alloc(size_t size, void (*clean_cb)(void *buf, void *opaque), 
 /**
  * 申请缓存
  * 
- * @return 失败返回 NULL(0)，成功返回缓存指针。
- * 
  * @see good_buffer_alloc()
 */
 void *good_buffer_alloc2(size_t size);

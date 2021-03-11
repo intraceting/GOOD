@@ -176,21 +176,28 @@ void good_tree_insert_least(good_tree_t *father, good_tree_t *child)
     good_tree_insert(father,child,NULL);
 }
 
-void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque)
+void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque)
 {
     good_tree_t *root_p = NULL;
+    good_tree_t *father = NULL;
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
 
-    if(!root || !*root)
+    if(!root)
         return;
     
-    root_p = *root;
+    
 
     /*
      * 断开关系链，以防清理到父节点关系链。 
     */
-    good_tree_detach(root_p);
+    father = good_tree_father(root);
+    root->chain[GOOD_TREE_CHAIN_FATHER] = NULL;
+
+    /*
+     * 复制一下
+    */
+    root_p = root;
 
     while (root_p)
     {
@@ -232,21 +239,32 @@ void good_tree_free(good_tree_t **root,void (*free_cb)(good_tree_t *node, void *
     }
 
     /*
-     * 删除自己
+     * 恢复关系链，关联到父节点。 
     */
-    if(free_cb)
-        free_cb(*root,opaque);
-    else 
-        good_buffer_unref((void **)root);
-
-    /*Must be set NULL(0)*/
-    *root = NULL;
-
+    root->chain[GOOD_TREE_CHAIN_FATHER] = father;
 }
 
-void good_tree_free2(good_tree_t **root)
+void good_tree_clear2(good_tree_t *root)
 {
-    good_tree_free(root,NULL,0);
+    good_tree_clear(root,NULL,NULL);
+}
+
+void good_tree_free(good_tree_t **root)
+{
+    good_tree_t *root_p = NULL;
+
+    if(!root ||!*root)
+        return ;
+
+    root_p = *root;
+
+    assert(root_p->chain[GOOD_TREE_CHAIN_FATHER] == NULL);
+    assert(root_p->chain[GOOD_TREE_CHAIN_SIBLING_PREV] == NULL);
+    assert(root_p->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] == NULL);
+    assert(root_p->chain[GOOD_TREE_CHAIN_CHILD_FIRST] == NULL);
+    assert(root_p->chain[GOOD_TREE_CHAIN_CHILD_LEAST] == NULL);
+
+    good_buffer_unref(root);
 }
 
 good_tree_t *good_tree_alloc(size_t size)
