@@ -25,6 +25,8 @@ typedef struct _good_tree
 {
     /**
      * 链
+     * 
+     * @note 尽量不要直接访问或修改。
     */
     struct _good_tree *chain[5];
 

@@ -15,7 +15,7 @@ void traversal(good_deque_t *q)
 {
     printf("\n------------------------------\n");
 
-    good_deque_t *p = good_deque_scroll(q, NULL, 1);
+    good_deque_node *p = good_deque_scroll(q, NULL, 1);
     while (p)
     {
         printf("%lu\n", p->code);
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 {
     good_deque_t q = {0};
 
-    good_deque_t *n = good_deque_alloc(0);
+    good_deque_node *n = good_deque_alloc(0);
 
     n->code = 1;
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
     traversal(&q);
 
-    good_deque_t *m = good_deque_alloc(0);
+    good_deque_node *m = good_deque_alloc(0);
 
     m->code = 5;
 

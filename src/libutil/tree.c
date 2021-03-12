@@ -97,6 +97,13 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
         return;
 
     /* 
+     * 必须是根节点，或独立节点。
+    */
+    assert(NULL == child->chain[GOOD_TREE_CHAIN_FATHER]);
+    assert(NULL == child->chain[GOOD_TREE_CHAIN_SIBLING_PREV]);
+    assert(NULL == child->chain[GOOD_TREE_CHAIN_SIBLING_NEXT]);
+
+    /* 
      * 绑定新父节点，并且打断旧的关系链。
     */
     child->chain[GOOD_TREE_CHAIN_FATHER] = father;
@@ -250,11 +257,11 @@ void good_tree_free(good_tree_t **root)
 
     root_p = *root;
 
-    assert(root_p->chain[GOOD_TREE_CHAIN_FATHER] == NULL);
-    assert(root_p->chain[GOOD_TREE_CHAIN_SIBLING_PREV] == NULL);
-    assert(root_p->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] == NULL);
-    assert(root_p->chain[GOOD_TREE_CHAIN_CHILD_FIRST] == NULL);
-    assert(root_p->chain[GOOD_TREE_CHAIN_CHILD_LEAST] == NULL);
+    assert(NULL == root_p->chain[GOOD_TREE_CHAIN_FATHER]);
+    assert(NULL == root_p->chain[GOOD_TREE_CHAIN_SIBLING_PREV]);
+    assert(NULL == root_p->chain[GOOD_TREE_CHAIN_SIBLING_NEXT]);
+    assert(NULL == root_p->chain[GOOD_TREE_CHAIN_CHILD_FIRST]);
+    assert(NULL == root_p->chain[GOOD_TREE_CHAIN_CHILD_LEAST]);
 
     good_buffer_unref((void**)root);
 }
