@@ -33,9 +33,9 @@ typedef struct _good_tree good_deque_t;
 good_deque_t *good_deque_scroll(good_deque_t *deque, good_deque_t *self,int front);
 
 /**
- * 拆分
+ * 断开
 */
-void good_deque_detach(good_deque_t *deque, good_deque_t *self);
+void good_deque_unlink(good_deque_t *deque, good_deque_t *self);
 
 /**
  * 弹出
@@ -69,7 +69,8 @@ void good_deque_push(good_deque_t *deque,good_deque_t *self,int front);
  * 
  * @note 包括所有节点。
  * 
- * @see good_buffer_unref()
+ * @see good_deque_free()
+ * 
 */
 void good_deque_clear(good_deque_t *deque,void (*free_cb)(good_deque_t *node, void *opaque), void *opaque);
 
@@ -83,6 +84,7 @@ void good_deque_clear2(good_deque_t *deque);
 /**
  * 删除
  * 
+ * @see good_deque_alloc()
 */
 void good_deque_free(good_deque_t **self);
 

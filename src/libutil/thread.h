@@ -63,7 +63,7 @@ typedef struct _good_mutex
 typedef struct _good_specific
 {
     /**
-     * 私有数据状态
+     * 状态
      * 
     */
     atomic_int status;
@@ -84,19 +84,19 @@ typedef struct _good_specific
 #define GOOD_SPECIFIC_STATUS_SYNCHING     2
 
     /**
-     * 私有数据KEY
+     * KEY
      * 
     */
     pthread_key_t key;
 
     /**
-     * 私有数据大小
+     * 大小
      * 
     */
     size_t size;
 
     /**
-     * 申请私有数据
+     * 申请
      * 
      * @see good_specific_default_alloc()
      * 
@@ -104,7 +104,7 @@ typedef struct _good_specific
     void *(*alloc_cb)(size_t s);
 
     /**
-     * 释放私有数据
+     * 释放
      * 
      * @see good_specific_default_free()
      * 
@@ -261,9 +261,9 @@ void good_specific_default_free(void* m);
 /**
  * 创建线程
  * 
- * @param joinable 0 线程结束后自回收资源，!0 线程结束后需要调用者回收资源。
+ * @param joinable 0 结束后自回收资源，!0 结束后需要调用者回收资源。
  * @param routine 线程函数
- * @param user 线程用户指针
+ * @param opaque 环境指针
  * 
  * @return 0 成功；!0 出错。
  * 
@@ -273,7 +273,7 @@ void good_specific_default_free(void* m);
  * @see pthread_create()
  * 
 */
-int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user);
+int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *opaque),void *opaque);
 
 /**
  * 创建线程
@@ -283,7 +283,7 @@ int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *us
  * @see good_thread_create()
  * 
 */
-int good_thread_create2(good_thread_t *ctx,void *(*routine)(void *user),void *user);
+int good_thread_create2(good_thread_t *ctx,void *(*routine)(void *opaque),void *opaque);
 
 /**
  * 等待线程结束并回收资源

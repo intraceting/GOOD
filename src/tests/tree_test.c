@@ -66,49 +66,49 @@ int main(int argc, char **argv)
 
     n->code = 1;
 
-    good_tree_insert_first(d, n);
+    good_tree_insert2(d, n,1);
 
     good_tree_t *n2 = n = good_tree_alloc(1000);
 
     n->code = 2;
 
-    good_tree_insert_first(d, n);
+    good_tree_insert2(d, n,1);
 
     n = good_tree_alloc(1000);
 
     n->code = 3;
 
-    good_tree_insert_first(d, n);
+    good_tree_insert2(d, n,1);
 
     good_tree_t *m = good_tree_alloc(sizeof(int));
 
     m->code = 4;
 
-    good_tree_insert_least(n, m);
+    good_tree_insert2(n, m,0);
 
     m = good_tree_alloc(sizeof(int));
 
     m->code  = 5;
 
-    good_tree_insert_least(n, m);
+    good_tree_insert2(n, m,0);
 
     good_tree_t *m6 = m = good_tree_alloc(sizeof(int));
 
     m->code  = 6;
 
-    good_tree_insert_least(n, m);
+    good_tree_insert2(n, m,0);
 
     good_tree_t *k = good_tree_alloc(sizeof(int));
 
     k->code = 7;
 
-    good_tree_insert_least(m, k);
+    good_tree_insert2(m, k,0);
 
     k = good_tree_alloc(sizeof(int));
 
     k->code = 8;
 
-    good_tree_insert_least(m, k);
+    good_tree_insert2(m, k,0);
 
     good_tree_t *u = good_tree_alloc(sizeof(int));
 
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 
     traversal(d);
 
-    good_tree_detach(m6);
+    good_tree_unlink(m6);
 
     traversal(d);
 

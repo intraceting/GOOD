@@ -38,7 +38,7 @@ good_tree_t *good_tree_child(const good_tree_t *self,int first)
     return self->chain[GOOD_TREE_CHAIN_CHILD_LEAST];
 }
 
-void good_tree_detach(good_tree_t *self)
+void good_tree_unlink(good_tree_t *self)
 {
     good_tree_t *root = NULL;
 
@@ -156,25 +156,19 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
     }
 }
 
-void good_tree_insert_first(good_tree_t *father, good_tree_t *child)
+void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first)
 {
     good_tree_t* where = NULL;
 
     if (!father || !child)
         return;
 
-    where = good_tree_child(father,1);
+    if(first)
+        where = good_tree_child(father,1);
 
     good_tree_insert(father,child,where);
 }
 
-void good_tree_insert_least(good_tree_t *father, good_tree_t *child)
-{
-    if (!father || !child)
-        return;
-
-    good_tree_insert(father,child,NULL);
-}
 
 void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque)
 {
@@ -185,8 +179,6 @@ void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *
 
     if(!root)
         return;
-    
-    
 
     /*
      * 断开关系链，以防清理到父节点关系链。 
@@ -216,7 +208,7 @@ void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *
             }
             else
             {
-                good_tree_detach(node);
+                good_tree_unlink(node);
 
                 if(free_cb)
                 {
@@ -225,7 +217,7 @@ void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *
                 }
                 else 
                 {
-                    good_buffer_unref((void **)&node);
+                    good_tree_free(&node);
                 }    
             }
         }
@@ -264,12 +256,12 @@ void good_tree_free(good_tree_t **root)
     assert(root_p->chain[GOOD_TREE_CHAIN_CHILD_FIRST] == NULL);
     assert(root_p->chain[GOOD_TREE_CHAIN_CHILD_LEAST] == NULL);
 
-    good_buffer_unref(root);
+    good_buffer_unref((void**)root);
 }
 
 good_tree_t *good_tree_alloc(size_t size)
 {
-    good_tree_t *node = (good_tree_t *)good_buffer_alloc(sizeof(good_tree_t) + size,NULL,NULL);
+    good_tree_t *node = (good_tree_t *)good_buffer_alloc2(sizeof(good_tree_t) + size);
 
     if (!node)
         return NULL;

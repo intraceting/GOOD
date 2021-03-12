@@ -210,7 +210,7 @@ void good_specific_default_free(void *m)
     good_buffer_unref(&m);
 }
 
-int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *user),void *user)
+int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *opaque),void *opaque)
 {
     int err = -1;
     pthread_attr_t attr;
@@ -224,14 +224,14 @@ int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *us
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
 
-    err = pthread_create(&ctx->handle,&attr,routine,user);
+    err = pthread_create(&ctx->handle,&attr,routine,opaque);
 
     pthread_attr_destroy(&attr);
 
     return err;
 }
 
-int good_thread_create2(good_thread_t *ctx,void *(*routine)(void *user),void *user)
+int good_thread_create2(good_thread_t *ctx,void *(*routine)(void *opaque),void *opaque)
 {
     int err = -1;
     int detachstate;
@@ -242,7 +242,7 @@ int good_thread_create2(good_thread_t *ctx,void *(*routine)(void *user),void *us
     if(!routine)
         return err = -EINVAL;
 
-    err = good_thread_create(ctx,1,routine,user);
+    err = good_thread_create(ctx,1,routine,opaque);
 
     return err;
 }

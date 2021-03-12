@@ -36,7 +36,7 @@ void good_deque_detach(good_deque_t *deque, good_deque_t *self)
 
     assert(deque = good_tree_father(self));
 
-    good_tree_detach(self);
+    good_tree_unlink(self);
 
 }
 
@@ -52,7 +52,7 @@ good_deque_t *good_deque_pop(good_deque_t *deque,int back)
     else 
         node = good_deque_scroll(deque,NULL,1);
 
-    good_tree_detach(node);
+    good_tree_unlink(node);
     
     return node;
 }
@@ -75,9 +75,17 @@ void good_deque_push(good_deque_t *deque, good_deque_t *self, int front)
     good_deque_insert(deque, self, where);
 }
 
+/*
+* 避免与TREE删除操作不一致。
+*/
+void _deque_clear_default_free(good_deque_t *node, void *opaque)
+{
+    good_deque_free(&node);
+}
+
 void good_deque_clear(good_deque_t *deque,void (*free_cb)(good_deque_t *node, void *opaque), void *opaque)
 {
-    good_tree_clear(deque,free_cb,opaque);
+    good_tree_clear(deque,free_cb?free_cb:_deque_clear_default_free,opaque);
 }
 
 void good_deque_clear2(good_deque_t *deque)
