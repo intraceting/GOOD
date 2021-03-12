@@ -53,7 +53,8 @@ all: ${PROJECT_NAME}
 ${PROJECT_NAME}: \
 	$(BUILD_PATH)/thread_test.exe \
 	$(BUILD_PATH)/buffer_test.exe \
-	$(BUILD_PATH)/tree_test.exe 
+	$(BUILD_PATH)/tree_test.exe \
+	$(BUILD_PATH)/deque_test.exe
 
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
 	mkdir -p $(BUILD_PATH)
@@ -72,5 +73,6 @@ clean:
 	rm -f $(BUILD_PATH)/thread_test.exe
 	rm -f $(BUILD_PATH)/buffer_test.exe
 	rm -f $(BUILD_PATH)/tree_test.exe
+	rm -f $(BUILD_PATH)/deque_test.exe
 
 

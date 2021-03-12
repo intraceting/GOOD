@@ -181,7 +181,7 @@ void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *
         return;
 
     /*
-     * 断开关系链，以防清理到父节点关系链。 
+     * 暂时断开父子关系链，以防清理到父节点。 
     */
     father = good_tree_father(root);
     root->chain[GOOD_TREE_CHAIN_FATHER] = NULL;

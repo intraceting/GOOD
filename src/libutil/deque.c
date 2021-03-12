@@ -29,7 +29,7 @@ good_deque_t *good_deque_scroll(good_deque_t *deque, good_deque_t *self,int fron
     }
 }
 
-void good_deque_detach(good_deque_t *deque, good_deque_t *self)
+void good_deque_unlink(good_deque_t *deque, good_deque_t *self)
 {
     if (!deque || !self)
         return ;
@@ -38,6 +38,17 @@ void good_deque_detach(good_deque_t *deque, good_deque_t *self)
 
     good_tree_unlink(self);
 
+}
+
+void good_deque_insert(good_deque_t *deque, good_deque_t *self,good_deque_t *where)
+{
+    if (!deque || !self)
+        return ;
+
+    if(where)
+        assert(deque = good_tree_father(where));
+
+    good_tree_insert(deque,self,where);
 }
 
 good_deque_t *good_deque_pop(good_deque_t *deque,int back)
@@ -55,17 +66,6 @@ good_deque_t *good_deque_pop(good_deque_t *deque,int back)
     good_tree_unlink(node);
     
     return node;
-}
-
-void good_deque_insert(good_deque_t *deque, good_deque_t *self,good_deque_t *where)
-{
-    if (!deque || !self)
-        return ;
-
-    if(where)
-        assert(deque = good_tree_father(where));
-
-    good_tree_insert(deque,self,where);
 }
 
 void good_deque_push(good_deque_t *deque, good_deque_t *self, int front)

@@ -34,15 +34,11 @@ good_deque_t *good_deque_scroll(good_deque_t *deque, good_deque_t *self,int fron
 
 /**
  * 断开
+ * 
+ * @note 仅从链表移除，对节点数据不做处理。
+ * 
 */
 void good_deque_unlink(good_deque_t *deque, good_deque_t *self);
-
-/**
- * 弹出
- * 
- * @param back 0 弹出最前的，!0 弹出最后的。
-*/
-good_deque_t *good_deque_pop(good_deque_t *deque,int back);
 
 /**
  * 插入
@@ -53,13 +49,19 @@ good_deque_t *good_deque_pop(good_deque_t *deque,int back);
 void good_deque_insert(good_deque_t *deque, good_deque_t *self,good_deque_t *where);
 
 /**
+ * 弹出
+ * 
+ * @param back 0 弹出最前的，!0 弹出最后的。
+*/
+good_deque_t *good_deque_pop(good_deque_t *deque,int back);
+
+/**
  * 推送
  * 
  * @param front 0 推送到最后，!0 推送到最前。
  * 
 */
 void good_deque_push(good_deque_t *deque,good_deque_t *self,int front);
-
 
 /**
  * 清理
@@ -91,6 +93,7 @@ void good_deque_free(good_deque_t **self);
 /**
  * 申请
  * 
+ * @see good_tree_alloc() 
 */
 good_deque_t *good_deque_alloc(size_t size);
 
