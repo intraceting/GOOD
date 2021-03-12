@@ -59,11 +59,6 @@ typedef struct _good_tree
     /**
      * 
     */
-    uintmax_t code;
-
-    /**
-     * 
-    */
     size_t size;
 
     /**
@@ -185,12 +180,15 @@ void good_tree_free(good_tree_t **root);
 /**
  * 申请
  * 
+ * @param size 携带的大小
+ * 
  * @see good_buffer_alloc2()
+ * 
 */
 good_tree_t *good_tree_alloc(size_t size);
 
 /**
- * 申请，并复制数据
+ * 申请，并复制携带数据
  * 
  * @see good_tree_alloc()
  * @see memcpy()

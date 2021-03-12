@@ -51,7 +51,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/buffer.o \
 	${OBJ_PATH}/endian.o \
 	${OBJ_PATH}/tree.o \
-	${OBJ_PATH}/map.o
+	${OBJ_PATH}/hash.o \
+	${OBJ_PATH}/vector.o
 
 #
 all: ${PROJECT_NAME}

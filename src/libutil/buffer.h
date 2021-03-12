@@ -27,7 +27,7 @@ size_t good_buffer_size(void *buf);
  * @param clean_cb 清理函数
  * @param opaque 环境指针
  * 
- * @return 失败返回 NULL(0)，成功返回缓存指针。
+ * @return  NULL(0) 失败，成功返回缓存指针。
 */
 void *good_buffer_alloc(size_t size, void (*clean_cb)(void *buf, void *opaque), void *opaque);
 
@@ -41,7 +41,7 @@ void *good_buffer_alloc2(size_t size);
 /**
  * 缓存引用
  * 
- * @return 失败返回 NULL(0)，成功返回缓存指针。
+ * @return NULL(0) 失败，成功返回缓存指针。
  * 
 */
 void *good_buffer_refer(void *buf);

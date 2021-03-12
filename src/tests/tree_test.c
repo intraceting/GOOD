@@ -13,7 +13,7 @@
 
 int dump(size_t deep, const good_tree_t *node, void *opaque)
 {
-    good_tree_fprintf(stderr,deep,node,"%lu\n",node->code);
+    good_tree_fprintf(stderr,deep,node,"%u\n",*GOOD_PTR2PTR(int,node->data,0));
 
     return 1;
 }
@@ -42,55 +42,55 @@ int main(int argc, char **argv)
 
     good_tree_t *n = good_tree_alloc(sizeof(int));
 
-    n->code = 1;
+    *(GOOD_PTR2PTR(int,n->data,0)) = 1;
 
     good_tree_insert2(d, n,1);
 
     good_tree_t *n2 = n = good_tree_alloc(1000);
 
-    n->code = 2;
+    *(GOOD_PTR2PTR(int,n->data,0)) = 2;
 
     good_tree_insert2(d, n,1);
 
     n = good_tree_alloc(1000);
 
-    n->code = 3;
+    *(GOOD_PTR2PTR(int,n->data,0)) = 3;
 
     good_tree_insert2(d, n,1);
 
     good_tree_t *m = good_tree_alloc(sizeof(int));
 
-    m->code = 4;
+    *(GOOD_PTR2PTR(int,m->data,0)) = 4;
 
     good_tree_insert2(n, m,0);
 
     m = good_tree_alloc(sizeof(int));
 
-    m->code  = 5;
+    *(GOOD_PTR2PTR(int,m->data,0))  = 5;
 
     good_tree_insert2(n, m,0);
 
     good_tree_t *m6 = m = good_tree_alloc(sizeof(int));
 
-    m->code  = 6;
+    *(GOOD_PTR2PTR(int,m->data,0))  = 6;
 
     good_tree_insert2(n, m,0);
 
     good_tree_t *k = good_tree_alloc(sizeof(int));
 
-    k->code = 7;
+    *(GOOD_PTR2PTR(int,k->data,0)) = 7;
 
     good_tree_insert2(m, k,0);
 
     k = good_tree_alloc(sizeof(int));
 
-    k->code = 8;
+    *(GOOD_PTR2PTR(int,k->data,0)) = 8;
 
     good_tree_insert2(m, k,0);
 
     good_tree_t *u = good_tree_alloc(sizeof(int));
 
-    u->code = 9;
+    *GOOD_PTR2PTR(int,u->data,0) = 9;
 
     good_tree_insert(m, u, k);
 
