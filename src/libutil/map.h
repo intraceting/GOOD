@@ -24,23 +24,13 @@
 typedef struct _good_map_node
 {
     /**
-     * @ref tree.h
+     * @see good_tree_t
      * 
      * @note 必须是第一个元素。
      * @note 尽量不要直接访问或修改。
     */
-    good_tree_t prefix;
-
-    /**
-     * Key size
-    */
-    size_t ksize;
-
-    /**
-     * Key 
-    */
-    void* key;
-    
+    good_tree_t key;
+   
     /**
      * Value size
     */
@@ -59,7 +49,7 @@ typedef struct _good_map_node
 typedef struct _good_map
 {
     /**
-     * @ref tree.h
+     * @see good_tree_t
     */
     good_tree_t root;
 
@@ -95,25 +85,9 @@ uint64_t good_map_hash_bkdr64(const void* data,size_t size);
 /**
  * 比较
  * 
- * @see memcpy()
+ * @see memcmp()
 */
 int good_map_compare(const void *data1, const void *data2, size_t size);
-
-/**
- * 查找或创建
- * 
- * @param create 0 仅查找，!0 如果不存在则创建。
- * 
-*/
-good_map_node* good_map_lookup(good_map_t* map,const void* key,size_t ksize,int create);
-
-/**
- * 查找或创建
- * 
- * @param key 以'\0'结束的字符串。
- * 
-*/
-good_map_node* good_map_lookup2(good_map_t* map,const char* key,int create);
 
 
 #endif //GOOD_UTIL_HASHMAP_H

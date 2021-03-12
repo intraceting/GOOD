@@ -11,33 +11,11 @@
 #include "libutil/tree.h"
 #include "libutil/buffer.h"
 
-void dump(size_t deep, const good_tree_t *node, void *opaque)
+int dump(size_t deep, const good_tree_t *node, void *opaque)
 {
-    // if (deep <= 0)
-    // {
-    //     printf("root\n");
-    // }
-    // else
-    // {
-    //     for (size_t i = 0; i < deep - 1; i++)
-    //     {
-    //         if ((i + 1 == deep - 1) && !good_tree_sibling(good_tree_father(node),0))
-    //         {
-    //             printf("    ");
-    //         }
-    //         else
-    //         {
-    //             printf("   │");
-    //         }
-    //     }
-
-    //     if(good_tree_sibling(node,0))
-    //         printf("   ├── %lu\n", node->code);
-    //     else 
-    //         printf("   └── %lu\n", node->code);
-    // }
-
     good_tree_fprintf(stderr,deep,node,"%lu\n",node->code);
+
+    return 1;
 }
 
 void traversal(const good_tree_t *root)

@@ -287,23 +287,48 @@ good_tree_t *good_tree_alloc(size_t size)
     return node;
 }
 
+good_tree_t *good_tree_alloc_dup(const void *data, size_t size)
+{
+    good_tree_t *node = good_tree_alloc(size);
+
+    if (size > 0)
+        memcpy(node->data, data, size);
+
+    return node;
+}
+
 void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
 {
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
     size_t deep = 1;// begin 1
+    int chk;
 
     if (!root || !it || !it->dump_cb)
         return;
 
-    it->dump_cb(0,root,it->opaque);
+    /**
+     * 清空
+    */    
+    memset(it->stack,0,sizeof(good_tree_t*)*(it->stack_size));
 
-    it->stack[0] = NULL;
+    /*
+     * 根
+    */
+    chk = it->dump_cb(0,root,it->opaque);
+    if(chk == 0)
+        return;
+
+    /*
+     * 从第一个孩子开始遍历。
+    */
     node = good_tree_child(root,1);
 
     while(node)
     {
-        it->dump_cb(deep,node,it->opaque);
+        chk = it->dump_cb(deep,node,it->opaque);
+        if(chk == 0)
+            return;
 
         child = good_tree_child(node,1);
 

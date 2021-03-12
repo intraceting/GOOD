@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <string.h>
 
 #include "macro.h"
 #include "buffer.h"
@@ -94,8 +95,10 @@ typedef struct _good_tree_iterator
 
     /**
      * 回显
+     * 
+     * @return 0 停止，!0 继续。
     */
-    void (*dump_cb)(size_t deep,const good_tree_t *node, void *opaque);
+    int (*dump_cb)(size_t deep,const good_tree_t *node, void *opaque);
 
     /**
      * 环境指针
@@ -105,7 +108,7 @@ typedef struct _good_tree_iterator
 } good_tree_iterator;
 
 /**
- * 父节点
+ * 父
 */
 good_tree_t *good_tree_father(const good_tree_t *self);
 
@@ -144,7 +147,7 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
  * 
  * @param father 父
  * @param child 孩子
- * @param first 0 么娃，!0 大娃。
+ * @param first 0 'child'为么娃，!0 'child'为大娃。
  * 
 */
 void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first); 
@@ -185,6 +188,14 @@ void good_tree_free(good_tree_t **root);
  * @see good_buffer_alloc2()
 */
 good_tree_t *good_tree_alloc(size_t size);
+
+/**
+ * 申请，并复制数据
+ * 
+ * @see good_tree_alloc()
+ * @see memcpy()
+*/
+good_tree_t *good_tree_alloc_dup(const void *data,size_t size);
 
 /**
  * 遍历
