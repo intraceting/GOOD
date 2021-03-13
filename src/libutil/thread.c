@@ -134,83 +134,7 @@ int good_mutex_signal(good_mutex_t* ctx,int broadcast)
     return err;
 }
 
-void good_specific_destroy(good_specific_t *ctx)
-{
-    void * value = NULL;
-
-    if (!ctx)
-        return;
-
-    if(atomic_load(&ctx->status)!=GOOD_SPECIFIC_STATUS_STABLE)
-        return;
-    
-    value = pthread_getspecific(ctx->key);
-    pthread_setspecific(ctx->key,NULL);
-
-    /*这里只释放私有数据，KEY是多线程共享，而且系统在进程结束时会自动回收，因此不用处理。*/
-    ctx->free_cb(value);
-
-}
-
-void* good_specific_value(good_specific_t*ctx)
-{
-    int err = 0;
-    void* value = NULL;
-    atomic_int status_expected = GOOD_SPECIFIC_STATUS_UNKNOWN;
-
-    if (!ctx)
-        return NULL;
-
-    /*多线程初始化，这里要保护一下。*/
-    if(atomic_compare_exchange_strong(&ctx->status,&status_expected,GOOD_SPECIFIC_STATUS_SYNCHING))
-    {
-        /*如果回调函数未指定，则绑定默认函数。*/
-        if(!ctx->alloc_cb)
-            ctx->alloc_cb = good_specific_default_alloc;
-        if(!ctx->free_cb)
-            ctx->free_cb = good_specific_default_free;
-
-        /*创建KEY*/
-        err = pthread_key_create(&ctx->key,ctx->free_cb);
-
-        /*如果创建失败，则恢复到未知状态。*/
-        atomic_store(&ctx->status,(err?GOOD_SPECIFIC_STATUS_UNKNOWN:GOOD_SPECIFIC_STATUS_STABLE));
-    }
-    else
-    {
-        /*等待同步完成。*/
-        while(atomic_load(&ctx->status)==GOOD_SPECIFIC_STATUS_SYNCHING)
-            pthread_yield();
-    }
-    
-    /*稳定的才有效。*/
-    if(atomic_load(&ctx->status)==GOOD_SPECIFIC_STATUS_STABLE)
-    {
-        value = pthread_getspecific(ctx->key);
-
-        if(!value)
-        {
-            value = ctx->alloc_cb(ctx->size);
-
-            if(value)
-                pthread_setspecific(ctx->key,value);
-        }
-    }
-
-    return value;
-}
-
-void* good_specific_default_alloc(size_t s)
-{
-    return good_buffer_alloc2(s);
-}
-
-void good_specific_default_free(void *m)
-{
-    good_buffer_unref(&m);
-}
-
-int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *opaque),void *opaque)
+int good_thread_create(good_thread_t *ctx,int joinable)
 {
     int err = -1;
     pthread_attr_t attr;
@@ -218,34 +142,19 @@ int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *op
     if (!ctx)
         return err;
 
-    if(!routine)
+    if(!ctx->routine)
         return err = -EINVAL;
 
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
 
-    err = pthread_create(&ctx->handle,&attr,routine,opaque);
+    err = pthread_create(&ctx->handle,&attr,ctx->routine,ctx->opaque);
 
     pthread_attr_destroy(&attr);
 
     return err;
 }
 
-int good_thread_create2(good_thread_t *ctx,void *(*routine)(void *opaque),void *opaque)
-{
-    int err = -1;
-    int detachstate;
-  
-    if (!ctx)
-        return err;
-
-    if(!routine)
-        return err = -EINVAL;
-
-    err = good_thread_create(ctx,1,routine,opaque);
-
-    return err;
-}
 
 int good_thread_join(good_thread_t *ctx)
 {

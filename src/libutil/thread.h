@@ -55,63 +55,6 @@ typedef struct _good_mutex
 
 } good_mutex_t;
 
-/**
- * 私有数据
- * 
- * @note 多线程共享KEY，但VALUE是线程私有。
-*/
-typedef struct _good_specific
-{
-    /**
-     * 状态
-     * 
-    */
-    atomic_int status;
-
-    /**
-     * KEY未创建或出错。
-    */
-#define GOOD_SPECIFIC_STATUS_UNKNOWN      0
-
-    /**
-     * KEY创建成功。
-     */
-#define GOOD_SPECIFIC_STATUS_STABLE       1
-
-    /**
-     * KEY正在创建。
-     */
-#define GOOD_SPECIFIC_STATUS_SYNCHING     2
-
-    /**
-     * KEY
-     * 
-    */
-    pthread_key_t key;
-
-    /**
-     * 大小
-     * 
-    */
-    size_t size;
-
-    /**
-     * 申请
-     * 
-     * @see good_specific_default_alloc()
-     * 
-    */
-    void *(*alloc_cb)(size_t s);
-
-    /**
-     * 释放
-     * 
-     * @see good_specific_default_free()
-     * 
-     * @note 如果私有数据无法自动释放，需要自定义此回调函数。
-    */
-    void (*free_cb)(void* m);
-} good_specific_t;
 
 /**
  * 线程句柄和返回值
@@ -131,6 +74,16 @@ typedef struct _good_thread_t
      * 
     */
     void* result;
+
+    /**
+     * @see pthared_create() 
+     */
+    void *(*routine)(void *opaque);
+
+    /**
+     * @see pthared_create() 
+     */
+    void *opaque;
 
 } good_thread_t;
 
@@ -221,49 +174,9 @@ int good_mutex_wait(good_mutex_t *ctx, int64_t timeout);
 int good_mutex_signal(good_mutex_t *ctx, int broadcast);
 
 /**
- * 销毁私有数据
- * 
- * @note 如果私有数据无法自动释放，则需要在线程退出前调用此函数。
- * 
- * @see pthread_key_delete()
- * @see pthread_setspecific()
- * @see pthread_getspecific()
-*/
-void good_specific_destroy(good_specific_t*ctx);
-
-/**
- * 私有数据指针
- * 
- * @return NULL(0) 出错，!NULL(0) 指针。
- * 
- * @see pthread_key_create()
- * @see pthread_setspecific()
- * @see pthread_getspecific()
- * 
-*/
-void* good_specific_value(good_specific_t*ctx);
-
-/**
- * 私有数据默认申请函数
- * 
- * @see good_buffer_alloc2()
-*/
-void* good_specific_default_alloc(size_t s);
-
-/**
- * 私有数据默认释放函数
- * 
- * @see good_buffer_unref()
- * 
-*/
-void good_specific_default_free(void* m);
-
-/**
  * 创建线程
  * 
  * @param joinable 0 结束后自回收资源，!0 结束后需要调用者回收资源。
- * @param routine 线程函数
- * @param opaque 环境指针
  * 
  * @return 0 成功；!0 出错。
  * 
@@ -273,17 +186,7 @@ void good_specific_default_free(void* m);
  * @see pthread_create()
  * 
 */
-int good_thread_create(good_thread_t *ctx,int joinable,void *(*routine)(void *opaque),void *opaque);
-
-/**
- * 创建线程
- * 
- * @return 0 成功；!0 出错。
- * 
- * @see good_thread_create()
- * 
-*/
-int good_thread_create2(good_thread_t *ctx,void *(*routine)(void *opaque),void *opaque);
+int good_thread_create(good_thread_t *ctx,int joinable);
 
 /**
  * 等待线程结束并回收资源

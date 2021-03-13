@@ -7,9 +7,9 @@
 #include "buffer.h"
 
 /**
- * 缓存区
+ * 缓存头部
 */
-typedef struct _good_buffer
+typedef struct _good_buffer_hdr
 {
     /**
      * 魔法数
@@ -27,74 +27,60 @@ typedef struct _good_buffer
     int refcount;
 
     /**
-     * 缓存大小
+     * 缓存
      * 
-     * @note 不包括头结构的大小
+     * @note 必须是最后一个。
     */
-    size_t size;
+    good_buffer_t out;
 
-    /**
-     * 清理回调函数
-     * 
-    */
-    void (*clean_cb)(void *buf, void *opaque);
+} good_buffer_hdr;
 
-    /**
-     * 私有指针
-    */
-    void *opaque;
 
-} good_buffer_t;
+#define GOOD_BUFFER_PTR_OUT2IN(PTR)    \
+            GOOD_PTR2PTR(good_buffer_hdr, (PTR), -(sizeof(good_buffer_hdr)-sizeof(good_buffer_t)))
 
-size_t good_buffer_size(void *buf)
+#define GOOD_BUFFER_PTR_IN2OUT(PTR)    \
+            GOOD_PTR2PTR(good_buffer_t, (PTR), (sizeof(good_buffer_hdr)-sizeof(good_buffer_t)))
+
+
+good_buffer_t *good_buffer_alloc(size_t size, void (*free_cb)(void *data, void *opaque), void *opaque)
 {
-    good_buffer_t *buf_p = NULL;
-
-    if (!buf)
-        return 0;
-
-    buf_p = GOOD_PTR2PTR(good_buffer_t, buf, -sizeof(good_buffer_t));
-
-    assert(buf_p->magic == GOOD_BUFFER_MAGIC);
-
-    return buf_p->size;
-}
-
-void *good_buffer_alloc(size_t size, void (*clean_cb)(void *buf, void *opaque), void *opaque)
-{
-    good_buffer_t *buf_p = NULL;
+    good_buffer_hdr *buf_p = NULL;
 
     if (size <= 0)
         return NULL;
 
-    buf_p = (good_buffer_t *)calloc(1, sizeof(good_buffer_t) + size);
+    buf_p = (good_buffer_hdr *)good_heap_alloc(sizeof(good_buffer_hdr) + size);
 
     if (!buf_p)
         return NULL;
 
+    buf_p->magic = GOOD_BUFFER_MAGIC;
     atomic_init(&buf_p->refcount, 1);
 
-    buf_p->magic = GOOD_BUFFER_MAGIC;
-    buf_p->size = size;
-    buf_p->clean_cb = clean_cb;
-    buf_p->opaque = opaque;
+    buf_p->out.size = size;
+    if(size>0)
+        buf_p->out.data = GOOD_PTR2PTR(void, buf_p, sizeof(good_buffer_hdr));
+    
+    buf_p->out.free_cb = free_cb;
+    buf_p->out.opaque = opaque;
 
-    return GOOD_PTR2PTR(void, buf_p, sizeof(good_buffer_t));
+    return GOOD_BUFFER_PTR_IN2OUT(buf_p);
 }
 
-void *good_buffer_alloc2(size_t size)
+good_buffer_t *good_buffer_alloc2(size_t size)
 {
     return good_buffer_alloc(size, NULL, NULL);
 }
 
-void *good_buffer_refer(void *buf)
+good_buffer_t *good_buffer_refer(good_buffer_t *buf)
 {
-    good_buffer_t *buf_p = NULL;
+    good_buffer_hdr *buf_p = NULL;
 
     if (!buf)
         return NULL;
 
-    buf_p = GOOD_PTR2PTR(good_buffer_t, buf, -sizeof(good_buffer_t));
+    buf_p = GOOD_BUFFER_PTR_OUT2IN(buf);
 
     assert(buf_p->magic == GOOD_BUFFER_MAGIC);
 
@@ -103,29 +89,29 @@ void *good_buffer_refer(void *buf)
     return buf;
 }
 
-void good_buffer_unref(void **buf)
+void good_buffer_unref(good_buffer_t **buf)
 {
-    good_buffer_t *buf_p = NULL;
+    good_buffer_hdr *buf_p = NULL;
 
     if (!buf || !*buf)
         return;
 
-    buf_p = GOOD_PTR2PTR(good_buffer_t, *buf, -sizeof(good_buffer_t));
+    buf_p = GOOD_BUFFER_PTR_OUT2IN(*buf);
 
     assert(buf_p->magic == GOOD_BUFFER_MAGIC);
 
     if (atomic_fetch_add_explicit(&buf_p->refcount, -1, memory_order_acq_rel) == 1)
     {
-        if (buf_p->clean_cb)
-            buf_p->clean_cb(*buf, buf_p->opaque);
+        if (buf_p->out.free_cb)
+            buf_p->out.free_cb(buf_p->out.data, buf_p->out.opaque);
 
         buf_p->magic = ~(GOOD_BUFFER_MAGIC);
-        buf_p->size = 0;
-        buf_p->clean_cb = NULL;
-        buf_p->opaque = NULL;
+        buf_p->out.size = 0;
+        buf_p->out.data = NULL;
+        buf_p->out.free_cb = NULL;
+        buf_p->out.opaque = NULL;
 
-        free(buf_p);
-        buf_p = NULL;
+        good_heap_freep((void**)&buf_p);
     }
 
     /*Set to NULL(0)*/

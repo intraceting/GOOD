@@ -57,14 +57,10 @@ typedef struct _good_tree
 #define GOOD_TREE_CHAIN_CHILD_LEAST     4
 
     /**
+     * 数据
      * 
-    */
-    size_t size;
-
-    /**
-     * 
-    */
-    void *data;
+     */
+    good_buffer_t *data;
 
 }good_tree_t;
 
@@ -148,52 +144,22 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
 void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first); 
 
 /**
- * 清理
- * 
- * @param free_cb NULL(0) 调用good_tree_free()直接删除节点，!NULL(0) 调用此函数执行删除操作。
- * @param opaque 环境指针
- * 
- * @note 所有子节点，但不包括自身。
- * 
- * @see good_tree_free()
-*/
-void good_tree_clear(good_tree_t *root,void (*free_cb)(good_tree_t *node, void *opaque), void *opaque);
-
-/**
- * 清理
- * 
- * @see good_tree_clear()
- */
-void good_tree_clear2(good_tree_t *root);
-
-/**
  * 删除
  * 
- * @note 不能有子节点。
+ * @note 包括所有子节点。 
  * 
- * @see good_tree_alloc()
- * @see good_buffer_unref()
- * 
+ * @see free()
 */
 void good_tree_free(good_tree_t **root);
 
 /**
  * 申请
  * 
- * @param size 携带的大小
- * 
- * @see good_buffer_alloc2()
+ * @see calloc()
  * 
 */
-good_tree_t *good_tree_alloc(size_t size);
+good_tree_t *good_tree_alloc();
 
-/**
- * 申请，并复制携带数据
- * 
- * @see good_tree_alloc()
- * @see memcpy()
-*/
-good_tree_t *good_tree_alloc_dup(const void *data,size_t size);
 
 /**
  * 遍历

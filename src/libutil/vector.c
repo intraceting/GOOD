@@ -92,11 +92,11 @@ void good_vector_destroy(good_vector_t *vec)
 int good_vector_init(good_vector_t *vec, size_t size)
 {
     if (!vec || size <= 0)
-        return 0;
+        return -1;
 
     vec->table = (good_tree_t**)good_buffer_alloc2(size * sizeof(good_tree_t*));
     if(!vec->table)
-        return 0;
+        return -1;
     
     vec->size = size;
 
@@ -110,7 +110,7 @@ int good_vector_init(good_vector_t *vec, size_t size)
     if(!vec->free_cb)
         vec->free_cb = good_vector_default_free;
 
-    return 1;
+    return 0;
 }
 
 good_tree_t* good_vector_seek(good_vector_t* vec,size_t index)

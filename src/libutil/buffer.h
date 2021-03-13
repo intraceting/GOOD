@@ -13,46 +13,72 @@
 #include <assert.h>
 
 #include "macro.h"
+#include "heap.h"
 
 /**
- * 获取缓存大小
- * 
+ * 缓存
 */
-size_t good_buffer_size(void *buf);
+typedef struct _good_buffer
+{
+    /**
+     * 大小
+    */
+    size_t size;
+
+    /**
+     * 缓存
+    */
+    void* data;
+
+    /**
+     * 释放
+     * 
+    */
+    void (*free_cb)(void *data, void *opaque);
+
+    /**
+     * 私有指针
+    */
+    void *opaque;
+
+} good_buffer_t;
+
 
 /**
- * 申请缓存
+ * 申请
  * 
- * @param size 大小
- * @param clean_cb 清理函数
+ * @param size 缓存大小
+ * @param free_cb 释放函数
  * @param opaque 环境指针
  * 
- * @return  NULL(0) 失败，成功返回缓存指针。
+ * @return  NULL(0) 失败，!NULL(0) 成功。
+ * 
+ * @see calloc()
 */
-void *good_buffer_alloc(size_t size, void (*clean_cb)(void *buf, void *opaque), void *opaque);
+good_buffer_t *good_buffer_alloc(size_t size, void (*free_cb)(void *data, void *opaque), void *opaque);
 
 /**
- * 申请缓存
+ * 申请
  * 
  * @see good_buffer_alloc()
 */
-void *good_buffer_alloc2(size_t size);
+good_buffer_t *good_buffer_alloc2(size_t size);
 
 /**
- * 缓存引用
+ * 引用
  * 
  * @return NULL(0) 失败，成功返回缓存指针。
  * 
 */
-void *good_buffer_refer(void *buf);
+good_buffer_t *good_buffer_refer(good_buffer_t *buf);
 
 /**
- * 缓存释放
+ * 释放
  * 
- * @note 当缓存引用计数为0时才会释放缓存。
+ * @note 当引用计数为0时才会真的释放。
  * 
- * @note 如果清理函数被定义，则在释放前调用清理函数。
+ * @see free()
 */
-void good_buffer_unref(void **buf);
+void good_buffer_unref(good_buffer_t **buf);
 
 #endif //GOOD_UTIL_BUFFER_H

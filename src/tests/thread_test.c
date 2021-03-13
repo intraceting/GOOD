@@ -13,19 +13,8 @@ void* specific_cb(void* args)
 {
     good_thread_setname("haha");
 
-    good_specific_t t;
-    memset(&t,0,sizeof(t));
 
-    t.size = 1000;
-    void *p = good_specific_value(&t);
-
-    void *p2 = good_specific_value(&t);
-
-    assert(p == p2);
-
-  //  good_specific_destroy(&t);
-
-  //  sleep(1000);
+    sleep(3);
 
     return NULL;
 }
@@ -44,7 +33,8 @@ int main(int argc, char **argv)
     good_mutex_destroy(&m);
 
     good_thread_t p;
-    good_thread_create2(&p,specific_cb,NULL);
+    p.routine = specific_cb;
+    good_thread_create(&p,1);
     good_thread_join(&p);
 
     return 0;
