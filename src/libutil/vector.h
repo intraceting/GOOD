@@ -54,13 +54,6 @@ typedef struct _good_vector
     */
     int (*compare_cb)(const void *key1, const void *key2, size_t size);
 
-    /**
-     * 清理
-     * 
-     * @see good_buffer_unref()
-     * 
-    */
-    void (*clean_cb)(good_tree_t *item);
 }good_vector_t;
 
 /**
@@ -76,13 +69,6 @@ uint64_t good_vector_default_hash(const void* data,size_t size);
  * @see memcmp()
 */
 int good_vector_default_compare(const void *data1, const void *data2, size_t size);
-
-/**
- * 清理
- * 
- * @see good_buffer_unref()
-*/
-void good_vector_default_clean(good_tree_t *item);
 
 /**
  * 销毁

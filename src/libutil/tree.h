@@ -158,13 +158,15 @@ void good_tree_free(good_tree_t **root);
  * @see calloc()
  * 
 */
-good_tree_t *good_tree_alloc();
+good_tree_t *good_tree_alloc(size_t buf_size);
 
 
 /**
  * 遍历
  * 
  * @param it 迭代器
+ * 
+ * @note 如果没准备栈，则内部自动申请和释放。
  * 
 */
 void good_tree_traversal(const good_tree_t *root,good_tree_iterator* it);

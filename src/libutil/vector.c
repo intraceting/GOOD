@@ -17,20 +17,12 @@ int good_vector_default_compare(const void *data1, const void *data2, size_t siz
     return memcmp(data1,data2,size);
 }
 
-void good_vector_default_free(void* m)
-{
-    good_buffer_unref(&m);
-}
-
 void good_vector_destroy(good_vector_t *vec)
 {
     if (!vec)
         return;
 
     if (vec->size <= 0 || !vec->table)
-        return;
-    
-    if(!vec->free_cb)
         return;
 
     for (size_t i = 0; i < vec->size; i++)
@@ -55,12 +47,6 @@ void good_vector_destroy(good_vector_t *vec)
             good_tree_t* val = good_tree_child(key,1);
             if(val)
             {
-                /**
-                 * VALUE 释放要特殊处理一下。
-                */
-                vec->free_cb(val->data);
-                val->data = NULL;
-                val->size = 0;
 
                 good_tree_unlink(val);
                 good_tree_free(&val);
@@ -107,8 +93,6 @@ int good_vector_init(good_vector_t *vec, size_t size)
         vec->hash_cb = good_vector_default_hash;
     if(!vec->compare_cb)
         vec->compare_cb = good_vector_default_compare;
-    if(!vec->free_cb)
-        vec->free_cb = good_vector_default_free;
 
     return 0;
 }

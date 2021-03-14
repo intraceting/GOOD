@@ -22,15 +22,15 @@ void traversal(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator it;
+    good_tree_iterator it = {0};
 
-    it.stack_size = 20;
-    it.stack = (good_tree_t **)good_heap_alloc(sizeof(good_tree_t *) * it.stack_size);
+ //   it.stack_size = 20;
+ //   it.stack = (good_tree_t **)good_heap_alloc(sizeof(good_tree_t *) * it.stack_size);
     it.dump_cb = dump;
 
     good_tree_traversal(root, &it);
 
-    good_heap_freep((void **)&it.stack);
+ //   good_heap_freep((void **)&it.stack);
 
     printf("\n-------------------------------------\n");
 }
@@ -38,79 +38,63 @@ void traversal(const good_tree_t *root)
 int main(int argc, char **argv)
 {
 
-    good_tree_t *d = good_tree_alloc();
-
-    d->buf = good_buffer_alloc2(1100);
+    good_tree_t *d = good_tree_alloc(10);
 
     *(GOOD_PTR2PTR(int,d->buf->data,0)) = 0;
 
-    good_tree_t *n = good_tree_alloc();
-
-    n->buf = good_buffer_alloc2(1100);
+    good_tree_t *n = good_tree_alloc(10);
 
     *(GOOD_PTR2PTR(int,n->buf->data,0)) = 1;
 
     good_tree_insert2(d, n,1);
 
-    good_tree_t *n2 = n = good_tree_alloc();
-
-    n->buf = good_buffer_alloc2(1100);
+    good_tree_t *n2 = n = good_tree_alloc(10);
 
     *(GOOD_PTR2PTR(int,n->buf->data,0)) = 2;
 
     good_tree_insert2(d, n,1);
 
-    n = good_tree_alloc(1000);
-
-    n->buf = good_buffer_alloc2(1100);
+    n = good_tree_alloc(15);
 
     *(GOOD_PTR2PTR(int,n->buf->data,0)) = 3;
 
     good_tree_insert2(d, n,1);
 
-    good_tree_t *m = good_tree_alloc();
+    traversal(d);
 
-    m->buf = good_buffer_alloc2(1100);
+    good_tree_t *m = good_tree_alloc(234);
 
     *(GOOD_PTR2PTR(int,m->buf->data,0)) = 4;
 
     good_tree_insert2(n, m,0);
 
-    m = good_tree_alloc();
+    traversal(d);
 
-    m->buf = good_buffer_alloc2(1100);
+    m = good_tree_alloc(223);
 
     *(GOOD_PTR2PTR(int,m->buf->data,0))  = 5;
 
     good_tree_insert2(n, m,0);
 
-    good_tree_t *m6 = m = good_tree_alloc();
-
-    m->buf = good_buffer_alloc2(1100);
+    good_tree_t *m6 = m = good_tree_alloc(45);
 
     *(GOOD_PTR2PTR(int,m->buf->data,0))  = 6;
 
     good_tree_insert2(n, m,0);
 
-    good_tree_t *k = good_tree_alloc();
-
-    k->buf = good_buffer_alloc2(1100);
+    good_tree_t *k = good_tree_alloc(78);
 
     *(GOOD_PTR2PTR(int,k->buf->data,0)) = 7;
 
     good_tree_insert2(m, k,0);
 
-    k = good_tree_alloc();
-
-    k->buf = good_buffer_alloc2(1100);
+    k = good_tree_alloc(78);
 
     *(GOOD_PTR2PTR(int,k->buf->data,0)) = 8;
 
     good_tree_insert2(m, k,0);
 
-    good_tree_t *u = good_tree_alloc();
-
-    u->buf = good_buffer_alloc2(1100);
+    good_tree_t *u = good_tree_alloc(78);
 
     *GOOD_PTR2PTR(int,u->buf->data,0) = 9;
 
@@ -127,6 +111,7 @@ int main(int argc, char **argv)
 
     traversal(d);
 
+    good_tree_unlink(m6);
     good_tree_free(&m6);
 
     traversal(d);
