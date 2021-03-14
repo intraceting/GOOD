@@ -148,25 +148,28 @@ void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first);
  * 
  * @note 包括所有子节点。 
  * 
- * @see free()
+ * @see good_heap_free()
+ * @see good_buffer_unref()
 */
 void good_tree_free(good_tree_t **root);
 
 /**
  * 申请
  * 
- * @see calloc()
+ * @param buf_size 0 不创建BUFFER。
+ * 
+ * @see good_heap_calloc()
+ * @see good_buffer_alloc2()
  * 
 */
 good_tree_t *good_tree_alloc(size_t buf_size);
-
 
 /**
  * 遍历
  * 
  * @param it 迭代器
  * 
- * @note 如果没准备栈，则内部自动申请和释放。
+ * @note 如果未准备堆栈，则内部自动申请和释放。
  * 
 */
 void good_tree_traversal(const good_tree_t *root,good_tree_iterator* it);

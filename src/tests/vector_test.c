@@ -16,13 +16,16 @@ int main(int argc, char **argv)
 {
     good_vector_t v = {0};
 
-    assert(good_vector_init(&v,100));
+    assert(good_vector_init(&v,100)==0);
 
-    good_tree_t* n =  good_vector_seek(&v,0);
+    for (int i = 0; i < 100; i++)
+    {
+        good_tree_t *n = good_vector_seek(&v, i);
 
-    n->size = 100;
-    n->data = good_buffer_alloc2(100);
+        n->buf = good_buffer_alloc2(sizeof(int));
 
+        *GOOD_PTR2PTR(int,n->buf->data,0) = i;
+    }
 
     good_vector_destroy(&v);
     

@@ -9,10 +9,10 @@
 
 /**/
 #include <errno.h>
-#include <stdatomic.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdatomic.h>
 #include <string.h>
 #include <time.h>
 #include <stdarg.h>

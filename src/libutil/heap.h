@@ -39,7 +39,7 @@ void good_heap_free(void *data);
 /**
  * @brief 内存释放，并清空指针。
  * 
- * @param data 
+ * @param data 指针的指针
  * 
  * @see good_heap_free()
  */

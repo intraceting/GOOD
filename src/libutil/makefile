@@ -52,8 +52,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/heap.o \
 	${OBJ_PATH}/buffer.o \
 	${OBJ_PATH}/thread.o \
-	${OBJ_PATH}/tree.o 
-#	${OBJ_PATH}/vector.o
+	${OBJ_PATH}/tree.o \
+	${OBJ_PATH}/vector.o
 
 #
 all: ${PROJECT_NAME}

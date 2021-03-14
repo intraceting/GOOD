@@ -32,7 +32,7 @@ typedef struct _good_vector
     size_t size;
 
     /**
-     * 数据表
+     * 表
      * 
      * @see good_tree_t
      * 
