@@ -218,8 +218,8 @@ void good_tree_free(good_tree_t **root)
             {
                 good_tree_unlink(node);
 
-                good_buffer_unref(&node->data);
-                good_heap_free((void**)&node);
+                good_buffer_unref(&node->buf);
+                good_heap_freep((void**)&node);
             }
         }
         else
@@ -231,8 +231,8 @@ void good_tree_free(good_tree_t **root)
         }
     }
 
-    good_buffer_unref(&(*root)->data);
-    good_heap_free((void**)root);
+    good_buffer_unref(&(*root)->buf);
+    good_heap_freep((void**)root);
 
 }
 
@@ -243,7 +243,7 @@ good_tree_t *good_tree_alloc()
     if (!node)
         return NULL;
 
-    node->data = NULL;
+    node->buf = NULL;
 
     return node;
 }
@@ -252,7 +252,7 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
 {
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
-    size_t deep = 1;// begin 1
+    size_t deep = 0;// begin 0
     int chk;
 
     if (!root || !it || !it->dump_cb)
@@ -277,8 +277,8 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
 
     while(node)
     {
-        chk = it->dump_cb(deep,node,it->opaque);
-        if(chk == 0)
+        chk = it->dump_cb(deep + 1, node, it->opaque);
+        if (chk == 0)
             return;
 
         child = good_tree_child(node,1);

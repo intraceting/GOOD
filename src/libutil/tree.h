@@ -57,10 +57,10 @@ typedef struct _good_tree
 #define GOOD_TREE_CHAIN_CHILD_LEAST     4
 
     /**
-     * 数据
+     * 缓存
      * 
      */
-    good_buffer_t *data;
+    good_buffer_t *buf;
 
 }good_tree_t;
 

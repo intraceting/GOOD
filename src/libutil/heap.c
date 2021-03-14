@@ -13,6 +13,13 @@ void *good_heap_alloc(size_t size)
     return calloc(1,size);
 }
 
+void* good_heap_realloc(void *buf,size_t size)
+{
+    assert(size > 0);
+
+    return realloc(buf,size);
+}
+
 void good_heap_free(void *data)
 {
     if (data)

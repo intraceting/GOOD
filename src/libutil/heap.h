@@ -14,8 +14,18 @@
 /**
  * @brief 内存申请
  * 
+ * @see calloc()
+ * 
  */
 void* good_heap_alloc(size_t size);
+
+/**
+ * @brief 内存申请
+ * 
+ * @see realloc()
+ * 
+ */
+void* good_heap_realloc(void *buf,size_t size);
 
 /**
  * @brief 内存释放
