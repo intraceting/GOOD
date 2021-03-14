@@ -133,8 +133,13 @@ good_tree_t* good_vector_find(good_vector_t* vec,const void* key,size_t ksize,in
     if(it)
     {
         value = good_tree_child(it, 1);
+        if(!value)
+        {
+            value = good_tree_alloc(0);
+            if(value)
+                good_tree_insert2(it,value,1);
+        }
     }
-
 
     return value;
 

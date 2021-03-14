@@ -27,6 +27,33 @@ int main(int argc, char **argv)
         *GOOD_PTR2PTR(int,n->buf->data,0) = i;
     }
 
+    for (int i = 0; i < 10000; i++)
+    {
+        good_tree_t *n = good_vector_find(&v, &i,sizeof(int),1);
+
+        n->buf = good_buffer_alloc2(sizeof(int));
+
+        *GOOD_PTR2PTR(int,n->buf->data,0) = 10000-i;
+    }
+
+    for (int i = 0; i < 100; i++)
+    {
+        good_tree_t *n = good_vector_seek(&v, i);
+
+        good_tree_t *n2 = good_vector_find(&v, &i, sizeof(int), 0);
+
+        printf("n=%d\n", *GOOD_PTR2PTR(int,n->buf->data,0));
+    }
+
+    for (int i = 0; i < 10000; i++)
+    {
+
+        good_tree_t *n2 = good_vector_find(&v, &i, sizeof(int), 0);
+
+        printf("n2=%d\n",*GOOD_PTR2PTR(int,n2->buf->data,0));
+    }
+
+
     good_vector_destroy(&v);
     
 
