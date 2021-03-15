@@ -69,6 +69,7 @@ double good_geom_halfline_radian(const good_point_t *p1, const good_point_t *p2,
  * 
  * @note Z轴忽略。
  * 
+ * @see good_geom_p2p_distance()
  * @see good_geom_halfline_radian()
  * @see cos()
  * @see sin()
