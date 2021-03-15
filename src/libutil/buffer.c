@@ -47,9 +47,6 @@ good_buffer_t *good_buffer_alloc(size_t size, void (*free_cb)(void *data, void *
 {
     good_buffer_hdr *buf_p = NULL;
 
-    if (size <= 0)
-        return NULL;
-
     buf_p = (good_buffer_hdr *)good_heap_alloc(sizeof(good_buffer_hdr) + size);
 
     if (!buf_p)
@@ -59,9 +56,9 @@ good_buffer_t *good_buffer_alloc(size_t size, void (*free_cb)(void *data, void *
     atomic_init(&buf_p->refcount, 1);
 
     buf_p->out.size = size;
-    if(size>0)
-        buf_p->out.data = GOOD_PTR2PTR(void, buf_p, sizeof(good_buffer_hdr));
-    
+    if (size > 0)
+        buf_p->out.data = GOOD_PTR2PTR(void, buf_p, sizeof(good_buffer_hdr));// good_buffer_hdr + 1
+
     buf_p->out.free_cb = free_cb;
     buf_p->out.opaque = opaque;
 

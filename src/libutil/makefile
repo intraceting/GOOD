@@ -7,12 +7,8 @@ PROJECT_NAME = libutil
 PROJECT_VERSION ?= devel
 BUILD_TYPE ?= release
 BUILD_PATH ?= ${MAKEFILE_PWD}/../build/
-
-#
 INSTALL_PATH ?= /usr/local/
-INSTALL_PATH_INC ?= ${INSTALL_PATH}/include/
-INSTALL_PATH_LIB ?= ${INSTALL_PATH}/lib/
-INSTALL_PATH_BIN ?= ${INSTALL_PATH}/bin/
+
 
 #
 # Common definitions
@@ -78,10 +74,15 @@ clean:
 	rm -f $(BUILD_PATH)/libgood_util.so
 
 #
+INSTALL_PATH_INC = ${INSTALL_PATH}/include/${PROJECT_NAME}/
+INSTALL_PATH_LIB = ${INSTALL_PATH}/lib/
+INSTALL_PATH_BIN = ${INSTALL_PATH}/bin/
+
+#
 install:
 #
 	mkdir -p ${INSTALL_PATH_LIB}
-	cp  $(BUILD_PATH)/libgood_util.so ${INSTALL_PATH_LIB_}/
+	cp  $(BUILD_PATH)/libgood_util.so ${INSTALL_PATH_LIB}/
 #
 	mkdir -p ${INSTALL_PATH_INC}/
 	cp  *.h ${INSTALL_PATH_INC}/
