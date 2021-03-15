@@ -36,7 +36,4 @@
 
 
 
-
-
-
 #endif //GOOD_UTIL_MACRO_H
