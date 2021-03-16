@@ -13,6 +13,7 @@
 #include <assert.h>
 
 #include "general.h"
+#include "heap.h"
 
 /**
  * 缓存
