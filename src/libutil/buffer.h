@@ -30,13 +30,23 @@ typedef struct _good_buffer
     void* data;
 
     /**
+     * 大小
+     * 
+     * @note 内部忽略此项。
+    */
+    size_t size1;
+
+    /**
      * 释放
      * 
+     * @note NULL(0) 忽略。
     */
     void (*free_cb)(void *data, void *opaque);
 
     /**
      * 私有指针
+     * 
+     * @see free_cb()
     */
     void *opaque;
 
