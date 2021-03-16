@@ -16,7 +16,7 @@
 #include "general.h"
 
 /**
- * @brief 点
+ * 点
  * 
  */
 typedef struct _good_point
@@ -41,13 +41,13 @@ typedef struct _good_point
 } good_point_t;
 
 /**
- * @brief 计算空间两点之间的距离
+ * 计算空间两点之间的距离
  *  
  */
 double good_geom_p2p_distance(const good_point_t *p1, const good_point_t *p2);
 
 /**
- * @brief 计算射线弧度
+ * 计算射线弧度
  * 
  * @param axis 仅支持X轴或者Y轴。
  * 
@@ -60,7 +60,7 @@ double good_geom_p2p_distance(const good_point_t *p1, const good_point_t *p2);
 double good_geom_halfline_radian(const good_point_t *p1, const good_point_t *p2, int axis);
 
 /**
- * @brief 点移动
+ * 点移动
  *  
  * @param p1 
  * @param radian 弧度

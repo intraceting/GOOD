@@ -113,7 +113,7 @@ uint32_t good_endian_hton32(uint32_t num);
 uint64_t good_endian_hton64(uint64_t num);
 
 /**
- * @brief 内存申请
+ * 内存申请
  * 
  * @see calloc()
  * 
@@ -121,7 +121,7 @@ uint64_t good_endian_hton64(uint64_t num);
 void* good_heap_alloc(size_t size);
 
 /**
- * @brief 内存申请
+ * 内存申请
  * 
  * @see realloc()
  * 
@@ -129,7 +129,7 @@ void* good_heap_alloc(size_t size);
 void* good_heap_realloc(void *buf,size_t size);
 
 /**
- * @brief 内存释放
+ * 内存释放
  * 
  * @param data 
  * 
@@ -138,7 +138,7 @@ void* good_heap_realloc(void *buf,size_t size);
 void good_heap_free(void *data);
 
 /**
- * @brief 内存释放，并清空指针。
+ * 内存释放，并清空指针。
  * 
  * @param data 指针的指针
  * 

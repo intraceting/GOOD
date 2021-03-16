@@ -7,12 +7,12 @@
 #include "log.h"
 
 /**
- * @brief 日志
+ * 日志
  * 
  */
 typedef struct _good_log
 {
-    /*
+    /**
      * 掩码
     */
     int mask;
