@@ -14,9 +14,8 @@
 #include <assert.h>
 #include <string.h>
 
-#include "macro.h"
+#include "general.h"
 #include "buffer.h"
-#include "hash.h"
 #include "tree.h"
 
 /**

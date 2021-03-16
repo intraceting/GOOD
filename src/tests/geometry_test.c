@@ -14,9 +14,9 @@
 int main(int argc, char **argv)
 {
     
-    good_point_t p1 = {100,-100,0};
+    good_point_t p1 = {0,0,0};
 
-    good_point_t p2= {10,-50,0};
+    good_point_t p2= {1,1,0};
 
     double d = good_geom_p2p_distance(&p1,&p2);
 

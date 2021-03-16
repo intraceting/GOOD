@@ -15,7 +15,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "macro.h"
+#include "general.h"
 #include "buffer.h"
 
 

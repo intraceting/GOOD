@@ -13,7 +13,7 @@
 #include <math.h>
 #include <ctype.h>
 
-#include "macro.h"
+#include "general.h"
 
 /**
  * @brief 点

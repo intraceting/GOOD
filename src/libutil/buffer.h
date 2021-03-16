@@ -12,8 +12,7 @@
 #include <stdatomic.h>
 #include <assert.h>
 
-#include "macro.h"
-#include "heap.h"
+#include "general.h"
 
 /**
  * 缓存
