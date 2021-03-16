@@ -55,7 +55,8 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/buffer_test.exe \
 	$(BUILD_PATH)/tree_test.exe \
 	$(BUILD_PATH)/vector_test.exe \
-	$(BUILD_PATH)/geometry_test.exe
+	$(BUILD_PATH)/geometry_test.exe \
+	$(BUILD_PATH)/log_test.exe
 
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
 	mkdir -p $(BUILD_PATH)
@@ -76,5 +77,6 @@ clean:
 	rm -f $(BUILD_PATH)/tree_test.exe
 	rm -f $(BUILD_PATH)/vector_test.exe
 	rm -f $(BUILD_PATH)/geometry_test.exe
+	rm -f $(BUILD_PATH)/log_test.exe
 
 
