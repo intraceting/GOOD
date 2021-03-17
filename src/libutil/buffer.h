@@ -21,28 +21,33 @@
 typedef struct _good_buffer
 {
     /**
-     * 大小
+     * 数量
     */
-    size_t size;
+    size_t number;
 
     /**
      * 缓存
     */
-    void* data;
+    void** data;
+
+    /**
+     * 大小
+    */
+    size_t* size;
 
     /**
      * 大小
      * 
      * @note 内部忽略此项。
     */
-    size_t size1;
+    size_t* size1;
 
     /**
      * 释放
      * 
      * @note NULL(0) 忽略。
     */
-    void (*free_cb)(void *data, void *opaque);
+    void (*free_cb)(void **data,size_t number,void *opaque);
 
     /**
      * 私有指针
@@ -52,7 +57,6 @@ typedef struct _good_buffer
     void *opaque;
 
 } good_buffer_t;
-
 
 /**
  * 申请
@@ -65,14 +69,14 @@ typedef struct _good_buffer
  * 
  * @see calloc()
 */
-good_buffer_t *good_buffer_alloc(size_t size, void (*free_cb)(void *data, void *opaque), void *opaque);
+good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(void **data,size_t number,void *opaque), void *opaque);
 
 /**
  * 申请
  * 
  * @see good_buffer_alloc()
 */
-good_buffer_t *good_buffer_alloc2(size_t size);
+good_buffer_t *good_buffer_alloc2(size_t size[],size_t number);
 
 /**
  * 引用

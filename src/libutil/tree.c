@@ -241,8 +241,8 @@ good_tree_t *good_tree_alloc(size_t buf_size)
     if (!node)
         return NULL;
 
-    if(buf_size>0)
-        node->buf = good_buffer_alloc2(buf_size);
+    if (buf_size > 0)
+        node->buf = NULL;
     else
         node->buf = NULL;
 

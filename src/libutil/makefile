@@ -50,7 +50,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/buffer.o \
 	${OBJ_PATH}/thread.o \
 	${OBJ_PATH}/tree.o \
-	${OBJ_PATH}/vector.o \
+	${OBJ_PATH}/map.o \
 	${OBJ_PATH}/geometry.o \
 	${OBJ_PATH}/log.o
 

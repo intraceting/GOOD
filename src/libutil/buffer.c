@@ -43,11 +43,19 @@ typedef struct _good_buffer_hdr
             GOOD_PTR2PTR(good_buffer_t, (PTR), (sizeof(good_buffer_hdr)-sizeof(good_buffer_t)))
 
 
-good_buffer_t *good_buffer_alloc(size_t size, void (*free_cb)(void *data, void *opaque), void *opaque)
+good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(void **data,size_t number, void *opaque), void *opaque)
 {
     good_buffer_hdr *buf_p = NULL;
+    void* data_p = NULL;
+    size_t need_size = sizeof(good_buffer_hdr) + number * sizeof(void *) + number * sizeof(size_t) + number * sizeof(size_t);
 
-    buf_p = (good_buffer_hdr *)good_heap_alloc(sizeof(good_buffer_hdr) + size);
+    /*
+     * 计算全部的缓存，以减少内存碎片，并且释放时可以简单的直接释放，而且也不会因为外部修改产生内存泄漏。
+    */
+    for (size_t i = 0; i < number; i++)
+        need_size += size[i];
+
+    buf_p = (good_buffer_hdr *)good_heap_alloc(need_size);
 
     if (!buf_p)
         return NULL;
@@ -55,19 +63,55 @@ good_buffer_t *good_buffer_alloc(size_t size, void (*free_cb)(void *data, void *
     buf_p->magic = GOOD_BUFFER_MAGIC;
     atomic_init(&buf_p->refcount, 1);
 
-    buf_p->out.size = size;
-    if (size > 0)
-        buf_p->out.data = GOOD_PTR2PTR(void, buf_p, sizeof(good_buffer_hdr));// good_buffer_hdr + 1
-
     buf_p->out.free_cb = free_cb;
     buf_p->out.opaque = opaque;
+    buf_p->out.number = number;
+
+    if (number > 0)
+    {
+        /*
+         * 分配各项地址。
+        */
+        buf_p->out.data = GOOD_PTR2PTR(void*, buf_p, sizeof(good_buffer_hdr));// good_buffer_hdr + 1
+        buf_p->out.size = GOOD_PTR2PTR(size_t, buf_p->out.data,number * sizeof(void *));// good_buffer_hdr + *data[]
+        buf_p->out.size1 = GOOD_PTR2PTR(size_t, buf_p->out.size,number * sizeof(size_t));// good_buffer_hdr + *data[] + size[]
+
+        /*
+         * 第一块缓存。
+        */
+        data_p = GOOD_PTR2PTR(void, buf_p->out.size1, number * sizeof(size_t));// good_buffer_hdr + *data[] + size[] + size[]
+
+        /*
+         * 分配缓存地址。
+        */
+        for (size_t i = 0; i < number; i++)
+        {
+            buf_p->out.size[i] = size[i];
+
+            /*
+             * 跳过不需要分配的。
+            */
+            if (buf_p->out.size[i] <= 0)
+                continue;
+
+            /*
+             * 绑定地址。
+            */
+            buf_p->out.data[i] = data_p;
+
+            /*
+             * 下一块。
+            */
+            data_p = GOOD_PTR2PTR(void, data_p, buf_p->out.size[i]);
+         }
+    }
 
     return GOOD_BUFFER_PTR_IN2OUT(buf_p);
 }
 
-good_buffer_t *good_buffer_alloc2(size_t size)
+good_buffer_t *good_buffer_alloc2(size_t size[],size_t number)
 {
-    return good_buffer_alloc(size, NULL, NULL);
+    return good_buffer_alloc(size, number, NULL, NULL);
 }
 
 good_buffer_t *good_buffer_refer(good_buffer_t *buf)
@@ -100,14 +144,19 @@ void good_buffer_unref(good_buffer_t **buf)
     if (atomic_fetch_add_explicit(&buf_p->refcount, -1, memory_order_acq_rel) == 1)
     {
         if (buf_p->out.free_cb)
-            buf_p->out.free_cb(buf_p->out.data, buf_p->out.opaque);
+            buf_p->out.free_cb(buf_p->out.data,buf_p->out.number,buf_p->out.opaque);
 
         buf_p->magic = ~(GOOD_BUFFER_MAGIC);
-        buf_p->out.size = 0;
+        buf_p->out.size1 = NULL;
+        buf_p->out.size = NULL;
         buf_p->out.data = NULL;
+        buf_p->out.number = 0;
         buf_p->out.free_cb = NULL;
         buf_p->out.opaque = NULL;
 
+        /*
+         * 只要释放一次即可全部释放，因为内存是一次申请的。
+        */
         good_heap_freep((void**)&buf_p);
     }
 
