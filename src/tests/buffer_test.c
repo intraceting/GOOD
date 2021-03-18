@@ -10,45 +10,77 @@
 #include <string.h>
 #include "libutil/buffer.h"
 
-void free_clean(void *buf, void *opaque)
+void free_clean(uint8_t **buf,size_t number, void *opaque)
 {
-    printf("%s\n",(char*)buf);
+    for(size_t i = 0;i<number;i++)
+    {
+        if(buf[i])
+            printf("[%ld]={%s}\n",i,(char*)buf[i]);
+    }
+
     
 
-    memset(buf,0,100);
 }
 
-void free_free(void *buf, void *opaque)
+void free_free(uint8_t **buf,size_t number, void *opaque)
 {
-    printf("%s\n",(char*)buf);
+    printf("[%ld]={%s}\n",0l,(char*)buf[0]);
     
-
-    good_heap_free(buf);
+    good_heap_freep(&buf[0]);
 }
 
 int main(int argc, char **argv)
 {
-    good_buffer_t* p = good_buffer_alloc(1000,free_clean,NULL);
+    size_t size[] = {100,45,0,0,123};
+    good_buffer_t* p = good_buffer_alloc(size,5,free_clean,NULL);
 
-    memset(p->data,'A',34);
+    for (size_t i = 0; i < p->number; i++)
+    {
+        printf("size[%ld]=%ld,size1[%ld]=%ld\n",i,p->size[i],i,p->size1[i]);
+
+        if(!p->size[i])
+            continue;
+
+        memset(p->data[i], 'A'+i, p->size[i]);
+        p->size1[i] = 34;
+
+
+    }
 
     good_buffer_t* q =good_buffer_refer(p);
 
-    memset(q->data,'B',20);
+
+    for(size_t i = 0;i<p->number;i++)
+    {
+        printf("size[%ld]=%ld,size1[%ld]=%ld\n",i,p->size[i],i,p->size1[i]);
+
+        if(!p->size[i])
+            continue;
+
+        memset(GOOD_PTR2PTR(char,q->data[i],1),'G',p->size[i]-2);
+    }
  
     good_buffer_unref(&p);
 
     good_buffer_unref(&q);
 
-  
-    p = good_buffer_alloc(0,free_free,NULL);
 
-    p->data = good_heap_alloc(123);
+    p = good_buffer_alloc(NULL,1,free_free,NULL);
+
+    p->data[0] = good_heap_alloc(123);
 
 
-    memset(p->data,'C',122);
+    memset(p->data[0],'C',122);
 
     good_buffer_unref(&p);
+
+    p = good_buffer_alloc3(1000);
+
+    q = good_buffer_refer(p);
+
+    good_buffer_unref(&p);
+
+    good_buffer_unref(&q);
 
     return 0;
 }

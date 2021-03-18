@@ -159,7 +159,7 @@ void good_tree_free(good_tree_t **root);
  * @param buf_size 0 不创建BUFFER。
  * 
  * @see good_heap_calloc()
- * @see good_buffer_alloc2()
+ * @see good_buffer_alloc3()
  * 
 */
 good_tree_t *good_tree_alloc(size_t buf_size);

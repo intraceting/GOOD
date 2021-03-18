@@ -28,7 +28,7 @@ typedef struct _good_buffer
     /**
      * 缓存
     */
-    void** data;
+    uint8_t** data;
 
     /**
      * 大小
@@ -38,7 +38,7 @@ typedef struct _good_buffer
     /**
      * 大小
      * 
-     * @note 内部忽略此项。
+     * @note 内部不使用此项。
     */
     size_t* size1;
 
@@ -47,7 +47,7 @@ typedef struct _good_buffer
      * 
      * @note NULL(0) 忽略。
     */
-    void (*free_cb)(void **data,size_t number,void *opaque);
+    void (*free_cb)(uint8_t **data,size_t number,void *opaque);
 
     /**
      * 私有指针
@@ -61,7 +61,8 @@ typedef struct _good_buffer
 /**
  * 申请
  * 
- * @param size 缓存大小
+ * @param size 缓存大小(数组)
+ * @param number 缓存数量
  * @param free_cb 释放函数
  * @param opaque 环境指针
  * 
@@ -69,7 +70,7 @@ typedef struct _good_buffer
  * 
  * @see calloc()
 */
-good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(void **data,size_t number,void *opaque), void *opaque);
+good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(uint8_t **data,size_t number,void *opaque), void *opaque);
 
 /**
  * 申请
@@ -77,6 +78,18 @@ good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(vo
  * @see good_buffer_alloc()
 */
 good_buffer_t *good_buffer_alloc2(size_t size[],size_t number);
+
+/**
+ * 申请
+ * 
+ * @param size 大小
+ * 
+ * @note 仅一个。
+ * 
+ * @see good_buffer_alloc()
+ * @see good_buffer_alloc2()
+*/
+good_buffer_t *good_buffer_alloc3(size_t size);
 
 /**
  * 引用

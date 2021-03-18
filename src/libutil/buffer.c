@@ -43,17 +43,20 @@ typedef struct _good_buffer_hdr
             GOOD_PTR2PTR(good_buffer_t, (PTR), (sizeof(good_buffer_hdr)-sizeof(good_buffer_t)))
 
 
-good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(void **data,size_t number, void *opaque), void *opaque)
+good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(uint8_t **data,size_t number, void *opaque), void *opaque)
 {
     good_buffer_hdr *buf_p = NULL;
-    void* data_p = NULL;
-    size_t need_size = sizeof(good_buffer_hdr) + number * sizeof(void *) + number * sizeof(size_t) + number * sizeof(size_t);
+    uint8_t* data_p = NULL;
+    size_t need_size = sizeof(good_buffer_hdr) + number * sizeof(uint8_t *) + number * sizeof(size_t) + number * sizeof(size_t);
 
     /*
      * 计算全部的缓存，以减少内存碎片，并且释放时可以简单的直接释放，而且也不会因为外部修改产生内存泄漏。
     */
-    for (size_t i = 0; i < number; i++)
-        need_size += size[i];
+    if(size != NULL)
+    {
+        for (size_t i = 0; i < number; i++)
+            need_size += size[i];
+    }
 
     buf_p = (good_buffer_hdr *)good_heap_alloc(need_size);
 
@@ -72,38 +75,40 @@ good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(vo
         /*
          * 分配各项地址。
         */
-        buf_p->out.data = GOOD_PTR2PTR(void*, buf_p, sizeof(good_buffer_hdr));// good_buffer_hdr + 1
-        buf_p->out.size = GOOD_PTR2PTR(size_t, buf_p->out.data,number * sizeof(void *));// good_buffer_hdr + *data[]
-        buf_p->out.size1 = GOOD_PTR2PTR(size_t, buf_p->out.size,number * sizeof(size_t));// good_buffer_hdr + *data[] + size[]
+        buf_p->out.data = GOOD_PTR2PTR(uint8_t*, buf_p, sizeof(good_buffer_hdr));            // good_buffer_hdr + 1
+        buf_p->out.size = GOOD_PTR2PTR(size_t, buf_p->out.data, number * sizeof(uint8_t*));  // good_buffer_hdr + *data[]
+        buf_p->out.size1 = GOOD_PTR2PTR(size_t, buf_p->out.size, number * sizeof(size_t)); // good_buffer_hdr + *data[] + size[]
 
         /*
          * 第一块缓存。
         */
-        data_p = GOOD_PTR2PTR(void, buf_p->out.size1, number * sizeof(size_t));// good_buffer_hdr + *data[] + size[] + size[]
+        data_p = GOOD_PTR2PTR(uint8_t, buf_p->out.size1, number * sizeof(size_t)); // good_buffer_hdr + *data[] + size[] + size[]
 
-        /*
-         * 分配缓存地址。
-        */
-        for (size_t i = 0; i < number; i++)
+        if (size != NULL)
         {
-            buf_p->out.size[i] = size[i];
-
             /*
-             * 跳过不需要分配的。
+            * 分配缓存地址。
             */
-            if (buf_p->out.size[i] <= 0)
-                continue;
+            for (size_t i = 0; i < number; i++)
+            {
+                /*
+                * 跳过不需要分配的。
+                */
+                if (size[i] <= 0)
+                    continue;
 
-            /*
-             * 绑定地址。
-            */
-            buf_p->out.data[i] = data_p;
+                /*
+                * 绑定大小和地址。
+                */
+                buf_p->out.size[i] = size[i];
+                buf_p->out.data[i] = data_p;
 
-            /*
-             * 下一块。
-            */
-            data_p = GOOD_PTR2PTR(void, data_p, buf_p->out.size[i]);
-         }
+                /*
+                * 下一块。
+                */
+                data_p = GOOD_PTR2PTR(uint8_t, data_p, size[i]);
+            }
+        }
     }
 
     return GOOD_BUFFER_PTR_IN2OUT(buf_p);
@@ -112,6 +117,11 @@ good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(vo
 good_buffer_t *good_buffer_alloc2(size_t size[],size_t number)
 {
     return good_buffer_alloc(size, number, NULL, NULL);
+}
+
+good_buffer_t *good_buffer_alloc3(size_t size)
+{
+    return good_buffer_alloc2(&size,1);
 }
 
 good_buffer_t *good_buffer_refer(good_buffer_t *buf)
