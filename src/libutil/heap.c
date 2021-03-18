@@ -30,7 +30,7 @@ void good_heap_free(void *data)
 void good_heap_freep(void **data)
 {
     if (!data || !*data)
-        return;
+        GOOD_ERRNO_AND_RETURN0(EINVAL);
 
     good_heap_free(*data);
     *data = NULL;

@@ -18,6 +18,9 @@ int good_endian_check(int big)
 
 uint8_t *good_endian_swap(uint8_t *dst, int len)
 {
+    if(!dst)
+        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
+
     if (len == 2 || len == 3)
     {
         GOOD_INTEGER_SWAP(dst[0], dst[len - 1]);

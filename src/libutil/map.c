@@ -19,24 +19,12 @@ int good_map_compare(const void *data1, const void *data2, size_t size)
 
 void good_map_destroy(good_map_t *map)
 {
-    if (!map)
-        return;
-
-    if (map->size <= 0 || !map->table)
-        return;
-
-    for (size_t i = 0; i < map->size; i++)
-    {
-        /*
-         * 也许还未创建。
-        */
-        if(!map->table[i])
-            continue;
-
-        good_tree_free(&map->table[i]);
-    }
-
-    good_heap_freep((void**)&map->table);
+    assert(map);
+    
+    /*
+     * 全部释放。
+    */
+    good_tree_free(&map->table);
     
     memset(map,0,sizeof(*map));
 }
@@ -44,13 +32,11 @@ void good_map_destroy(good_map_t *map)
 int good_map_init(good_map_t *map, size_t size)
 {
     if (!map || size <= 0)
-        return -1;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,-1);
 
-    map->table = (good_tree_t**)good_heap_alloc(size * sizeof(good_tree_t*));
-    if(!map->table)
-        return -1;
-    
-    map->size = size;
+    map->table = good_tree_alloc(NULL, size);
+    if (!map->table)
+        GOOD_ERRNO_AND_RETURN1(ENOMEM,-1);
 
     /*
      * 如果未指定，则启用默认函数。

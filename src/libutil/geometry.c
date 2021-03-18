@@ -17,12 +17,12 @@ double good_geom_halfline_radian(const good_point_t *p1, const good_point_t *p2,
 {
     double radian;
 
+    assert(p1 && p2);
+
     /*
      * To upper
     */
     axis = toupper(axis);
-
-    assert(p1 && p2);
     assert((axis == 'X') || (axis == 'Y'));
 
     if (axis == 'X')

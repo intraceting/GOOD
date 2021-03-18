@@ -61,7 +61,7 @@ good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(ui
     buf_p = (good_buffer_hdr *)good_heap_alloc(need_size);
 
     if (!buf_p)
-        return NULL;
+        GOOD_ERRNO_AND_RETURN1(ENOMEM,NULL);
 
     buf_p->magic = GOOD_BUFFER_MAGIC;
     atomic_init(&buf_p->refcount, 1);
@@ -129,7 +129,7 @@ good_buffer_t *good_buffer_refer(good_buffer_t *buf)
     good_buffer_hdr *buf_p = NULL;
 
     if (!buf)
-        return NULL;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
 
     buf_p = GOOD_BUFFER_PTR_OUT2IN(buf);
 
@@ -145,7 +145,7 @@ void good_buffer_unref(good_buffer_t **buf)
     good_buffer_hdr *buf_p = NULL;
 
     if (!buf || !*buf)
-        return;
+        GOOD_ERRNO_AND_RETURN0(EINVAL);
 
     buf_p = GOOD_BUFFER_PTR_OUT2IN(*buf);
 

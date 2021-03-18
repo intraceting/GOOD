@@ -19,6 +19,7 @@
 #include <pthread.h>
 
 /**/
+#include "general.h"
 #include "buffer.h"
 
 /**

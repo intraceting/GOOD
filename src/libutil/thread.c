@@ -8,8 +8,7 @@
 
 void good_mutex_destroy(good_mutex_t *ctx)
 {
-    if (!ctx)
-        return;
+    assert(ctx);
 
     pthread_condattr_destroy(&ctx->condattr);
     pthread_cond_destroy(&ctx->cond);
@@ -21,8 +20,7 @@ void good_mutex_destroy(good_mutex_t *ctx)
 
 void good_mutex_init(good_mutex_t *ctx)
 {
-    if (!ctx)
-        return;
+    assert(ctx);
 
     pthread_cond_init(&ctx->cond, &ctx->condattr);
     pthread_mutex_init(&ctx->mutex, &ctx->mutexattr);
@@ -30,8 +28,7 @@ void good_mutex_init(good_mutex_t *ctx)
 
 void good_mutex_init2(good_mutex_t* ctx,int shared)
 {
-    if (!ctx)
-        return;
+    assert(ctx);
 
     pthread_condattr_init(&ctx->condattr);
     pthread_condattr_setclock(&ctx->condattr, CLOCK_MONOTONIC);
@@ -49,7 +46,7 @@ int good_mutex_lock(good_mutex_t *ctx, int try)
     int err = -1;
 
     if (!ctx)
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     if(try)
         err = pthread_mutex_lock(&ctx->mutex);
@@ -74,7 +71,7 @@ int good_mutex_unlock(good_mutex_t* ctx)
     int err = -1;
 
     if (!ctx)
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     err = pthread_mutex_unlock(&ctx->mutex);
     
@@ -90,7 +87,7 @@ int good_mutex_wait(good_mutex_t* ctx,int64_t timeout)
     __clockid_t condclock;
 
     if (!ctx)
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     if(timeout>=0)
     {
@@ -103,7 +100,7 @@ int good_mutex_wait(good_mutex_t* ctx,int64_t timeout)
         else if (condclock == CLOCK_REALTIME)
             clock_gettime(CLOCK_REALTIME, &sys_ts);
         else
-            return err = -EINVAL;
+            GOOD_ERRNO_AND_RETURN1(EINVAL,err=-1);
 
         out_ts.tv_sec = sys_ts.tv_sec + (timeout / 1000);
         out_ts.tv_nsec = sys_ts.tv_nsec + (timeout % 1000);
@@ -124,7 +121,7 @@ int good_mutex_signal(good_mutex_t* ctx,int broadcast)
     int err = -1;
 
     if (!ctx)
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     if(broadcast)
         err = pthread_cond_broadcast(&ctx->cond);
@@ -140,10 +137,10 @@ int good_thread_create(good_thread_t *ctx,int joinable)
     pthread_attr_t attr;
   
     if (!ctx)
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     if(!ctx->routine)
-        return err = -EINVAL;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
@@ -163,7 +160,7 @@ int good_thread_join(good_thread_t *ctx)
     int detachstate = -1;
 
     if (!ctx)
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     err = pthread_getattr_np(ctx->handle,&attr);
     if (err != 0)
@@ -187,7 +184,7 @@ int good_thread_setname(const char* fmt,...)
     char name[16] = {0};
 
     if(!fmt || !fmt[0])
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     va_list vaptr;
     va_start(vaptr, fmt);
@@ -204,7 +201,7 @@ int good_thread_getname(char name[16])
     int err = -1;
 
     if(!name)
-        return err;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
 
     err = pthread_getname_np(pthread_self(),name,16);
 

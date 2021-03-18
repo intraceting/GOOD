@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <errno.h>
 
 /**
  * 转换指针类型。
@@ -37,6 +38,16 @@
  * 
 */
 #define GOOD_INTEGER_SWAP(A,B)  ({(A)^=(B);(B)^=(A);(A)^=(B);})
+
+/*
+ * 设置出错码，并返回。
+*/
+#define GOOD_ERRNO_AND_RETURN0(E) ({errno=(E);return;})
+
+/*
+ * 设置出错码，并返回值。
+*/
+#define GOOD_ERRNO_AND_RETURN1(E, V) ({errno=(E);return (V);})
 
 /**
  * 尺寸对齐

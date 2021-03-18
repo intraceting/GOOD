@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <assert.h>
 #include <string.h>
+#include <errno.h>
 
 #include "general.h"
 #include "buffer.h"
@@ -24,39 +25,23 @@
 typedef struct _good_map
 {
     /**
-     * 根 
+     * 表格 
      * 
      * @note 尽量不要直接修改。
     */
-    good_tree_t root;
-
-    /**
-     * 大小
-     * 
-     * @note 尽量不要直接修改。
-    */
-    size_t size;
-
-    /**
-     * 表
-     * 
-     * @see good_tree_t
-     * 
-     * @note 尽量不要直接修改。
-    */
-    good_tree_t **table;
+    good_tree_t *table;
 
     /**
      * HASH
      * 
-     * @see good_vector_hash()
+     * @see good_map_hash()
     */
     uint64_t (*hash_cb)(const void* key,size_t size);
 
     /**
      * 比较
      * 
-     * @see good_vector_compare()
+     * @see good_map_compare()
     */
     int (*compare_cb)(const void *key1, const void *key2, size_t size);
 

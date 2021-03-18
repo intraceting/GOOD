@@ -156,13 +156,24 @@ void good_tree_free(good_tree_t **root);
 /**
  * 申请
  * 
- * @param buf_size 0 不创建BUFFER。
+ * @param size NULL(0) 不申请缓存。
+ * @param number 0 不创建缓存。
  * 
  * @see good_heap_calloc()
- * @see good_buffer_alloc3()
+ * @see good_buffer_alloc2()
  * 
 */
-good_tree_t *good_tree_alloc(size_t buf_size);
+good_tree_t *good_tree_alloc(size_t size[],size_t number);
+
+/**
+ * 申请
+ * 
+ * @param size 0 不创建缓存。
+ * 
+ * @see good_tree_alloc()
+ * 
+*/
+good_tree_t *good_tree_alloc2(size_t size);
 
 /**
  * 遍历

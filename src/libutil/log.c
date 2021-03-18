@@ -61,8 +61,7 @@ void good_log_redirect(void (*agent_cb)(void *opaque,int level,const char* fmt,v
 
 int good_log_mask(int mask)
 {
-    if(!__good_log_ctx)
-        return 0;
+    assert(__good_log_ctx);
     
     return setlogmask(__good_log_ctx->mask = mask);
 }
@@ -77,8 +76,7 @@ void good_log_printf(int level,const char* fmt,...)
 
 void good_log_vprintf(int level,const char* fmt,va_list args)
 {
-    if(!__good_log_ctx)
-        return;
+    assert(__good_log_ctx);
 
     if(__good_log_ctx->agent_cb)    
     {

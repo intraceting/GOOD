@@ -10,7 +10,7 @@
 good_tree_t *good_tree_father(const good_tree_t *self)
 {
     if (!self)
-        return NULL;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
 
     return self->chain[GOOD_TREE_CHAIN_FATHER];
 }
@@ -18,7 +18,7 @@ good_tree_t *good_tree_father(const good_tree_t *self)
 good_tree_t *good_tree_sibling(const good_tree_t *self,int elder)
 {
     if (!self)
-        return NULL;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
 
     if(elder)
         return self->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
@@ -30,7 +30,7 @@ good_tree_t *good_tree_sibling(const good_tree_t *self,int elder)
 good_tree_t *good_tree_child(const good_tree_t *self,int first)
 {
     if (!self)
-        return NULL;
+        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
 
     if(first)
         return self->chain[GOOD_TREE_CHAIN_CHILD_FIRST];
@@ -42,8 +42,7 @@ void good_tree_unlink(good_tree_t *self)
 {
     good_tree_t *root = NULL;
 
-    if (!self)
-        return;
+    assert(self);
 
     /*
      * 获取父节点
@@ -93,8 +92,7 @@ void good_tree_unlink(good_tree_t *self)
 
 void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *where)
 {
-    if (!father || !child)
-        return;
+    assert(father && child);
 
     /* 
      * 必须是根节点，或独立节点。
@@ -165,8 +163,7 @@ void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first)
 {
     good_tree_t* where = NULL;
 
-    if (!father || !child)
-        return;
+    assert(father && child);
 
     if(first)
         where = good_tree_child(father,1);
@@ -183,7 +180,7 @@ void good_tree_free(good_tree_t **root)
     good_tree_t *child = NULL;
 
     if(!root || !*root)
-        return;
+        GOOD_ERRNO_AND_RETURN0(EINVAL);
 
     /*
      * 复制一下
@@ -234,19 +231,24 @@ void good_tree_free(good_tree_t **root)
 
 }
 
-good_tree_t *good_tree_alloc(size_t buf_size)
+good_tree_t *good_tree_alloc(size_t size[], size_t number)
 {
     good_tree_t *node = (good_tree_t *)good_heap_alloc(sizeof(good_tree_t));
 
     if (!node)
-        return NULL;
+        GOOD_ERRNO_AND_RETURN1(ENOMEM,NULL);
 
-    if (buf_size > 0)
-        node->buf = good_buffer_alloc3(buf_size);
+    if (number > 0)
+        node->buf = good_buffer_alloc2(size, number);
     else
         node->buf = NULL;
 
     return node;
+}
+
+good_tree_t *good_tree_alloc2(size_t size)
+{
+    return good_tree_alloc(&size,1);
 }
 
 void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
@@ -257,8 +259,8 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
     int chk_dump;
     int inside_stack = 0; 
 
-    if (!root || !it || !it->dump_cb)
-        return;
+    assert(root && it && it->dump_cb);
+        
 
     /*
      * 如果没有准备，则在内部准备。
@@ -327,11 +329,6 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
 
         it->stack_size = 0;
     }
-}
-
-void good_tree_traversal2(const good_tree_t *root,good_tree_iterator* it)
-{
-    
 }
 
 void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,...)

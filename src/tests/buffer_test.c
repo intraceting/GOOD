@@ -17,16 +17,13 @@ void free_clean(uint8_t **buf,size_t number, void *opaque)
         if(buf[i])
             printf("[%ld]={%s}\n",i,(char*)buf[i]);
     }
-
-    
-
 }
 
 void free_free(uint8_t **buf,size_t number, void *opaque)
 {
     printf("[%ld]={%s}\n",0l,(char*)buf[0]);
     
-    good_heap_freep(&buf[0]);
+    good_heap_freep((void**)&buf[0]);
 }
 
 int main(int argc, char **argv)

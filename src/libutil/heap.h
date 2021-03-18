@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "general.h"
+
 /**
  * 内存申请
  * 
