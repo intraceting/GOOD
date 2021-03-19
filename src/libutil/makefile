@@ -53,6 +53,9 @@ OBJ_FILES = \
 	${OBJ_PATH}/map.o \
 	${OBJ_PATH}/geometry.o \
 	${OBJ_PATH}/bloom.o \
+	${OBJ_PATH}/crc32.o \
+	${OBJ_PATH}/time.o \
+	${OBJ_PATH}/clock.o \
 	${OBJ_PATH}/log.o
 
 

@@ -36,7 +36,7 @@ int good_bloom_unset(uint8_t* pool,size_t size,size_t number);
 /**
  * 布隆-过滤
  * 
- * @return 0 不存在，!0 已存在。
+ * @return 0 不存在，1 已存在，-1 参数误错。
 */
 int good_bloom_filter(uint8_t* pool,size_t size,size_t number);
 

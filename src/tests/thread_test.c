@@ -8,11 +8,15 @@
 #include <assert.h>
 #include <unistd.h>
 #include "libutil/thread.h"
+#include "libutil/crc32.h"
 
 void* specific_cb(void* args)
 {
     good_thread_setname("haha");
 
+    uint32_t sum = good_crc32_sum("abc",3,0);
+
+    printf("sun=%u,%08X\n",sum,sum);
 
     sleep(3);
 
