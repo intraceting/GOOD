@@ -121,8 +121,13 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
 
 void good_map_erase(good_map_t* map,const void* key,size_t ksize)
 {
-    good_tree_t *node = good_map_find(map,key,ksize,0);
- 
+    good_tree_t *node = NULL;
+
+    assert(map);
+    assert(map->table && map->hash_cb && map->compare_cb);
+    assert(key && ksize>0);
+    
+    node = good_map_find(map,key,ksize,0);
     if(node)
     {
         good_tree_unlink(node);

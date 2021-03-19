@@ -111,11 +111,10 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
 
 /**
  * 擦除
+ * 
+ * @see good_map_find()
 */
 void good_map_erase(good_map_t* map,const void* key,size_t ksize);
-
-
-
 
 
 #endif //GOOD_UTIL_MAP_H

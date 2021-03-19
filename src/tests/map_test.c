@@ -134,9 +134,7 @@ int main(int argc, char **argv)
         good_tree_t *n = good_map_find(&m,buf,strlen(buf),100);
         if(!n)
             continue;
-
-        
-        
+            
         memset(n->buf->data[GOOD_MAP_VALUE],'A'+i%26,n->buf->size[GOOD_MAP_VALUE]-1);
     }
 
