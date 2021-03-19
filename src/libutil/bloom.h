@@ -14,10 +14,31 @@
 
 #include "general.h"
 
-
+/** 
+ * 布隆-插旗
+ * 
+ * @param size 池大小(Bytes)
+ * 
+ * @return 0 成功，1 成功（重复操作），-1 参数误错。
+*/
 int good_bloom_mark(uint8_t* pool,size_t size,size_t number);
 
+/** 
+ * 布隆-拔旗
+ * 
+ * @param size 池大小(Bytes)
+ * 
+ * @return 0 成功，1 成功（重复操作），-1 参数误错。
+ * 
+*/
 int good_bloom_unset(uint8_t* pool,size_t size,size_t number);
+
+/**
+ * 布隆-过滤
+ * 
+ * @return 0 不存在，!0 已存在。
+*/
+int good_bloom_filter(uint8_t* pool,size_t size,size_t number);
 
 
 #endif //GOOD_UTIL_BLOOM_H

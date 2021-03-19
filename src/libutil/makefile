@@ -52,6 +52,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/tree.o \
 	${OBJ_PATH}/map.o \
 	${OBJ_PATH}/geometry.o \
+	${OBJ_PATH}/bloom.o \
 	${OBJ_PATH}/log.o
 
 
