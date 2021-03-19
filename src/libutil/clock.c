@@ -29,7 +29,7 @@ void _good_clock_destroy(void* buf)
         good_heap_free(buf);
 }
 
-good_clock_t* _good_clock_init()
+pthread_key_t* _good_clock_init()
 {
     static atomic_int init = 0;
     static pthread_key_t key = -1;
@@ -52,17 +52,7 @@ good_clock_t* _good_clock_init()
 
     assert(atomic_load(&init) == 2);
 
-    ctx = (good_clock_t *)pthread_getspecific(key);
-    if (!ctx)
-    {
-        good_heap_alloc(sizeof(good_clock_t));
-
-        chk = pthread_setspecific(key, ctx);
-
-        assert(chk == 0);
-    }
-
-    return ctx;
+    return &key;
 }
 
 
@@ -70,9 +60,17 @@ void good_clock_reset()
 {
     good_clock_t* ctx = _good_clock_init();
 
-    assert(ctx);
+    ctx = (good_clock_t *)pthread_getspecific(key);
+    if (!ctx)
+    {
+        ctx = good_heap_alloc(sizeof(good_clock_t));
 
-    ctx->point = ctx->point = good_time_clock2kind_with(CLOCK_MONOTONIC,6);
+        chk = pthread_setspecific(key, ctx);
+
+        assert(chk == 0);
+    }
+
+    ctx->start = ctx->point = good_time_clock2kind_with(CLOCK_MONOTONIC,6);
 }
 
 uint64_t good_clock_dot(uint64_t *step)
