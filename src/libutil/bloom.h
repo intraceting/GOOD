@@ -17,5 +17,7 @@
 
 int good_bloom_mark(uint8_t* pool,size_t size,size_t number);
 
+int good_bloom_unset(uint8_t* pool,size_t size,size_t number);
+
 
 #endif //GOOD_UTIL_BLOOM_H
