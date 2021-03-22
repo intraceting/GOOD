@@ -20,26 +20,26 @@ typedef struct _good_log
     /**
      * 代理
     */
-    void (*agent_cb)(void *opaque,int level,const char* fmt,va_list args);
+    void (*agent_cb)(void *opaque, int level, const char *fmt, va_list args);
 
     /**
      * 环境指针
     */
     void *opaque;
-}good_log_t;
+} good_log_t;
 
 /*
  * 全局的日志环境
 */
-static good_log_t* __good_log_ctx = NULL;
+static good_log_t *__good_log_ctx = NULL;
 
 void good_log_init(const char *ident, int copy2stderr)
 {
-    static good_log_t log = {LOG_UPTO(LOG_INFO),NULL,NULL};
+    static good_log_t log = {LOG_UPTO(LOG_INFO), NULL, NULL};
 
     assert(__good_log_ctx == NULL);
 
-    openlog(ident,LOG_CONS | LOG_PID | (copy2stderr ? LOG_PERROR : 0), LOG_USER);
+    openlog(ident, LOG_CONS | LOG_PID | (copy2stderr ? LOG_PERROR : 0), LOG_USER);
     setlogmask(log.mask);
 
     /*
@@ -48,11 +48,10 @@ void good_log_init(const char *ident, int copy2stderr)
     __good_log_ctx = &log;
 }
 
-void good_log_redirect(void (*agent_cb)(void *opaque,int level,const char* fmt,va_list args),void *opaque)
+void good_log_redirect(void (*agent_cb)(void *opaque, int level, const char *fmt, va_list args), void *opaque)
 {
-    if(!__good_log_ctx)
-        return;
-    
+    assert(__good_log_ctx != NULL);
+
     assert(agent_cb);
 
     __good_log_ctx->agent_cb = agent_cb;
@@ -61,30 +60,30 @@ void good_log_redirect(void (*agent_cb)(void *opaque,int level,const char* fmt,v
 
 int good_log_mask(int mask)
 {
-    assert(__good_log_ctx);
-    
+    assert(__good_log_ctx != NULL);
+
     return setlogmask(__good_log_ctx->mask = mask);
 }
 
-void good_log_printf(int level,const char* fmt,...)
+void good_log_printf(int level, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    good_log_vprintf(level,fmt, args);
+    good_log_vprintf(level, fmt, args);
     va_end(args);
 }
 
-void good_log_vprintf(int level,const char* fmt,va_list args)
+void good_log_vprintf(int level, const char *fmt, va_list args)
 {
-    assert(__good_log_ctx);
+    assert(__good_log_ctx != NULL);
 
-    if(__good_log_ctx->agent_cb)    
+    if (__good_log_ctx->agent_cb)
     {
-        if(LOG_MASK(level) & __good_log_ctx->mask)
-            __good_log_ctx->agent_cb(__good_log_ctx->opaque,level,fmt,args);
+        if (LOG_MASK(level) & __good_log_ctx->mask)
+            __good_log_ctx->agent_cb(__good_log_ctx->opaque, level, fmt, args);
     }
     else
     {
-        vsyslog(level,fmt,args);
-    } 
+        vsyslog(level, fmt, args);
+    }
 }

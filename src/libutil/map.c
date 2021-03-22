@@ -31,8 +31,7 @@ void good_map_destroy(good_map_t *map)
 
 int good_map_init(good_map_t *map, size_t size)
 {
-    if (!map || size <= 0)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,-1);
+    assert(map && size > 0);
 
     map->table = good_tree_alloc(NULL, size);
 
@@ -58,8 +57,7 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     uint64_t index = -1;
     int chk = 0;
 
-    if (!map || !key || ksize <= 0)
-        GOOD_ERRNO_AND_RETURN1(EINVAL, NULL);
+    assert(map && key && ksize > 0);
 
     assert(map->table);
     assert(map->hash_cb);

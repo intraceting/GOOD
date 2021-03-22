@@ -79,6 +79,8 @@ uint64_t good_clock_dot(uint64_t *step)
     uint64_t current = good_time_clock2kind_with(CLOCK_MONOTONIC,6);
     good_clock_t* ctx = _good_clock_init(current);
 
+    assert(ctx);
+
     uint64_t dot = current - ctx->start;
 
     if (step)

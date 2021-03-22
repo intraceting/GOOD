@@ -45,8 +45,7 @@ int good_mutex_lock(good_mutex_t *ctx, int try)
 {
     int err = -1;
 
-    if (!ctx)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(ctx);
 
     if(try)
         err = pthread_mutex_lock(&ctx->mutex);
@@ -70,8 +69,7 @@ int good_mutex_unlock(good_mutex_t* ctx)
 {
     int err = -1;
 
-    if (!ctx)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(ctx);
 
     err = pthread_mutex_unlock(&ctx->mutex);
     
@@ -86,8 +84,7 @@ int good_mutex_wait(good_mutex_t* ctx,int64_t timeout)
     struct timespec out_ts;
     __clockid_t condclock;
 
-    if (!ctx)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(ctx);
 
     if(timeout>=0)
     {
@@ -120,8 +117,7 @@ int good_mutex_signal(good_mutex_t* ctx,int broadcast)
 {
     int err = -1;
 
-    if (!ctx)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(ctx);
 
     if(broadcast)
         err = pthread_cond_broadcast(&ctx->cond);
@@ -136,11 +132,8 @@ int good_thread_create(good_thread_t *ctx,int joinable)
     int err = -1;
     pthread_attr_t attr;
   
-    if (!ctx)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
-
-    if(!ctx->routine)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(ctx);
+    assert(ctx->routine);
 
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr,(joinable?PTHREAD_CREATE_JOINABLE:PTHREAD_CREATE_DETACHED));
@@ -159,8 +152,7 @@ int good_thread_join(good_thread_t *ctx)
     pthread_attr_t attr;
     int detachstate = -1;
 
-    if (!ctx)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(ctx);
 
     err = pthread_getattr_np(ctx->handle,&attr);
     if (err != 0)
@@ -183,8 +175,7 @@ int good_thread_setname(const char* fmt,...)
     int err = -1;
     char name[16] = {0};
 
-    if(!fmt || !fmt[0])
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(fmt && fmt[0]);
 
     va_list vaptr;
     va_start(vaptr, fmt);
@@ -200,8 +191,7 @@ int good_thread_getname(char name[16])
 {
     int err = -1;
 
-    if(!name)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,err);
+    assert(name);
 
     err = pthread_getname_np(pthread_self(),name,16);
 

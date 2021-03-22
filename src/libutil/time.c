@@ -11,6 +11,8 @@ uint64_t good_time_clock2kind(struct timespec *ts, uint8_t precision)
     uint64_t kind = 0;
     uint64_t p = 0;
 
+    assert(ts);
+
     if (precision <= 9 && precision >= 1)
     {
         p = powl(10, precision);

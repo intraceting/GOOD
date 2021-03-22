@@ -12,8 +12,7 @@ uint32_t good_hash_bkdr(const void* data,size_t size)
     uint32_t seed = 131; /* 31 131 1313 13131 131313 etc.. */
     uint32_t hash = 0;
 
-    if(!data)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,hash);
+    assert(data && size>0);
 
     for (size_t i = 0; i < size;i++)
     {
@@ -28,8 +27,7 @@ uint64_t good_hash_bkdr64(const void* data,size_t size)
     uint64_t seed = 13113131; /* 31 131 1313 13131 131313 etc.. */
     uint64_t hash = 0;
 
-    if(!data)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,hash);
+    assert(data && size>0);
 
     for (size_t i = 0; i < size;i++)
     {

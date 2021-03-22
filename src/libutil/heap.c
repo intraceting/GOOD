@@ -40,8 +40,7 @@ void *good_heap_dup(const void *data, size_t size)
 {
     void *buf = NULL;
 
-    if (!data || size <= 0)
-        GOOD_ERRNO_AND_RETURN1(EINVAL, NULL);
+    assert(data && size > 0);
 
     buf = good_heap_alloc(size);
     if (!buf)

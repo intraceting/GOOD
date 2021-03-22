@@ -9,16 +9,14 @@
 
 good_tree_t *good_tree_father(const good_tree_t *self)
 {
-    if (!self)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
+    assert(self);
 
     return self->chain[GOOD_TREE_CHAIN_FATHER];
 }
 
 good_tree_t *good_tree_sibling(const good_tree_t *self,int elder)
 {
-    if (!self)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
+    assert(self);
 
     if(elder)
         return self->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
@@ -29,8 +27,7 @@ good_tree_t *good_tree_sibling(const good_tree_t *self,int elder)
 
 good_tree_t *good_tree_child(const good_tree_t *self,int first)
 {
-    if (!self)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
+    assert(self);
 
     if(first)
         return self->chain[GOOD_TREE_CHAIN_CHILD_FIRST];
@@ -343,6 +340,8 @@ void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* 
 
 void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args)
 {
+    assert(fp);
+
     if (deep <= 0)
     {
         vfprintf(fp,fmt,args);
