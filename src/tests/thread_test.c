@@ -9,16 +9,29 @@
 #include <unistd.h>
 #include "libutil/thread.h"
 #include "libutil/crc32.h"
+#include "libutil/clock.h"
 
 void* specific_cb(void* args)
 {
     good_thread_setname("haha");
 
+    printf("dot:%lu\n",good_clock_dot(NULL));
+
     uint32_t sum = good_crc32_sum("abc",3,0);
 
     printf("sun=%u,%08X\n",sum,sum);
 
+    printf("step:%lu\n",good_clock_step(NULL));
+
+    sum = good_crc32_sum("abc",3,sum);
+
+    printf("sun=%u,%08X\n",sum,sum);
+
+    printf("step:%lu\n",good_clock_step(NULL));
+
     sleep(3);
+
+    printf("dot:%lu\n",good_clock_dot(NULL));
 
     return NULL;
 }

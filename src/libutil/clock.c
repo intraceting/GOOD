@@ -29,55 +29,56 @@ void _good_clock_destroy(void* buf)
         good_heap_free(buf);
 }
 
-pthread_key_t* _good_clock_init()
+int _good_clock_create(void *opaque)
+{
+    return pthread_key_create((pthread_key_t *)opaque, _good_clock_destroy);
+}
+
+good_clock_t *_good_clock_init(uint64_t set)
 {
     static atomic_int init = 0;
     static pthread_key_t key = -1;
 
-    good_clock_t* ctx = NULL;
-    atomic_int cmp = 0;
-    int chk;
+    int chk = 0;
+    good_clock_t *ctx = NULL;
 
-    if(atomic_compare_exchange_strong(&init,&cmp,1))
-    {
-        chk = pthread_key_create(&key,_good_clock_destroy);
-        
-        atomic_store(&init,((chk == 0)?2:0));
-    }
-    else
-    {
-        while(atomic_load(&init) == 1)
-            pthread_yield();
-    }
+    chk = good_once(&init, _good_clock_create, &key);
+    if (chk < 0)
+        return NULL;
 
-    assert(atomic_load(&init) == 2);
-
-    return &key;
-}
-
-
-void good_clock_reset()
-{
-    good_clock_t* ctx = _good_clock_init();
-
-    ctx = (good_clock_t *)pthread_getspecific(key);
+    ctx = pthread_getspecific(key);
     if (!ctx)
     {
         ctx = good_heap_alloc(sizeof(good_clock_t));
+        if (!ctx)
+            return NULL;
 
         chk = pthread_setspecific(key, ctx);
-
-        assert(chk == 0);
+        if (chk != 0)
+            good_heap_freep((void **)&ctx);
     }
 
-    ctx->start = ctx->point = good_time_clock2kind_with(CLOCK_MONOTONIC,6);
+    if (ctx && chk == 0)
+        ctx->point = ctx->start = set;
+
+    return ctx;
+}
+
+void good_clock_reset()
+{
+    uint64_t current = good_time_clock2kind_with(CLOCK_MONOTONIC,6);
+    good_clock_t* ctx = _good_clock_init(current);
+
+    assert(ctx);
+    
+    ctx->start = ctx->point = current;
 }
 
 uint64_t good_clock_dot(uint64_t *step)
 {
-    good_clock_t* ctx = _good_clock_init();
-
     uint64_t current = good_time_clock2kind_with(CLOCK_MONOTONIC,6);
+    good_clock_t* ctx = _good_clock_init(current);
+
     uint64_t dot = current - ctx->start;
 
     if (step)

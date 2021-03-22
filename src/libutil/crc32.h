@@ -9,11 +9,9 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdatomic.h>
 #include <assert.h>
 
 #include "general.h"
-#include "thread.h"
 
 /**
  * 计算CRC32值
