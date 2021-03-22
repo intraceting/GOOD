@@ -50,7 +50,8 @@ void good_log_init(const char *ident, int copy2stderr)
 
 void good_log_redirect(void (*agent_cb)(void *opaque, int level, const char *fmt, va_list args), void *opaque)
 {
-    assert(__good_log_ctx != NULL);
+    if(!__good_log_ctx)
+        GOOD_ERRNO_AND_RETURN0(EACCES);
 
     assert(agent_cb);
 
@@ -60,7 +61,8 @@ void good_log_redirect(void (*agent_cb)(void *opaque, int level, const char *fmt
 
 int good_log_mask(int mask)
 {
-    assert(__good_log_ctx != NULL);
+    if(!__good_log_ctx)
+        GOOD_ERRNO_AND_RETURN1(EACCES,-1);
 
     return setlogmask(__good_log_ctx->mask = mask);
 }
@@ -75,7 +77,8 @@ void good_log_printf(int level, const char *fmt, ...)
 
 void good_log_vprintf(int level, const char *fmt, va_list args)
 {
-    assert(__good_log_ctx != NULL);
+    if(!__good_log_ctx)
+        GOOD_ERRNO_AND_RETURN0(EACCES);
 
     if (__good_log_ctx->agent_cb)
     {

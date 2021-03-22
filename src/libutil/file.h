@@ -47,10 +47,6 @@ char *good_path_dirname(char *dst, const char *src);
 */
 char *good_path_basename(char *dst, const char *src);
 
-/**
- * 路径美化
-*/
-char *good_path_prettify(char *dst, const char *src);
 
 
 

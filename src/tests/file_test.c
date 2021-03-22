@@ -33,10 +33,6 @@ int main(int argc, char **argv)
     good_heap_free(path2);
     good_heap_free(path3);
 
-    good_path_prettify(path4,"/123/qwe/../../asdf./././//////123/kkll/../../fdffdfdfdfdfdfdfdfd/");
-
-    printf("%s\n",path4);
-
 
 
     good_heap_free(path4);
