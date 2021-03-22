@@ -21,7 +21,7 @@ CCC_STD = -std=c11
 CCC_FLAGS = -fPIC -Wno-unused-result -MMD -MP -MF "$@.mdep"
 
 #
-LINK_FLAGS = -Wl,--as-needed
+LINK_FLAGS = -Wl,--as-needed -Wl,-rpath="./"
 
 #
 ifeq ($(BUILD_TYPE),debug)
