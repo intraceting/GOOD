@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdatomic.h>
+#include <pthread.h>
 #include <assert.h>
 #include <errno.h>
 
@@ -51,7 +52,7 @@
 #define GOOD_ERRNO_AND_RETURN1(E, V) ({errno=(E);return (V);})
 
 /**
- * 尺寸对齐
+ * 对齐
  * 
 */
 size_t good_align(size_t size,size_t align);
@@ -60,7 +61,7 @@ size_t good_align(size_t size,size_t align);
  * 执行一次。
  * 
  * @param status 状态，一般是静态类型。必须初始化为0。
- * @param routine 0 成功，!0 失败。
+ * @param routine 执行函数。0 成功，!0 失败。
  * 
  * @return 0 第一次，1 第N次，-1 失败。
  * 
