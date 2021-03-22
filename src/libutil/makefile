@@ -56,7 +56,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/crc32.o \
 	${OBJ_PATH}/time.o \
 	${OBJ_PATH}/clock.o \
-	${OBJ_PATH}/log.o
+	${OBJ_PATH}/log.o \
+	${OBJ_PATH}/file.o
 
 
 #

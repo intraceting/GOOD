@@ -57,7 +57,8 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/map_test.exe \
 	$(BUILD_PATH)/geometry_test.exe \
 	$(BUILD_PATH)/log_test.exe \
-	$(BUILD_PATH)/bloom_test.exe
+	$(BUILD_PATH)/bloom_test.exe \
+	$(BUILD_PATH)/file_test.exe
 
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
 	mkdir -p $(BUILD_PATH)
@@ -80,5 +81,6 @@ clean:
 	rm -f $(BUILD_PATH)/geometry_test.exe
 	rm -f $(BUILD_PATH)/log_test.exe
 	rm -f $(BUILD_PATH)/bloom_test.exe
+	rm -f $(BUILD_PATH)/file_test.exe
 
 
