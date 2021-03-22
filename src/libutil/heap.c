@@ -35,3 +35,19 @@ void good_heap_freep(void **data)
     good_heap_free(*data);
     *data = NULL;
 }
+
+void *good_heap_dup(const void *data, size_t size)
+{
+    void *buf = NULL;
+
+    if (!data || size <= 0)
+        GOOD_ERRNO_AND_RETURN1(EINVAL, NULL);
+
+    buf = good_heap_alloc(size);
+    if (!buf)
+        GOOD_ERRNO_AND_RETURN1(EINVAL, NULL);
+
+    memcpy(buf, data, size);
+
+    return buf;
+}
