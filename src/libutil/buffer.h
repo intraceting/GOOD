@@ -43,6 +43,13 @@ typedef struct _good_buffer
     size_t* size1;
 
     /**
+     * 大小
+     * 
+     * @note 内部不使用此项。
+    */
+    size_t* size2;
+
+    /**
      * 释放
      * 
      * @note NULL(0) 忽略。

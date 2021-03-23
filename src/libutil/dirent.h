@@ -20,8 +20,33 @@
 #include <sys/types.h>
 
 #include "general.h"
-#include "heap.h"
+#include "buffer.h"
 #include "string.h"
+
+/**
+ * 迭代器
+*/
+typedef struct _good_dir_iterator
+{
+    /**
+     * 栈
+    */
+    good_buffer_t *stack;
+
+    /**
+     * 回显
+     * 
+     * @return 0 停止，!0 继续。
+    */
+    int (*dump_cb)(size_t deep,const char *file, void *opaque);
+
+    /**
+     * 环境指针
+    */
+    void *opaque;
+
+} good_dir_iterator;
+
 
 /**
  * 拼接目录

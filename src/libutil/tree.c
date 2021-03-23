@@ -253,7 +253,7 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
     size_t deep = 0;// begin 0
-    int chk_dump;
+    int chk;
 
     assert(root && it && it->dump_cb);
         
@@ -266,8 +266,8 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
     /*
      * 根
     */
-    chk_dump = it->dump_cb(0,root,it->opaque);
-    if(chk_dump == 0)
+    chk = it->dump_cb(0,root,it->opaque);
+    if(chk == 0)
         return;
 
     /*
@@ -277,8 +277,8 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
 
     while(node)
     {
-        chk_dump = it->dump_cb(deep + 1, node, it->opaque);
-        if (chk_dump == 0)
+        chk = it->dump_cb(deep + 1, node, it->opaque);
+        if (chk == 0)
             return;
 
         child = good_tree_child(node,1);

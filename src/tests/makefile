@@ -77,7 +77,7 @@ clean:
 	rm -f $(BUILD_PATH)/thread_test.exe
 	rm -f $(BUILD_PATH)/buffer_test.exe
 	rm -f $(BUILD_PATH)/tree_test.exe
-	rm -f $(BUILD_PATH)/vector_test.exe
+	rm -f $(BUILD_PATH)/map_test.exe
 	rm -f $(BUILD_PATH)/geometry_test.exe
 	rm -f $(BUILD_PATH)/log_test.exe
 	rm -f $(BUILD_PATH)/bloom_test.exe

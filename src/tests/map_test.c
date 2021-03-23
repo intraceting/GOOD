@@ -74,7 +74,7 @@ void make_str(char*buf,size_t max)
 {
     static char pool[] = {"123455678890poiuytreqwqasdfghjjklmnbvcxz"};
 
-    size_t len = (abs(rand())+11)%max;
+    size_t len = abs(rand())%max+1;
 
     assert(len<100);
 

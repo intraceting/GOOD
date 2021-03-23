@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_GENERAL_H
-#define GOOD_UTIL_GENERAL_H
+#ifndef GOOD_UTIL_STRING_H
+#define GOOD_UTIL_STRING_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -82,4 +82,4 @@ char *good_strtok(char *str, const char *delim, char **saveptr);
 */
 int good_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
 
-#endif //GOOD_UTIL_GENERAL_H
+#endif //GOOD_UTIL_STRING_H

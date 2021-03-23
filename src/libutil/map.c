@@ -33,6 +33,9 @@ int good_map_init(good_map_t *map, size_t size)
 {
     assert(map && size > 0);
 
+    /*
+     * 创建树节点，用于表格。
+    */
     map->table = good_tree_alloc(NULL, size);
 
     if (!map->table)
@@ -66,15 +69,24 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     hash = map->hash_cb(key, ksize,map->opaque);
     index = hash % map->table->buf->number;
 
+    /*
+     * 查找桶，不存在创建。
+    */
     it = (good_tree_t *)map->table->buf->data[index];
     if(!it)
     {
         it = good_tree_alloc2(sizeof(index));
         if(it)
         {
+            /*
+             * 桶的BUF存放索引值。
+            */
             *GOOD_PTR2PTR(uint64_t,it->buf->data[GOOD_MAP_INDEX],0) = index;
             it->buf->size1[GOOD_MAP_INDEX] = sizeof(index);
 
+            /*
+             * 桶加和入到表格中。
+            */
             good_tree_insert2(map->table,it,0);
             map->table->buf->data[index] = (uint8_t*)it;
         }
@@ -83,8 +95,10 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     if(!it)
         GOOD_ERRNO_AND_RETURN1(ENOMEM,NULL);
 
+    /*
+     * 链表存储的节点，依次比较查找。
+    */
     node = good_tree_child(it,1);
-
     while(node)
     {
         if (node->buf->size1[GOOD_MAP_KEY] == ksize)
@@ -97,6 +111,9 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
         node = good_tree_sibling(node,0);
     }
 
+    /*
+     * 如果节点不存在并且需要创建，则添加到链表头。
+    */
     if (!node && vsize > 0)
     {
         size_t size[2] = {ksize + 1, vsize + 1};
