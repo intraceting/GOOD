@@ -6,8 +6,7 @@
  */
 #include "file.h"
 
-
-ssize_t good_write(int fd,const void *data,size_t size,good_buffer_t *buf)
+ssize_t good_write(int fd, const void *data, size_t size, good_buffer_t *buf)
 {
     ssize_t wsize = 0;
     ssize_t wsize2 = 0;
@@ -25,7 +24,7 @@ ssize_t good_write(int fd,const void *data,size_t size,good_buffer_t *buf)
                 /*
                  * 缓存满了，需要执行落盘操作。
                 */
-                wsize2 = good_write(fd,buf->data[0], buf->size1[0], NULL);
+                wsize2 = good_write(fd, buf->data[0], buf->size1[0], NULL);
                 if (wsize2 != buf->size1[0])
                 {
                     /*
@@ -34,9 +33,9 @@ ssize_t good_write(int fd,const void *data,size_t size,good_buffer_t *buf)
                     if (wsize2 > 0)
                     {
                         buf->size1[0] -= wsize2;
-                        memmove(buf->data[0], GOOD_PTR2PTR(void,buf->data[0],wsize2), buf->size1[0]);
+                        memmove(buf->data[0], GOOD_PTR2PTR(void, buf->data[0], wsize2), buf->size1[0]);
                     }
-                    
+
                     /*
                      * 数据未写完，提前中断。
                     */
@@ -54,7 +53,7 @@ ssize_t good_write(int fd,const void *data,size_t size,good_buffer_t *buf)
                     /*
                      * 缓存是空的，并且待写数据大于缓存空间，则直接落盘。
                     */
-                    wsize2 = good_write(fd,GOOD_PTR2PTR(void,data,wsize),buf->size[0],NULL);
+                    wsize2 = good_write(fd, GOOD_PTR2PTR(void, data, wsize), buf->size[0], NULL);
                     if (wsize2 == buf->size[0])
                     {
                         wsize += wsize2;
@@ -75,13 +74,12 @@ ssize_t good_write(int fd,const void *data,size_t size,good_buffer_t *buf)
                     /*
                      * 缓存有数据，或待写数据小于缓存空间，则先写入缓存。
                     */
-                    wsize2 = GOOD_MIN(size - wsize, buf->size[0]- buf->size1[0]);
-                    memcpy(GOOD_PTR2PTR(void, buf->data[0],buf->size1[0]), GOOD_PTR2PTR(void,data,wsize),wsize2);
-                    
+                    wsize2 = GOOD_MIN(size - wsize, buf->size[0] - buf->size1[0]);
+                    memcpy(GOOD_PTR2PTR(void, buf->data[0], buf->size1[0]), GOOD_PTR2PTR(void, data, wsize), wsize2);
+
                     wsize += wsize2;
                     buf->size1[0] += wsize2;
                 }
-
             }
         }
     }
@@ -108,7 +106,7 @@ ssize_t good_write(int fd,const void *data,size_t size,good_buffer_t *buf)
     return wsize;
 }
 
-ssize_t good_flush(int fd,uint8_t stuffing,good_buffer_t *buf)
+ssize_t good_write_trailer(int fd, int fill, uint8_t stuffing, good_buffer_t *buf)
 {
     ssize_t wsize = 0;
     ssize_t wsize2 = 0;
@@ -120,12 +118,15 @@ ssize_t good_flush(int fd,uint8_t stuffing,good_buffer_t *buf)
         if (buf->size1[0] > 0)
         {
             /*
-             * 把缓存填满了。
+             * 可能需要把缓存填满了。
             */
-            memset(GOOD_PTR2PTR(void, buf->data[0],buf->size1[0]),stuffing, buf->size[0] - buf->size1[0]);
-            buf->size1[0] = buf->size[0];
+            if (fill)
+            {
+                memset(GOOD_PTR2PTR(void, buf->data[0], buf->size1[0]), stuffing, buf->size[0] - buf->size1[0]);
+                buf->size1[0] = buf->size[0];
+            }
 
-            wsize2 = good_write(fd,buf->data[0], buf->size1[0],NULL);
+            wsize2 = good_write(fd, buf->data[0], buf->size1[0], NULL);
             if (wsize2 == buf->size1[0])
             {
                 wsize = buf->size1[0] = buf->size[0] = 0;
@@ -133,7 +134,7 @@ ssize_t good_flush(int fd,uint8_t stuffing,good_buffer_t *buf)
             else if (wsize2 > 0)
             {
                 buf->size1[0] -= wsize2;
-                memmove(buf->data[0], GOOD_PTR2PTR(void,buf->data[0],wsize2), buf->size1[0]);
+                memmove(buf->data[0], GOOD_PTR2PTR(void, buf->data[0], wsize2), buf->size1[0]);
             }
             else
             {
@@ -231,24 +232,77 @@ void good_closep(int *fd)
     *fd = -1;
 }
 
-int good_open(const char* file,int rw,int nonblock,int create)
+int good_open(const char *file, int rw, int nonblock, int create)
 {
     int flag = O_RDONLY;
-    mode_t mode = S_IRUSR|S_IWUSR;
+    mode_t mode = S_IRUSR | S_IWUSR;
 
     assert(file);
 
-    if(rw)
+    if (rw)
         flag = O_RDWR;
 
-    if(nonblock)
+    if (nonblock)
         flag |= O_NONBLOCK;
 
-    if(rw && create)
+    if (rw && create)
         flag |= O_CREAT;
 
     flag |= __O_LARGEFILE;
     flag |= __O_CLOEXEC;
 
-    return open(file, flag|__O_LARGEFILE|__O_CLOEXEC, mode);
+    return open(file, flag | __O_LARGEFILE | __O_CLOEXEC, mode);
+}
+
+int good_open2(int fd2, const char *file, int rw, int nonblock, int create)
+{
+    int fd = -1;
+    int fd3 = -1;
+
+    assert(fd2 >= 0);
+
+    fd = good_open(file, rw, nonblock, create);
+    if (fd < 0)
+        return -1;
+
+    fd3 = dup2(fd, fd2);
+
+    /*
+     * 必须要关闭，不然句柄就会丢失，造成资源泄露。
+    */
+    good_closep(&fd);
+
+    return fd3;
+}
+
+int good_fflag_add(int fd, int flag)
+{
+    int old;
+    int opt;
+
+    assert(fd >= 0 && flag != 0);
+
+    old = fcntl(fd, F_GETFL, 0);
+    if (old == -1)
+        return -1;
+
+    opt = old | flag;
+
+    return fcntl(fd, F_SETFL, opt);
+}
+
+int good_fflag_del(int fd, int flag)
+{
+    int old;
+    int opt;
+
+    assert(fd >= 0 && flag != 0);
+
+    old = fcntl(fd, F_GETFL, 0);
+    if (old == -1)
+        return -1;
+
+    opt = old & ~flag;
+
+    return fcntl(fd, F_SETFL, opt);
 }

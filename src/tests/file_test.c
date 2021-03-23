@@ -57,8 +57,8 @@ void test_file(const char* f1,const char* f2)
 
     assert(fd1 >= 0 && fd2 >= 0);
 
-    good_buffer_t *rbuf = good_buffer_alloc3(512);
-    good_buffer_t *wbuf = good_buffer_alloc3(256*1024);
+    good_buffer_t *rbuf = good_buffer_alloc3(512*1024);
+    good_buffer_t *wbuf = good_buffer_alloc3(256);
 
     while (1)
     {
@@ -72,7 +72,9 @@ void test_file(const char* f1,const char* f2)
         assert(wsize == rsize);
     }
     
-    assert(good_flush(fd2,0,wbuf)!=0);
+    assert(good_write_trailer(fd2,1,0,wbuf)==0);
+
+  //  assert(good_write_trailer(fd2,0,0,wbuf)==0);
 
     good_buffer_unref(&rbuf);
     good_buffer_unref(&wbuf);
