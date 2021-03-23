@@ -19,20 +19,27 @@ void test_dir()
     char* path2 = good_heap_alloc(PATH_MAX);
     char* path3 = good_heap_alloc(PATH_MAX);
     char* path4 = good_heap_alloc(PATH_MAX);
+    char* path5 = good_heap_alloc(PATH_MAX);
 
-    good_dircat(path,"/tmp/abcd/efg/heigh//dfgsdfg///../..////////aaa.txt");
+    good_dirdir(path,"/tmp/abcd/efg/heigh//dfgsdfg///../..////////aaa.txt");
 
-  //  good_mkdir(path,0);
+    realpath(path,path5);
+
+    good_mkdir(path,0);
 
     good_dirname(path2,path);
+
+ //   good_dirname(path5,path2);
 
     good_basename(path3,path);
 
     printf("%s : %s\n",path2,path3);
+    printf("%s\n",path5);
 
     good_heap_free(path);
     good_heap_free(path2);
     good_heap_free(path3);
+    good_heap_free(path5);
 
     strcpy(path4,"              asdfasdfsad     \r\n\t");
 

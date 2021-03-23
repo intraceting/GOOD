@@ -53,7 +53,7 @@ typedef struct _good_dir_iterator
  * 
  * @warning 要有足够的可用空间，不然会溢出。
 */
-char *good_dircat(char *path,const char *suffix);
+char *good_dirdir(char *path,const char *suffix);
 
 /**
  * 创建目录
@@ -63,7 +63,7 @@ char *good_dircat(char *path,const char *suffix);
 void good_mkdir(const char *path,mode_t mode);
 
 /**
- * 截取路径
+ * 截取目录
  * 
 */
 char *good_dirname(char *dst, const char *src);
@@ -74,6 +74,10 @@ char *good_dirname(char *dst, const char *src);
 */
 char *good_basename(char *dst, const char *src);
 
-
+/**
+ * 美化目录
+ * 
+*/
+char *good_dirnice(char *dst, const char *src);
 
 #endif //GOOD_UTIL_DIRENT_H

@@ -6,7 +6,7 @@
  */
 #include "dirent.h"
 
-char *good_dircat(char *path, const char *suffix)
+char *good_dirdir(char *path, const char *suffix)
 {
     size_t len = 0;
 
@@ -112,6 +112,27 @@ char *good_basename(char *dst, const char *src)
         memcpy(dst, find, strlen(find) + 1);
 
     good_heap_freep((void**)&path);
+
+    return dst;
+}
+
+char *good_dirnice(char *dst, const char *src)
+{
+    const char *s = NULL;
+    
+    assert(dst != NULL && src != NULL);
+
+    s = src;
+
+    if (*s == '\0')
+        goto final;
+
+    if (*s == '/')
+        s++;
+
+    
+
+final:
 
     return dst;
 }
