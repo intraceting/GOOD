@@ -75,14 +75,9 @@ typedef struct _good_tree_iterator
     int flags;
 
     /**
-     * 栈高度
-    */
-    size_t stack_size;
-
-    /**
      * 栈
     */
-    good_tree_t **stack;
+    good_buffer_t *stack;
 
     /**
      * 回显

@@ -22,31 +22,6 @@
 #include "general.h"
 #include "heap.h"
 
-/**
- * 路径拼接
- * 
- * @warning 要有足够的可用空间，不然会溢出。
-*/
-char *good_path_concat(char *path,const char *suffix);
-
-/**
- * 路径创建
- * 
-*/
-void good_path_create(const char *path,mode_t mode);
-
-/**
- * 截取路径
- * 
-*/
-char *good_path_dirname(char *dst, const char *src);
-
-/**
- * 截取文件名
- * 
-*/
-char *good_path_basename(char *dst, const char *src);
-
 
 
 

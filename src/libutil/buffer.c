@@ -128,8 +128,7 @@ good_buffer_t *good_buffer_refer(good_buffer_t *buf)
 {
     good_buffer_hdr *buf_p = NULL;
 
-    if (!buf)
-        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
+    assert(buf);
 
     buf_p = GOOD_BUFFER_PTR_OUT2IN(buf);
 

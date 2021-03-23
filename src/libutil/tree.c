@@ -254,30 +254,14 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
     good_tree_t *child = NULL;
     size_t deep = 0;// begin 0
     int chk_dump;
-    int inside_stack = 0; 
 
     assert(root && it && it->dump_cb);
         
-
     /*
      * 如果没有准备，则在内部准备。
     */
-    if ((it->stack_size <= 0) && (!it->stack))
-    {
-        /*
-         * 释放用
-        */
-        inside_stack = 1;
-
-        it->stack_size = 256;
-        it->stack = (good_tree_t **)good_heap_alloc(sizeof(good_tree_t *) * (it->stack_size));
-    }
-
-    /*
-     * 清空
-    */
-    if (it->stack)
-        memset(it->stack, 0, sizeof(good_tree_t *) * (it->stack_size));
+    if (!it->stack)
+        it->stack = good_buffer_alloc2(NULL,256);
 
     /*
      * 根
@@ -301,9 +285,9 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
 
         if(child)
         {
-            assert(it->stack_size > deep);
+            assert(it->stack->number > deep);
 
-            it->stack[deep++] = node;
+            it->stack->data[deep++] = (uint8_t*)node;
 
             node = child;
         }
@@ -313,19 +297,14 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
 
             while (!node && deep > 0)
             {
-                node = it->stack[--deep];
+                node = (good_tree_t *)it->stack->data[--deep];
                 node = good_tree_sibling(node,0);
             }
         }
     }
 
-    if(inside_stack)
-    {
-        if(it->stack)
-            good_heap_freep((void**)&it->stack);
+    good_buffer_unref(&it->stack);
 
-        it->stack_size = 0;
-    }
 }
 
 void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,...)
