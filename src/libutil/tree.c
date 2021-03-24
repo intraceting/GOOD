@@ -278,10 +278,13 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
     while(node)
     {
         chk = it->dump_cb(deep + 1, node, it->opaque);
-        if (chk == 0)
+        if (chk < 0)
             return;
 
-        child = good_tree_child(node,1);
+        if(chk > 0)
+            child = good_tree_child(node,1);
+        else 
+            child = NULL;
 
         if(child)
         {

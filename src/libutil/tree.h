@@ -82,7 +82,7 @@ typedef struct _good_tree_iterator
     /**
      * 回显
      * 
-     * @return 0 停止，!0 继续。
+     * @return -1 终止，0 忽略孩子，1 继续。
     */
     int (*dump_cb)(size_t deep,const good_tree_t *node, void *opaque);
 

@@ -15,6 +15,8 @@ int dump(size_t deep, const good_tree_t *node, void *opaque)
 {
     good_tree_fprintf(stderr,deep,node,"%u\n",*GOOD_PTR2PTR(int,node->buf->data[0],0));
 
+    // if(deep>=1)
+    //     return 0;
     return 1;
 }
 
