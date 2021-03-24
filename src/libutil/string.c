@@ -112,7 +112,7 @@ char *good_strtok(char *str,const char *delim, char **saveptr)
     return prev;
 }
 
-int good_strmatch(const char *str,const char *wildcard,int caseAb,int ispath)
+int good_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath)
 {
     int flag = 0;
     int chk = FNM_NOMATCH;

@@ -77,6 +77,7 @@ char *good_basename(char *dst, const char *src);
 /**
  * 美化目录
  * 
+ * @note 目录不存在也可以。
 */
 char *good_dirnice(char *dst, const char *src);
 

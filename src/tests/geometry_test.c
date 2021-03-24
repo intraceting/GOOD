@@ -14,9 +14,9 @@
 int main(int argc, char **argv)
 {
     
-    good_point_t p1 = {9,-10,0};
+    good_point_t p1 = {0,0,0};
 
-    good_point_t p2= {95,-55,0};
+    good_point_t p2= {95,55,0};
 
     double d = good_geom_p2p_distance(&p1,&p2);
 
@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
     good_point_t p3 = {0,0,0};
 
-    good_geom_point_move(&p1,r,d*2,&p3);
+    good_geom_point_move(&p1,r,d/2,&p3);
 
     printf("x = %lf y = %lf\n",p3.x,p3.y);
 

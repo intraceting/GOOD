@@ -118,21 +118,71 @@ char *good_basename(char *dst, const char *src)
 
 char *good_dirnice(char *dst, const char *src)
 {
-    const char *s = NULL;
+    char *s = NULL;
+    char *t = NULL;
+    char *d = NULL;
+    size_t deep = 0;
+    good_buffer_t* stack;
+    char* saveptr = NULL;
     
     assert(dst != NULL && src != NULL);
 
-    s = src;
-
-    if (*s == '\0')
+    stack = good_buffer_alloc2(NULL,2048);
+    if(!stack)
         goto final;
 
-    if (*s == '/')
-        s++;
+    d = dst;
+    s = good_heap_dup(src,strlen(src)+1);
 
-    
+    if (s == NULL || *s == '\0')
+        goto final;
+
+    /*
+     * 拆分目录，根据目录层级关系压入堆栈。
+    */
+    while (1)
+    {
+        t = good_strtok(s,"/",&saveptr);
+        if(!t)
+            break;
+        
+        if(*t == '\0')
+            continue;
+
+        if(good_strcmp(t,".",1)==0)
+            continue;
+        
+        if(good_strcmp(t,"..",1)==0)
+        {
+            if (deep > 0)
+                stack->data[--deep] = NULL;
+        }    
+        else
+        {
+            assert(deep < stack->number);
+
+            stack->data[deep++] = t;
+        }
+    }
+
+    /*
+     * 拼接目录
+    */
+    if (*src == '/')
+        good_dirdir(dst, "/");
+
+    for (size_t i = 0; i < deep; i++)
+    {
+        if (i > 0)
+             good_dirdir(dst, "/");
+
+        good_dirdir(dst,stack->data[i]);
+    }
 
 final:
+
+    good_buffer_unref(&stack);
+    good_heap_freep((void**)&s);
 
     return dst;
 }
