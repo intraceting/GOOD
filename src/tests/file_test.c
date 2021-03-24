@@ -90,7 +90,11 @@ void test_dirscan()
 {
     good_tree_t * t = good_tree_alloc2(PATH_MAX);
 
-    strcpy(t->buf->data[0],"/tmp/");
+  //  strcpy(t->buf->data[0],"/tmp/");
+  //  good_dirscan(t,t->buf->data[0],100,0);
+
+
+    strcpy(t->buf->data[0],"/usr/include");
     good_dirscan(t,t->buf->data[0],100,0);
 
     //strcpy(t->buf->data[0],"/mnt");

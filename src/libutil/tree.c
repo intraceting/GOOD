@@ -325,6 +325,9 @@ void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* 
 
 void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args)
 {
+    good_tree_t *tmp = NULL;
+    good_buffer_t *stack = NULL;
+
     assert(fp && node && fmt);
 
     if (deep <= 0)
@@ -333,16 +336,24 @@ void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char*
     }
     else
     {
-        for (size_t i = 0; i < deep - 1; i++)
+        /*
+         * 准备堆栈。
+        */
+        stack = good_buffer_alloc2(NULL,deep);
+        if(!stack)
+            GOOD_ERRNO_AND_RETURN0(ENOMEM);
+
+        tmp = (good_tree_t *)node;
+
+        for (size_t i = 1; i < deep; i++)
+            stack->data[deep-i] = (uint8_t*)(tmp = good_tree_father(tmp));
+
+        for (size_t i = 1; i < deep; i++)
         {
-            if ((i + 1 == deep - 1) && !good_tree_sibling(good_tree_father(node),0))
-            {
-                fprintf(fp,"    ");
-            }
+            if (good_tree_sibling((good_tree_t *)stack->data[i], 0))
+                fprintf(fp, "   │");
             else
-            {
-                fprintf(fp,"   │");
-            }
+                fprintf(fp, "    ");
         }
 
         if(good_tree_sibling(node,0))
@@ -352,4 +363,6 @@ void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char*
 
         vfprintf(fp,fmt,args);
     }
+
+    good_buffer_unref(&stack);
 }

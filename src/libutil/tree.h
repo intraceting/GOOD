@@ -17,6 +17,7 @@
 
 #include "general.h"
 #include "buffer.h"
+#include "bloom.h"
 
 
 /**
