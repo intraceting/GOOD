@@ -57,6 +57,54 @@ void test_dir()
     good_heap_free(path4);
 }
 
+int dump2(size_t deep, const good_tree_t *node, void *opaque)
+{
+#if 1
+    char name[NAME_MAX] ={0};
+
+    good_basename(name,node->buf->data[0]);
+    
+    good_tree_fprintf(stderr,deep,node,"%s\n",name);
+
+#else 
+    fprintf(stderr,"%s\n",node->buf->data[0]);
+#endif 
+
+
+    return 1;
+}
+
+void traversal(const good_tree_t *root)
+{
+    printf("\n-------------------------------------\n");
+
+    good_tree_iterator it = {0};
+    it.dump_cb = dump2;
+
+    good_tree_scan(root, &it);
+
+    printf("\n-------------------------------------\n");
+}
+
+void test_dirscan()
+{
+    good_tree_t * t = good_tree_alloc2(PATH_MAX);
+
+    strcpy(t->buf->data[0],"/tmp/");
+    good_dirscan(t,t->buf->data[0],100,0);
+
+    //strcpy(t->buf->data[0],"/mnt");
+    //good_dirscan(t,t->buf->data[0],100,1);
+
+  //  strcpy(t->buf->data[0],"/tmp");
+  //  good_dirscan(t,t->buf->data[0],1,0);
+
+    traversal(t);
+
+    good_tree_free(&t);
+    
+}
+
 void test_file(const char* f1,const char* f2)
 {
     good_mkdir(f2,0);
@@ -97,6 +145,8 @@ int main(int argc, char **argv)
 {
     
     test_dir();
+
+    test_dirscan();
 
     if(argc>=3)
         test_file(argv[1],argv[2]);

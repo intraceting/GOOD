@@ -178,7 +178,7 @@ good_tree_t *good_tree_alloc2(size_t size);
  * @note 如果未准备堆栈，则内部自动申请和释放。
  * 
 */
-void good_tree_traversal(const good_tree_t *root,good_tree_iterator* it);
+void good_tree_scan(const good_tree_t *root,good_tree_iterator* it);
 
 /**
  * 格式化输出

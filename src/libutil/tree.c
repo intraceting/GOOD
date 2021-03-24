@@ -248,7 +248,7 @@ good_tree_t *good_tree_alloc2(size_t size)
     return good_tree_alloc(&size,1);
 }
 
-void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
+void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
 {
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
@@ -262,6 +262,9 @@ void good_tree_traversal(const good_tree_t *root, good_tree_iterator *it)
     */
     if (!it->stack)
         it->stack = good_buffer_alloc2(NULL,256);
+
+    if (!it->stack)
+        return;
 
     /*
      * 根
@@ -322,7 +325,7 @@ void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* 
 
 void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args)
 {
-    assert(fp);
+    assert(fp && node && fmt);
 
     if (deep <= 0)
     {

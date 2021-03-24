@@ -30,7 +30,7 @@ void traversal(const good_tree_t *root)
  //   it.stack = (good_tree_t **)good_heap_alloc(sizeof(good_tree_t *) * it.stack_size);
     it.dump_cb = dump;
 
-    good_tree_traversal(root, &it);
+    good_tree_scan(root, &it);
 
  //   good_heap_freep((void **)&it.stack);
 
