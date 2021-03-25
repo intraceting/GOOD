@@ -44,6 +44,8 @@ ssize_t good_write(int fd, const void *data, size_t size, good_buffer_t *buf);
  * 
  * @return > 0 未写完的数据长度，= 0 缓存为空或已经全部写入文件。
  * 
+ * @see good_write()
+ * 
 */
 ssize_t good_write_trailer(int fd, int fill, uint8_t stuffing, good_buffer_t *buf);
 

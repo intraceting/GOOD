@@ -77,6 +77,8 @@ typedef struct _good_tree_iterator
 
     /**
      * 栈
+     * 
+     * @note 如果没有准备，则在内部准备256深度的栈。
     */
     good_buffer_t *stack;
 

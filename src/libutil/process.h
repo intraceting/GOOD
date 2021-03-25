@@ -37,6 +37,7 @@ char* good_user_dirname(char* buf,const char* append);
 /**
  * 获取当前程序的完整路径和文件名。
  * 
+ * @see readlink()
 */
 char* good_app_pathfile(char* buf);
 
@@ -45,12 +46,16 @@ char* good_app_pathfile(char* buf);
  * 
  * @param append 拼接目录或文件名。NULL(0) 忽略。
  * 
+ * @see good_app_pathfile()
+ * @see good_dirname()
 */
 char* good_app_dirname(char* buf,const char* append);
 
 /**
  * 获取当前程序的文件名。
  * 
+ * @see good_app_pathfile()
+ * @see good_basename()
 */
 char* good_app_basename(char* buf);
 
@@ -64,6 +69,10 @@ char* good_app_basename(char* buf);
  * @note $PID 以10进制文本格式写入文件。例：2021
  * 
  * @warning 返回的句柄在退出前不要关闭，否则会使文件解除锁定状态。
+ * 
+ * @see good_open()
+ * @see flock()
+ * @see good_closep()
 */
 int good_run_singleton(const char* lockfile,int* pid);
 
@@ -71,8 +80,10 @@ int good_run_singleton(const char* lockfile,int* pid);
  * 等待信号
  * 
  * @param timeout >= 0 当信号到达或时间(毫秒)过期即返回，< 0 直到信号到达或出错返回。
+ * @param signal_cb 信号处理函数。NULL(0) 忽略信号。返回 !0 继续，0 终止。
  * 
  * @return >=0 成功，< 0 失败或超时。
+ * 
 */
 int good_wait_signal(sigset_t *sig, time_t timeout,
                      int (*signal_cb)(const siginfo_t *info, void *opaque), 
