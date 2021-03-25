@@ -18,6 +18,7 @@
 #include <libgen.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/mman.h>
 
 #include "general.h"
 #include "buffer.h"
@@ -109,5 +110,7 @@ int good_fflag_add(int fd,int flag);
  * @see fcntl()
 */
 int good_fflag_del(int fd,int flag);
+
+
 
 #endif //GOOD_UTIL_FILE_H

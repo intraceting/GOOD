@@ -171,6 +171,35 @@ void test_mman()
     assert(good_msync(buf3,0)==0);
 
     good_munmap(&buf3);
+
+    /*创建共享内存文件。*/
+    int fd = good_shm_open("test_mman",1,1);
+
+    /*划拔点内存空间。*/
+  //  ftruncate(fd,100);
+
+    good_buffer_t * buf4 = good_mmap(fd,1,1);
+
+    memset(buf4->data[0],'C',buf4->size[0]);
+
+    good_buffer_t * buf5  = good_buffer_refer(buf4);
+
+    good_munmap(&buf4);
+
+    assert(good_msync(buf5,0)==0);
+
+    good_munmap(&buf5);
+
+    good_buffer_t * buf6 = good_mmap(fd,1,0);
+
+    printf("%s\n",buf6->data[0]);
+
+    good_munmap(&buf6);
+
+    good_closep(&fd);
+
+    /*删除*/
+    good_shm_unlink("test_mman");
 }
 
 int main(int argc, char **argv)
