@@ -42,8 +42,9 @@ typedef struct _good_buffer_hdr
 #define GOOD_BUFFER_PTR_IN2OUT(PTR)    \
             GOOD_PTR2PTR(good_buffer_t, (PTR), (sizeof(good_buffer_hdr)-sizeof(good_buffer_t)))
 
-
-good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(uint8_t **data,size_t number, void *opaque), void *opaque)
+good_buffer_t *good_buffer_alloc(size_t size[], size_t number,
+                                 void (*free_cb)(size_t number, uint8_t **data, size_t *size, void *opaque), 
+                                 void *opaque)
 {
     good_buffer_hdr *buf_p = NULL;
     uint8_t* data_p = NULL;
@@ -164,7 +165,7 @@ void good_buffer_unref(good_buffer_t **buf)
     if (atomic_fetch_add_explicit(&buf_p->refcount, -1, memory_order_acq_rel) == 1)
     {
         if (buf_p->out.free_cb)
-            buf_p->out.free_cb(buf_p->out.data,buf_p->out.number,buf_p->out.opaque);
+            buf_p->out.free_cb(buf_p->out.number,buf_p->out.data,buf_p->out.size,buf_p->out.opaque);
 
         buf_p->magic = ~(GOOD_BUFFER_MAGIC);
         buf_p->out.size1 = NULL;

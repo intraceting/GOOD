@@ -10,20 +10,20 @@
 #include <string.h>
 #include "libutil/buffer.h"
 
-void free_clean(uint8_t **buf,size_t number, void *opaque)
+void free_clean(size_t number,uint8_t **data,size_t* size, void *opaque)
 {
     for(size_t i = 0;i<number;i++)
     {
-        if(buf[i])
-            printf("[%ld]={%s}\n",i,(char*)buf[i]);
+        if(data[i])
+            printf("[%ld]={%s}\n",i,(char*)data[i]);
     }
 }
 
-void free_free(uint8_t **buf,size_t number, void *opaque)
+void free_free(size_t number,uint8_t **data,size_t* size, void *opaque)
 {
-    printf("[%ld]={%s}\n",0l,(char*)buf[0]);
+    printf("[%ld]={%s}\n",0l,(char*)data[0]);
     
-    good_heap_freep((void**)&buf[0]);
+    good_heap_freep((void**)&data[0]);
 }
 
 int main(int argc, char **argv)

@@ -54,7 +54,7 @@ typedef struct _good_buffer
      * 
      * @note NULL(0) 忽略。
     */
-    void (*free_cb)(uint8_t **data,size_t number,void *opaque);
+    void (*free_cb)(size_t number,uint8_t **data,size_t* size,void *opaque);
 
     /**
      * 私有指针
@@ -77,7 +77,9 @@ typedef struct _good_buffer
  * 
  * @see calloc()
 */
-good_buffer_t *good_buffer_alloc(size_t size[],size_t number, void (*free_cb)(uint8_t **data,size_t number,void *opaque), void *opaque);
+good_buffer_t *good_buffer_alloc(size_t size[], size_t number,
+                                 void (*free_cb)(size_t number, uint8_t **data, size_t *size, void *opaque), 
+                                 void *opaque);
 
 /**
  * 申请
@@ -109,7 +111,7 @@ good_buffer_t *good_buffer_refer(good_buffer_t *buf);
 /**
  * 释放
  * 
- * @note 当引用计数为0时才会真的释放。
+ * @note 当引用计数为0时才会真的释放内存，因此引用计数大于0时，不会影向其它使用者。
  * 
  * @see free()
 */

@@ -65,7 +65,7 @@ typedef struct _good_map
      * 
      * @note NULL(0) 忽略。
     */
-    void (*free_cb)(uint8_t **data,size_t number,void *opaque);
+    void (*free_cb)(size_t number,uint8_t **data,size_t *size,void *opaque);
 
     /**
      * 私有指针

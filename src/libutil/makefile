@@ -59,7 +59,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/string.o \
 	${OBJ_PATH}/log.o \
 	${OBJ_PATH}/dirent.o \
-	${OBJ_PATH}/file.o 
+	${OBJ_PATH}/file.o \
+	${OBJ_PATH}/mman.o
 
 
 #

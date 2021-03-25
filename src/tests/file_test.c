@@ -12,6 +12,7 @@
 #include "libutil/dirent.h"
 #include "libutil/file.h"
 #include "libutil/string.h"
+#include "libutil/mman.h"
 
 void test_dir()
 {
@@ -146,6 +147,31 @@ void test_file(const char* f1,const char* f2)
     good_closep(&fd2);
 }
 
+void test_mman()
+{
+    good_buffer_t * buf = good_mmap2("/tmp/test_mman.txt",1,1);
+
+    /*支持引用访问。*/
+    good_buffer_t * buf2 = good_buffer_refer(buf);
+
+    memset(buf->data[0],'A',buf->size[0]);
+
+    good_munmap(&buf);
+
+    assert(good_msync(buf2,0)==0);
+
+    good_munmap(&buf2);
+
+
+    /*如果映射的内存页面是私有模式，则对内存数据修改不会影响原文件。*/
+    good_buffer_t * buf3 = good_mmap2("/tmp/test_mman.txt",1,0);
+
+    memset(buf3->data[0],'B',buf3->size[0]);
+
+    assert(good_msync(buf3,0)==0);
+
+    good_munmap(&buf3);
+}
 
 int main(int argc, char **argv)
 {
@@ -156,6 +182,8 @@ int main(int argc, char **argv)
 
     if(argc>=3)
         test_file(argv[1],argv[2]);
+
+    test_mman();
 
     return 0;
 }
