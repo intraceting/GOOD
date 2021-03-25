@@ -10,6 +10,7 @@
 #include "libutil/thread.h"
 #include "libutil/crc32.h"
 #include "libutil/clock.h"
+#include "libutil/process.h"
 
 void* specific_cb(void* args)
 {
@@ -36,6 +37,22 @@ void* specific_cb(void* args)
     return NULL;
 }
 
+int signal_cb(const siginfo_t *info, void *opaque)
+{
+    printf("signo=%d,errno=%d,code =%d\n",info->si_signo,info->si_errno,info->si_code);
+
+    switch(info->si_code)
+    {
+        case SI_USER:
+        {
+            printf("pid=%d,uid=%d\n",info->si_pid,info->si_uid);
+        }
+        break;
+    }
+
+    return 1;
+}
+
 int main(int argc, char **argv)
 {
     good_thread_setname("hehe");
@@ -53,6 +70,10 @@ int main(int argc, char **argv)
     p.routine = specific_cb;
     good_thread_create(&p,1);
     good_thread_join(&p);
+
+    sigset_t sig;
+    sigfillset(&sig);
+    good_wait_signal(&sig,-1,signal_cb,NULL);
 
     return 0;
 }

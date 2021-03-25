@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
+#include <sys/file.h>
 
 #include "general.h"
 #include "heap.h"
@@ -64,8 +65,17 @@ char* good_app_basename(char* buf);
  * 
  * @warning 返回的句柄在退出前不要关闭，否则会使文件解除锁定状态。
 */
-int good_app_singleton(const char* lockfile,int* pid);
+int good_run_singleton(const char* lockfile,int* pid);
 
-
+/**
+ * 等待信号
+ * 
+ * @param timeout >= 0 当信号到达或时间(毫秒)过期即返回，< 0 直到信号到达或出错返回。
+ * 
+ * @return >=0 成功，< 0 失败或超时。
+*/
+int good_wait_signal(sigset_t *sig, time_t timeout,
+                     int (*signal_cb)(const siginfo_t *info, void *opaque), 
+                     void *opaque);
 
 #endif //GOOD_UTIL_PROCESS_H

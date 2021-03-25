@@ -160,7 +160,7 @@ int good_mutex_unlock(good_mutex_t *ctx);
  * @see pthread_cond_timedwait()
  * @see pthread_cond_wait()
 */
-int good_mutex_wait(good_mutex_t *ctx, int64_t timeout);
+int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
 
 /**
  * 发出事件通知

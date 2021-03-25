@@ -77,7 +77,7 @@ int good_mutex_unlock(good_mutex_t* ctx)
 }
 
 
-int good_mutex_wait(good_mutex_t* ctx,int64_t timeout)
+int good_mutex_wait(good_mutex_t* ctx,time_t timeout)
 {
     int err = -1;
     struct timespec sys_ts;
@@ -100,7 +100,7 @@ int good_mutex_wait(good_mutex_t* ctx,int64_t timeout)
             GOOD_ERRNO_AND_RETURN1(EINVAL,err=-1);
 
         out_ts.tv_sec = sys_ts.tv_sec + (timeout / 1000);
-        out_ts.tv_nsec = sys_ts.tv_nsec + (timeout % 1000);
+        out_ts.tv_nsec = sys_ts.tv_nsec + (timeout % 1000) * 1000000;
 
         err = pthread_cond_timedwait(&ctx->cond,&ctx->mutex,&out_ts);
     }

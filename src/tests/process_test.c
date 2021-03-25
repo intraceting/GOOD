@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     printf("%s\n",buf4);
 
     int pid = -1;
-    lock_fd = good_app_singleton(lock_file,&pid);
+    lock_fd = good_run_singleton(lock_file,&pid);
     if (lock_fd >= 0)
     {
         atexit(exit_befor);
