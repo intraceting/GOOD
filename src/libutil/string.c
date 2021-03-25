@@ -55,12 +55,12 @@ char *good_strtrim(char *str, int (*isctype_cb)(int c),int where)
         while (*tmp)
             tmp++;
 
-        while (isctype_cb(*(--tmp)) != 0)
+        while (isctype_cb(*(--tmp)))
             *tmp = '\0';
     }
     else if (1 == where)
     {
-        while (isctype_cb(*(tmp)) != 0)
+        while (isctype_cb(*(tmp)))
         {
             tmp++;
             blklen++;
@@ -127,4 +127,24 @@ int good_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath)
     chk = fnmatch(wildcard, str, flag);
 
     return ((chk==FNM_NOMATCH)?-1:0);
+}
+
+int good_strtype(const char* str,int (*isctype_cb)(int c))
+{
+    const char* s = NULL;
+
+    assert(str && isctype_cb);
+
+    s = str;
+
+    if(*s == '\0')
+        return 0;
+
+    while(*s)
+    {
+        if(!isctype_cb(*s++))
+            return 0;
+    }
+
+    return 1;
 }

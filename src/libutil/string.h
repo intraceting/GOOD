@@ -57,6 +57,8 @@ int good_strncmp(const char *s1, const char *s2,size_t len,int caseAb);
  * 
  * @param isctype_cb 字符比较函数。NULL(0) 等于isblank()。
  * @param where 0 右端，1 左端，2 两端。
+ * 
+ * @see is*() functions. in ctype.h
 */
 char* good_strtrim(char* str,int (*isctype_cb)(int c),int where);
 
@@ -81,5 +83,12 @@ char *good_strtok(char *str, const char *delim, char **saveptr);
  * @see fnmatch()
 */
 int good_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
+
+/**
+ * 检测字符串中的字符类型。
+ * 
+ * @return !0 通过，0 未通过。
+*/
+int good_strtype(const char* str,int (*isctype_cb)(int c));
 
 #endif //GOOD_UTIL_STRING_H
