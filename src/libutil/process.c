@@ -150,5 +150,4 @@ int good_app_singleton(const char *lockfile,int* pid)
     */
     good_closep(&fd);
     GOOD_ERRNO_AND_RETURN1(EPERM,-1);
-    
 }

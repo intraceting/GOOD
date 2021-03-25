@@ -12,6 +12,7 @@
 #include <stdatomic.h>
 #include <assert.h>
 #include <sys/mman.h>
+#include <sys/wait.h>
 
 #include "general.h"
 #include "heap.h"
