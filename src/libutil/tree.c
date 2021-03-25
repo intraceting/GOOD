@@ -351,15 +351,15 @@ void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char*
         for (size_t i = 1; i < deep; i++)
         {
             if (good_tree_sibling((good_tree_t *)stack->data[i], 0))
-                fprintf(fp, "   │");
+                fprintf(fp, "│   ");
             else
                 fprintf(fp, "    ");
         }
 
         if(good_tree_sibling(node,0))
-            fprintf(fp,"   ├── ");
+            fprintf(fp,"├── ");
         else 
-            fprintf(fp,"   └── ");
+            fprintf(fp,"└── ");
 
         vfprintf(fp,fmt,args);
     }

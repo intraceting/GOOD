@@ -60,12 +60,14 @@ void test_dir()
 int dump2(size_t deep, const good_tree_t *node, void *opaque)
 {
 #if 1
-    char name[NAME_MAX] ={0};
-
-    good_basename(name,node->buf->data[0]);
-    
-    good_tree_fprintf(stderr,deep,node,"%s\n",name);
-
+    if(deep==0)
+        good_tree_fprintf(stderr,deep,node,"%s\n",node->buf->data[0]);
+    else 
+    {
+        char name[NAME_MAX] ={0};
+        good_basename(name,node->buf->data[0]);
+        good_tree_fprintf(stderr,deep,node,"%s\n",name);
+    }
 #else 
     fprintf(stderr,"%s\n",node->buf->data[0]);
 #endif 
