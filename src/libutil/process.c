@@ -6,22 +6,7 @@
  */
 #include "process.h"
 
-char *good_user_dirname(char *buf, const char *append)
-{
-    assert(buf);
-
-    snprintf(buf, PATH_MAX, "/var/run/user/%d/", getuid());
-
-    if (access(buf, R_OK | W_OK | X_OK | F_OK) != 0)
-        GOOD_ERRNO_AND_RETURN1(ENOENT, NULL);
-
-    if (append)
-        good_dirdir(buf, append);
-
-    return buf;
-}
-
-char *good_app_pathfile(char *buf)
+char *good_proc_pathfile(char *buf)
 {
     assert(buf);
 
@@ -31,7 +16,7 @@ char *good_app_pathfile(char *buf)
     return buf;
 }
 
-char *good_app_dirname(char *buf, const char *append)
+char *good_proc_dirname(char *buf, const char *append)
 {
     char *tmp = NULL;
 
@@ -41,7 +26,7 @@ char *good_app_dirname(char *buf, const char *append)
     if (!tmp)
         GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
 
-    if (good_app_pathfile(tmp))
+    if (good_proc_pathfile(tmp))
     {
         good_dirname(buf, tmp);
 
@@ -61,7 +46,7 @@ char *good_app_dirname(char *buf, const char *append)
     return buf;
 }
 
-char *good_app_basename(char *buf)
+char *good_proc_basename(char *buf)
 {
     char *tmp = NULL;
 
@@ -71,7 +56,7 @@ char *good_app_basename(char *buf)
     if (!tmp)
         GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
 
-    if (good_app_pathfile(tmp))
+    if (good_proc_pathfile(tmp))
     {
         good_basename(buf, tmp);
     }
@@ -88,10 +73,10 @@ char *good_app_basename(char *buf)
     return buf;
 }
 
-int good_run_singleton(const char *lockfile,int* pid)
+int good_proc_singleton(const char *lockfile,int* pid)
 {
     int fd = -1;
-    char strpid[12] = {0};
+    char strpid[16] = {0};
 
     assert(lockfile);
 
@@ -107,7 +92,7 @@ int good_run_singleton(const char *lockfile,int* pid)
         /*
          * PID可视化，便于阅读。
         */
-        sprintf(strpid,"%d",getpid());
+        snprintf(strpid,15,"%d",getpid());
 
         /*
          * 清空。
@@ -137,7 +122,7 @@ int good_run_singleton(const char *lockfile,int* pid)
     */
     if(pid)
     {
-        good_read(fd,strpid,11,NULL);
+        good_read(fd,strpid,12,NULL);
 
         if(good_strtype(strpid,isdigit))
             *pid = atoi(strpid);
@@ -150,50 +135,4 @@ int good_run_singleton(const char *lockfile,int* pid)
     */
     good_closep(&fd);
     GOOD_ERRNO_AND_RETURN1(EPERM,-1);
-}
-
-int good_wait_signal(sigset_t *sig, time_t timeout,
-                     int (*signal_cb)(const siginfo_t *info, void *opaque), 
-                     void *opaque)
-{
-    sigset_t old;
-    struct timespec tout;
-    siginfo_t info;
-    int chk;
-
-    assert(sig);
-
-    chk = pthread_sigmask(SIG_BLOCK, sig, &old);
-    if (chk != 0)
-        return chk;
-
-    while (1)
-    {
-        if(timeout>=0)
-        {
-            tout.tv_sec = timeout / 1000;
-            tout.tv_nsec = (timeout % 1000) * 1000000;
-            chk = sigtimedwait(sig, &info, &tout);
-        }
-        else
-        {
-            chk = sigwaitinfo(sig, &info);
-        }
-
-        if (chk == -1)
-            break;
-        
-        if(signal_cb)
-            chk = signal_cb(&info,opaque);
-
-        /*
-         * 0 结束。
-        */
-        if(!chk)
-            break;
-    }
-    
-    pthread_sigmask(SIG_BLOCK,&old,NULL);
-
-    return chk;
 }

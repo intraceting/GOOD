@@ -61,7 +61,10 @@ OBJ_FILES = \
 	${OBJ_PATH}/dirent.o \
 	${OBJ_PATH}/file.o \
 	${OBJ_PATH}/mman.o \
-	${OBJ_PATH}/process.o
+	${OBJ_PATH}/signal.o \
+	${OBJ_PATH}/user.o \
+	${OBJ_PATH}/process.o \
+	${OBJ_PATH}/popen.o
 
 
 #

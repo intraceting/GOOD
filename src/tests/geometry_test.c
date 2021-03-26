@@ -10,8 +10,9 @@
 #include <string.h>
 #include "libutil/geometry.h"
 
+#define PI (3.1415926)
 
-int main(int argc, char **argv)
+void test1()
 {
     
     good_point_t p1 = {0,0,0};
@@ -22,10 +23,8 @@ int main(int argc, char **argv)
 
     printf("d=%lf\n",d);
 
-    double pi = 3.1415926;
-
     double r = good_geom_halfline_radian(&p1,&p2,'X');
-    double a = r*180/pi;
+    double a = r*180/PI;
     printf("r=%lf;a=%lf\n",r,a);
 
     good_point_t p3 = {0,0,0};
@@ -37,6 +36,34 @@ int main(int argc, char **argv)
     double d2 = good_geom_p2p_distance(&p1,&p3);
 
     printf("d2=%lf\n",d2);
+}
+
+void test2()
+{
+    good_point_t p = {0,0,0};
+
+    //good_point_t p1 = {99,95,0};
+    //good_point_t p2 = {90,90,0};
+
+    good_point_t p1 = {90,90,0};
+    good_point_t p2 = {81,85,0};
+
+    double d1 = good_geom_p2p_distance(&p,&p1);
+    double d2 = good_geom_p2p_distance(&p,&p2);
+    double r1 = good_geom_halfline_radian(&p,&p1,'X');
+    double r2 = good_geom_halfline_radian(&p,&p2,'X');
+    double R1 = r1*180/PI;
+    double R2 = r2*180/PI;
+
+    printf("d1(%lf)-d2(%lf)=%lf\n",d1,d2,d1-d2);
+    printf("r1(%lf)-r2(%lf)=%lf\n",r1,r2,r1-r2);
+    printf("R1(%lf)-R2(%lf)=%lf\n",R1,R2,R1-R2);
+}
+
+int main(int argc, char **argv)
+{
+    //test1();
+    test2();
 
     return 0;
 }

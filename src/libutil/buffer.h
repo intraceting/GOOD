@@ -76,10 +76,10 @@ typedef struct _good_buffer
  * 
  * 内部会创建附加结构，用于引用计数器。
  * 
- * @param size 缓存大小(数组)
- * @param number 缓存数量
- * @param free_cb 释放函数
- * @param opaque 环境指针
+ * @param size 缓存大小(数组)。NULL(0) 缓存空间为0。
+ * @param number 缓存数量。0 不创建缓存。
+ * @param free_cb 释放函数。
+ * @param opaque 环境指针。
  * 
  * @return  NULL(0) 失败，!NULL(0) 成功。
  * 
@@ -99,7 +99,7 @@ good_buffer_t *good_buffer_alloc2(size_t size[],size_t number);
 /**
  * 创建缓存。
  * 
- * @param size 大小。number = 1。
+ * @param size 缓存大小(缓存数量为1。)。
  * 
  * @see good_buffer_alloc()
  * @see good_buffer_alloc2()
