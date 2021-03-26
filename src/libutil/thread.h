@@ -89,7 +89,7 @@ typedef struct _good_thread_t
 } good_thread_t;
 
 /**
- * 销毁互斥量及属性
+ * 销毁互斥量及属性。
  * 
  * @see pthread_condattr_destroy()
  * @see pthread_cond_destroy()
@@ -99,21 +99,21 @@ typedef struct _good_thread_t
 void good_mutex_destroy(good_mutex_t *ctx);
 
 /**
- * 初始化互斥量
+ * 初始化互斥量。
+ * 
+ * 在调用此函数前需先初始化属性。
  * 
  * @see pthread_cond_init()
  * @see pthread_mutex_init()
- * 
- * @note 在调用此函数前需先初始化属性。
 */
 void good_mutex_init(good_mutex_t *ctx);
 
 /**
- * 初始化互斥量及属性
+ * 初始化互斥量及属性。
+ * 
+ * 当互斥量拥用共享属性时，在多进程间有效。
  * 
  * @param shared 0 私有，!0 共享。
- * 
- * @note 当互斥量拥用共享属性时，在多进程间有效。
  * 
  * @see pthread_condattr_init()
  * @see pthread_condattr_setclock()
@@ -128,7 +128,7 @@ void good_mutex_init(good_mutex_t *ctx);
 void good_mutex_init2(good_mutex_t *ctx, int shared);
 
 /**
- * 互斥量加锁
+ * 互斥量加锁。
  * 
  * @param try 0 直到成功或出错返回，!0 尝试一下即返回。
  * 
@@ -142,7 +142,7 @@ void good_mutex_init2(good_mutex_t *ctx, int shared);
 int good_mutex_lock(good_mutex_t *ctx, int try);
 
 /**
- * 互斥量解锁
+ * 互斥量解锁。
  * 
  * @return 0 成功；!0 出错。
  * 
@@ -151,7 +151,7 @@ int good_mutex_lock(good_mutex_t *ctx, int try);
 int good_mutex_unlock(good_mutex_t *ctx);
 
 /**
- * 等待事件通知
+ * 等待事件通知。
  * 
  * @param timeout >= 0 当通知到达或时间(毫秒)过期即返回，< 0 直到通知到达或出错返回。
  * 
@@ -163,7 +163,7 @@ int good_mutex_unlock(good_mutex_t *ctx);
 int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
 
 /**
- * 发出事件通知
+ * 发出事件通知。
  * 
  * @param broadcast 0 通知一个等待线程，!0 通知所有等待线程。
  * 
@@ -175,7 +175,7 @@ int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
 int good_mutex_signal(good_mutex_t *ctx, int broadcast);
 
 /**
- * 创建线程
+ * 创建线程。
  * 
  * @param joinable 0 结束后自回收资源，!0 结束后需要调用者回收资源。
  * 
@@ -190,29 +190,33 @@ int good_mutex_signal(good_mutex_t *ctx, int broadcast);
 int good_thread_create(good_thread_t *ctx,int joinable);
 
 /**
- * 等待线程结束并回收资源
+ * 等待线程结束并回收资源。
+ * 
+ * 当线程被已经分离或已经分离模式创建的，直接返回。
  * 
  * @return 0 成功；!0 出错。
  * 
  * @see pthread_attr_getdetachstate()
  * @see pthread_join()
- * 
- * @note 当线程被已经分离或已经分离模式创建的，直接返回。
 */
 int good_thread_join(good_thread_t* ctx);
 
 /**
- * 设置当前线程名字
+ * 设置当前线程名字。
+ * 
+ * 最大支持16个字节(Bytes)。
+ * 
+ * @return 0 成功；!0 出错。
  * 
  * @see pthread_setname_np()
- * 
- * @note 最大支持16个字节(Bytes)。
  * 
 */
 int good_thread_setname(const char* fmt,...);
 
 /**
- * 获取当前线程名字
+ * 获取当前线程名字。
+ * 
+ * @return 0 成功；!0 出错。
  * 
  * @see pthread_getname_np()
  * 

@@ -44,20 +44,25 @@ good_buffer_t* good_mmap(int fd,int rw,int share);
 good_buffer_t* good_mmap2(const char* name,int rw,int share);
 
 /**
- * 刷新数据
+ * 刷新数据。
+ * 
+ * 如果映射的内存页面是私有模式，则对内存数据修改不会影响原文件。
  * 
  * @param async 0 同步，!0 异步。
  * 
  * @return 0 成功，-1 失败。
- * 
- * @note 如果映射的内存页面是私有模式，则对内存数据修改不会影响原文件。
 */
 int good_msync(good_buffer_t* buf,int async);
 
 /**
  * 解除内存页面映射。
  * 
- * @note 当引用计数为0时才会解除映射，因此引用计数大于0时，不会影向其它使用者。
+ * 当引用计数为0时才会解除映射，因此引用计数大于0时，不会影向其它使用者。
+ * 
+ * @param buf 缓存指针的指针。当接口返回时，被赋值NULL(0)。
+ * 
+ * @see good_buffer_unref()
+ * @see munmap()
 */
 void good_munmap(good_buffer_t** buf);
 

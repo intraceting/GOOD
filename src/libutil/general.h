@@ -55,8 +55,9 @@
 #define GOOD_ERRNO_AND_RETURN1(E, V) ({errno=(E);return (V);})
 
 /**
- * 对齐
+ * 数值对齐。
  * 
+ * @param align 对齐量。0,1是等价的。
 */
 size_t good_align(size_t size,size_t align);
 

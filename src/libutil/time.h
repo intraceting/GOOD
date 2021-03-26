@@ -17,11 +17,12 @@
 #include "general.h"
 
 /**
- * 时间戳整形化
+ * 时间戳整形化。
+ * 
+ * 当精度为纳秒时，公元2444年之前或者时长544年之内有效。
  * 
  * @param precision 精度。0～9。
  * 
- * @note 当精度为纳秒时，公元2444年之前或者时长544年之内有效。
 */
 uint64_t good_time_clock2kind(struct timespec* ts,uint8_t precision);
 

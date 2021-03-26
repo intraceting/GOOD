@@ -173,7 +173,7 @@ int good_thread_join(good_thread_t *ctx)
 int good_thread_setname(const char* fmt,...)
 {
     int err = -1;
-    char name[16] = {0};
+    char name[17] = {0};
 
     assert(fmt && fmt[0]);
 

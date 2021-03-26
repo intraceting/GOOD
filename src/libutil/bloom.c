@@ -8,8 +8,7 @@
 
 int good_bloom_mark(uint8_t *pool, size_t size, size_t number)
 {
-    if (!pool || size <= 0 && size * 8 <= number)
-        GOOD_ERRNO_AND_RETURN1(EINVAL, -1);
+    assert(pool && size > 0 && size * 8 > number);
 
     size_t bloom_pos = number & 7;
     size_t byte_pos = number >> 3;
@@ -25,8 +24,7 @@ int good_bloom_mark(uint8_t *pool, size_t size, size_t number)
 
 int good_bloom_unset(uint8_t* pool,size_t size,size_t number)
 {
-    if (!pool || size <= 0 && size * 8 <= number)
-        GOOD_ERRNO_AND_RETURN1(EINVAL, -1);
+    assert(pool && size > 0 && size * 8 > number);
 
     size_t bloom_pos = number & 7;
     size_t byte_pos = number >> 3;
@@ -42,8 +40,7 @@ int good_bloom_unset(uint8_t* pool,size_t size,size_t number)
 
 int good_bloom_filter(uint8_t* pool,size_t size,size_t number)
 {
-    if (!pool || size <= 0 && size * 8 <= number)
-        GOOD_ERRNO_AND_RETURN1(EINVAL, -1);
+    assert(pool && size > 0 && size * 8 > number);
 
     size_t bloom_pos = number & 7;
     size_t byte_pos = number >> 3;

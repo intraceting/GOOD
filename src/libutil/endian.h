@@ -24,14 +24,16 @@
 int good_endian_check(int big);
 
 /**
- * 字节序交换
+ * 字节序交换。
  * 
  * @return dst
 */
 uint8_t* good_endian_swap(uint8_t* dst,int len);
 
 /**
- * 网络字节序转本地字节序
+ * 网络字节序转本地字节序。
+ * 
+ * 如果本地是大端字节序，会忽略。
 */
 uint8_t* good_endian_ntoh(uint8_t* dst,int len);
 
@@ -51,7 +53,9 @@ uint32_t good_endian_ntoh32(uint32_t num);
 uint64_t good_endian_ntoh64(uint64_t num);
 
 /**
- * 本地字节序转网络字节序
+ * 本地字节序转网络字节序。
+ * 
+ * 如果本地是大端字节序，会忽略。
 */
 uint8_t* good_endian_hton(uint8_t* dst,int len);
 

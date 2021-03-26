@@ -253,6 +253,7 @@ void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
     size_t deep = 0;// begin 0
+    int inside_stack = 0;
     int chk;
 
     assert(root && it && it->dump_cb);
@@ -261,7 +262,10 @@ void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
      * 如果没有准备，则在内部准备。
     */
     if (!it->stack)
-        it->stack = good_buffer_alloc2(NULL,256);
+    {   
+        inside_stack = 1;
+        it->stack = good_buffer_alloc2(NULL,2048);
+    }
 
     if (!it->stack)
         return;
@@ -309,7 +313,11 @@ void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
         }
     }
 
-    good_buffer_unref(&it->stack);
+    /*
+     * 不能释放外部准备的堆栈。
+    */
+    if(inside_stack)
+        good_buffer_unref(&it->stack);
 
 }
 

@@ -21,64 +21,70 @@
 
 
 /**
- * 树
+ * 树节点。
+ * 
+ * 比较原始的树节点结构。
 */
 typedef struct _good_tree
 {
     /**
-     * 链
+     * 节点之间的关系链。
      * 
      * @note 尽量不要直接访问或修改。
     */
     struct _good_tree *chain[5];
 
     /**
-    * 父
+    * 父。
     */
 #define GOOD_TREE_CHAIN_FATHER          0
 
     /**
-    * 兄长
+    * 兄长。
     */
 #define GOOD_TREE_CHAIN_SIBLING_PREV    1
 
     /**
-    * 小弟
+    * 小弟。
     */
 #define GOOD_TREE_CHAIN_SIBLING_NEXT    2
 
     /**
-    * 大娃
+    * 大娃。
     */
 #define GOOD_TREE_CHAIN_CHILD_FIRST     3
 
     /**
-    * 么娃
+    * 么娃。
     */
 #define GOOD_TREE_CHAIN_CHILD_LEAST     4
 
     /**
-     * 缓存
+     * 缓存，存放节点数据。
      * 
+     * @see good_buffer_alloc()
+     * @see good_buffer_alloc2()
+     * @see good_buffer_alloc3()
+     * @see good_buffer_refer()
+     * @see good_buffer_unref()
      */
     good_buffer_t *buf;
 
 }good_tree_t;
 
 /**
- * 迭代器
+ * 迭代器。
 */
 typedef struct _good_tree_iterator
 {
     /**
-     * @note Must be 0.
+     * Must be 0.
     */
     int flags;
 
     /**
-     * 栈
+     * 栈。
      * 
-     * @note 如果没有准备，则在内部准备256深度的栈。
     */
     good_buffer_t *stack;
 
@@ -97,54 +103,56 @@ typedef struct _good_tree_iterator
 } good_tree_iterator;
 
 /**
- * 父
+ * 获取自己的父节指针。
 */
 good_tree_t *good_tree_father(const good_tree_t *self);
 
 /**
- * 兄弟
+ * 获取自己的兄弟指针。
  * 
- * @param elder 0 返回小弟，!0 返回兄长。
+ * @param elder 0 找小弟，!0 找兄长。
 */
 good_tree_t *good_tree_sibling(const good_tree_t *self,int elder);
 
 /**
- * 孩子
+ * 获取自己的孩子指针。
  * 
- * @param first 0 返回么娃，!0 返回大娃。
+ * @param first 0 找么娃，!0 找大娃。
 */
 good_tree_t *good_tree_child(const good_tree_t *self,int first);
 
 /**
- * 断开
+ * 断开自己在树中的关系链。
+ * 
+ * 自己的孩子，以孩子的孩子都会跟随自己从树节点中断开。
  * 
 */
 void good_tree_unlink(good_tree_t *self);
 
 /**
- * 插入
+ * 插入节点到树的关系链中。
  * 
- * @param father 父
- * @param child 孩子
+ * @param father 父。
+ * @param child 孩子。
  * @param where NULL(0) 'child'为小弟，!NULL(0) 'child'为兄长。
  * 
 */
 void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *where);
 
 /**
- * 插入
+ * 插入节点到树的关系链中。
  * 
- * @param father 父
- * @param child 孩子
+ * @param father 父。
+ * @param child 孩子。
  * @param first 0 'child'为么娃，!0 'child'为大娃。
  * 
 */
 void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first); 
 
 /**
- * 删除
+ * 删除节点。
  * 
- * @note 包括所有子节点。 
+ * 包括自己，自己的孩子，以孩子的孩子都会被删除。
  * 
  * @see good_heap_free()
  * @see good_buffer_unref()
@@ -152,7 +160,9 @@ void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first);
 void good_tree_free(good_tree_t **root);
 
 /**
- * 申请
+ * 创建节点。
+ * 
+ * 可以附带创建缓存区用于数据存储。
  * 
  * @param size NULL(0) 不申请缓存。
  * @param number 0 不创建缓存。
@@ -164,9 +174,11 @@ void good_tree_free(good_tree_t **root);
 good_tree_t *good_tree_alloc(size_t size[],size_t number);
 
 /**
- * 申请
+ * 创建节点。
  * 
- * @param size 0 不创建缓存。
+ * 可以附带创建缓存区用于数据存储。
+ * 
+ * @param size 0 不创建缓存。number = 1。
  * 
  * @see good_tree_alloc()
  * 
@@ -174,17 +186,21 @@ good_tree_t *good_tree_alloc(size_t size[],size_t number);
 good_tree_t *good_tree_alloc2(size_t size);
 
 /**
- * 遍历
+ * 扫描树节点。
  * 
- * @param it 迭代器
+ * 深度优先遍历节点，也可以通过迭代器控制遍历方向。
  * 
- * @note 如果未准备堆栈，则内部自动申请和释放。
+ * 如果没有准备迭代堆栈，内部自动创建2048高度的堆栈。
+ * 
+ * @param it 迭代器。
  * 
 */
 void good_tree_scan(const good_tree_t *root,good_tree_iterator* it);
 
 /**
- * 格式化输出
+ * 格式化输出。
+ * 
+ * 输出有层次感的树形图。
  * 
  * @note 不会在末尾添加'\n'(换行)字符。
  * 
@@ -193,7 +209,9 @@ void good_tree_scan(const good_tree_t *root,good_tree_iterator* it);
 void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,...);
 
 /**
- * 格式化输出
+ * 格式化输出。
+ * 
+ * 输出有层次感的树形图。
  * 
  * @note 不会在末尾添加'\n'(换行)字符。
  * 

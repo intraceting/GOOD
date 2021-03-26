@@ -21,7 +21,7 @@
 #include "general.h"
 
 /**
- * 字符串查找
+ * 字符串查找。
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
  * 
@@ -33,7 +33,7 @@
 const char* good_strstr(const char *str, const char *sub,int caseAb);
 
 /**
- * 字符串比较
+ * 字符串比较。
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
  * 
@@ -43,7 +43,7 @@ const char* good_strstr(const char *str, const char *sub,int caseAb);
 int good_strcmp(const char *s1, const char *s2,int caseAb);
 
 /**
- * 字符串比较
+ * 字符串比较。
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
  * 
@@ -53,7 +53,7 @@ int good_strcmp(const char *s1, const char *s2,int caseAb);
 int good_strncmp(const char *s1, const char *s2,size_t len,int caseAb);
 
 /**
- * 字符串修剪
+ * 字符串修剪。
  * 
  * @param isctype_cb 字符比较函数。NULL(0) 等于isblank()。返回 !0 是，0 否。
  * @param where 0 右端，1 左端，2 两端。
@@ -63,7 +63,7 @@ int good_strncmp(const char *s1, const char *s2,size_t len,int caseAb);
 char* good_strtrim(char* str,int (*isctype_cb)(int c),int where);
 
 /**
- * 字符串分割
+ * 字符串分割。
  * 
  * @param str 待分割的字符串。可能会被修改。
  * @param delim 分割字符串。全字匹配，并区分大小写。
@@ -76,7 +76,7 @@ char* good_strtrim(char* str,int (*isctype_cb)(int c),int where);
 char *good_strtok(char *str, const char *delim, char **saveptr);
 
 /**
- * 字符串匹配
+ * 字符串匹配。
  * 
  * @return 0 成功，!0 失败。
  * 

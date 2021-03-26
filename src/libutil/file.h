@@ -24,20 +24,20 @@
 #include "buffer.h"
 
 /**
- * 写数据
+ * 写数据。
+ * 
+ * 当需要定长写入时，或数据生产碎片化比较严重需要优化写入次数时，请启用缓存区。
  * 
  * @param buf 缓存。
  * 
  * @return > 0 写入完成的大小，<= 0 写入失败或空间不足。
- * 
- * @note 当需要定长写入时，或数据生产碎片化比较严重需要优化写入次数时，请启用缓存区。
  * 
  * @see good_buffer_alloc3()
 */
 ssize_t good_write(int fd, const void *data, size_t size, good_buffer_t *buf);
 
 /**
- * 写数据尾
+ * 写数据尾。
  * 
  * @param fill !0 填满缓存，0 不填充。
  * @param stuffing 填充字符。
@@ -50,13 +50,13 @@ ssize_t good_write(int fd, const void *data, size_t size, good_buffer_t *buf);
 ssize_t good_write_trailer(int fd, int fill, uint8_t stuffing, good_buffer_t *buf);
 
 /**
- * 读数据
+ * 读数据。
+ * 
+ * 当需要定长读取时，或数据消费碎片化比较严重需要优化读取次数时，请启用缓存区。
  * 
  * @param buf 缓存。
  * 
  * @return > 0 读取完成的大小，<= 0 读取失败或文件已经到末尾。
- * 
- * @note 当需要定长读取时，或数据消费碎片化比较严重需要优化读取次数时，请启用缓存区。
  * 
  * @see good_buffer_alloc3()
  * 
@@ -83,11 +83,11 @@ int good_open(const char *file, int rw, int nonblock, int create);
 /**
  * 打开文件2。
  * 
+ * 已打开的文件会被关闭，新打开的文件会绑定到fd2句柄。
+ * 
  * @param fd2 已打开的句柄。
  * 
  * @return fd2 成功，-1 失败。
- * 
- * @note 已打开的文件会被关闭，新打开的文件会绑定到fd2句柄。
  * 
  * @see open()
  * @see dup2()
@@ -96,7 +96,7 @@ int good_open(const char *file, int rw, int nonblock, int create);
 int good_open2(int fd2,const char *file, int rw, int nonblock, int create);
 
 /**
- * 添加标记
+ * 添加标记。
  * 
  * @return 0 成功，-1 失败。
  * 
@@ -105,7 +105,7 @@ int good_open2(int fd2,const char *file, int rw, int nonblock, int create);
 int good_fflag_add(int fd,int flag);
 
 /**
- * 删除标记
+ * 删除标记。
  * 
  * @return 0 成功，-1 失败。
  * 
