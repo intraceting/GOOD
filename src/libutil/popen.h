@@ -23,6 +23,8 @@
  * 创建子进程，用于执行shell。
  *
  * @param env 环境变量。GOOD_MAP_KEY is name,GOOD_MAP_VALUE is value。NULL(0) 忽略。
+ * 
+ * @return 子进程ID 成功，-1 失败。
 */
 pid_t good_popen(const char* cmd,int* stdin_fd, int* stdout_fd, int* stderr_fd,const good_map_t *env);
 

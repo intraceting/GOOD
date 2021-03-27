@@ -46,7 +46,7 @@ good_buffer_t* good_mmap2(const char* name,int rw,int share);
 /**
  * 刷新数据。
  * 
- * 如果映射的内存页面是私有模式，则对内存数据修改不会影响原文件。
+ * 如果映射的内存页面是私有模式，对数据修改不会影响原文件。
  * 
  * @param async 0 同步，!0 异步。
  * 

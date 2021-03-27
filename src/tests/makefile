@@ -59,7 +59,8 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/log_test.exe \
 	$(BUILD_PATH)/bloom_test.exe \
 	$(BUILD_PATH)/file_test.exe \
-	$(BUILD_PATH)/process_test.exe
+	$(BUILD_PATH)/process_test.exe \
+	$(BUILD_PATH)/popen_test.exe
 
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
 	mkdir -p $(BUILD_PATH)
@@ -84,5 +85,6 @@ clean:
 	rm -f $(BUILD_PATH)/bloom_test.exe
 	rm -f $(BUILD_PATH)/file_test.exe
 	rm -f $(BUILD_PATH)/process_test.exe
+	rm -f $(BUILD_PATH)/popen_test.exe
 
 

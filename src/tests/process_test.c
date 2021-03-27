@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "libutil/process.h"
+#include "libutil/user.h"
 
 static int lock_fd = -1;
 static char lock_file[] = {"/tmp/test_process.lock"};
@@ -25,19 +26,19 @@ int main(int argc, char **argv)
 {
     char buf1[PATH_MAX]={0};
 
-    assert(good_app_pathfile(buf1));
+    assert(good_proc_pathfile(buf1));
 
     printf("%s\n",buf1);
 
     char buf2[PATH_MAX]={0};
 
-    assert(good_app_dirname(buf2,"append.name"));
+    assert(good_proc_dirname(buf2,"append.name"));
 
     printf("%s\n",buf2);
 
     char buf3[PATH_MAX]={0};
 
-    assert(good_app_basename(buf3));
+    assert(good_proc_basename(buf3));
 
     printf("%s\n",buf3);
 
@@ -48,7 +49,7 @@ int main(int argc, char **argv)
     printf("%s\n",buf4);
 
     int pid = -1;
-    lock_fd = good_run_singleton(lock_file,&pid);
+    lock_fd = good_proc_singleton(lock_file,&pid);
     if (lock_fd >= 0)
     {
         atexit(exit_befor);

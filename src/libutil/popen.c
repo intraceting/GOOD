@@ -48,31 +48,36 @@ pid_t good_popen(const char *cmd, int *stdin_fd, int *stdout_fd, int *stderr_fd,
 
             good_tree_scan(env->table, &it);
         }
-
-        good_closep(&out2in_fd[1]);
+        
         if (stdin_fd)
             dup2(out2in_fd[0], STDIN_FILENO);
         else
             good_open2(STDIN_FILENO, "/dev/null", 0, 0, 0);
+
+        good_closep(&out2in_fd[1]);
         good_closep(&out2in_fd[0]);
-        /**/
-        good_closep(&in2out_fd[0]);
+
+        
         if (stdout_fd)
             dup2(in2out_fd[1], STDOUT_FILENO);
         else
             good_open2(STDOUT_FILENO, "/dev/null", 1, 0, 0);
+
+        good_closep(&in2out_fd[0]);
         good_closep(&in2out_fd[1]);
-        /**/
-        good_closep(&in2err_fd[0]);
+
+        
         if (stderr_fd)
             dup2(in2err_fd[1], STDERR_FILENO);
         else
             good_open2(STDERR_FILENO, "/dev/null", 1, 0, 0);
+
+        good_closep(&in2err_fd[0]);
         good_closep(&in2err_fd[1]);
 
         /*
-             * 这个基本都支持。
-            */
+         * 这个基本都支持。
+        */
         execl("/bin/sh", "sh", "-c", cmd, (char *)0);
 
         /*Maybe it will never be here.*/
@@ -87,20 +92,21 @@ pid_t good_popen(const char *cmd, int *stdin_fd, int *stdout_fd, int *stderr_fd,
         good_closep(&in2out_fd[1]);
         good_closep(&in2err_fd[1]);
 
-        if (!stdin_fd)
-            good_closep(&out2in_fd[1]);
-        else
+        if (stdin_fd)
             *stdin_fd = out2in_fd[1];
-
-        if (!stdout_fd)
-            good_closep(&in2out_fd[0]);
         else
+            good_closep(&out2in_fd[1]);
+
+        if (stdout_fd)
             *stdout_fd = in2out_fd[0];
-
-        if (!stderr_fd)
-            good_closep(&in2err_fd[0]);
         else
+            good_closep(&in2out_fd[0]);
+
+        if (stderr_fd)
             *stderr_fd = in2err_fd[0];
+        else
+            good_closep(&in2err_fd[0]);
+            
     }
 
 final:
