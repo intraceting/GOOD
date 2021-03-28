@@ -70,6 +70,20 @@ typedef struct _good_tree
      */
     good_buffer_t *buf;
 
+    union
+    {
+        good_buffer_t stream;
+
+        struct
+        {
+
+            good_buffer_t first;
+
+            good_buffer_t second;
+
+        } pair;
+    } data;
+
 }good_tree_t;
 
 /**

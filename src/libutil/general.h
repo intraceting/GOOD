@@ -10,12 +10,24 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdatomic.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <errno.h>
+#include <assert.h>
+#include <syslog.h>
 #include <pthread.h>
 #include <string.h>
 #include <ctype.h>
-#include <assert.h>
-#include <errno.h>
+#include <memory.h>
+#include <time.h>
+#include <math.h>
+#include <fcntl.h>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/mman.h>
 
 
 /**

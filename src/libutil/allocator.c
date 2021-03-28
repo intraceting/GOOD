@@ -37,11 +37,6 @@ typedef struct _good_allocator
     size_t size;
 
     /**
-    * 构造回调。
-    */
-    void (*construct_cb)(void *m, size_t size, void *opaque);
-
-    /**
     * 析构回调。
     */
     void (*destroy_cb)(void *m, size_t size, void *opaque);
@@ -76,31 +71,41 @@ size_t good_size(void *mem)
     return in_p->size;
 }
 
-void *good_alloc(size_t size,
-                 void (*construct_cb)(void *m, size_t size, void *opaque),
+void good_atfree(void *mem,
                  void (*destroy_cb)(void *m, size_t size, void *opaque),
                  void *opaque)
 {
-    good_allocator_t* m = NULL;
+    good_allocator_t *in_p = NULL;
+
+    assert(mem);
+    assert(destroy_cb);
+
+    in_p = GOOD_ALLOC_PTR_OUT2IN(mem);
+
+    assert(in_p->magic == GOOD_ALLOC_MAGIC);
+
+    in_p->destroy_cb = destroy_cb;
+    in_p->opaque = opaque;
+}
+
+void *good_alloc(size_t size)
+{
+    good_allocator_t* in_p = NULL;
     void* out_p = NULL;
 
     assert(size > 0);
 
-    m = (good_allocator_t *)calloc(1, sizeof(good_allocator_t) + size);
-    if(!m)
+    in_p = (good_allocator_t *)calloc(1, sizeof(good_allocator_t) + size);
+    if(!in_p)
         return NULL;
 
-    m->magic = GOOD_ALLOC_MAGIC;
-    atomic_init(&m->refcount, 1);
-    m->size = size;
-    out_p = GOOD_ALLOC_PTR_IN2OUT(m);
+    in_p->magic = GOOD_ALLOC_MAGIC;
+    atomic_init(&in_p->refcount, 1);
+    in_p->size = size;
+    out_p = GOOD_ALLOC_PTR_IN2OUT(in_p);
 
-    m->construct_cb = construct_cb;
-    m->destroy_cb = destroy_cb;
-    m->opaque = opaque;
-
-    if(m->construct_cb)
-        m->construct_cb(out_p,size,m->opaque);
+    in_p->destroy_cb = NULL;
+    in_p->opaque = NULL;
 
     return out_p;
 }
@@ -141,7 +146,6 @@ void good_unref(void **mem)
 
         in_p->magic = ~(GOOD_ALLOC_MAGIC);
         in_p->size = 0;
-        in_p->construct_cb = NULL;
         in_p->destroy_cb = NULL;
         in_p->opaque = NULL;
 
@@ -153,4 +157,19 @@ void good_unref(void **mem)
 
     /*Set to NULL(0)*/
     *mem = NULL;
+}
+
+void* good_clone(const void* data,size_t size)
+{
+    void *out_p = NULL;
+
+    assert(data != NULL && size>0);
+    
+    out_p = good_alloc(size);
+    if(!out_p)
+        return NULL;
+
+    memcpy(out_p,data,size);
+
+    return out_p;
 }
