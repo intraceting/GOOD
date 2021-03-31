@@ -10,74 +10,36 @@
 #include <string.h>
 #include "libutil/buffer.h"
 
-void free_clean(size_t number,uint8_t **data,size_t* size, void *opaque)
-{
-    for(size_t i = 0;i<number;i++)
-    {
-        if(data[i])
-            printf("[%ld]={%s}\n",i,(char*)data[i]);
-    }
-}
-
-void free_free(size_t number,uint8_t **data,size_t* size, void *opaque)
-{
-    printf("[%ld]={%s}\n",0l,(char*)data[0]);
-    
-    good_heap_freep((void**)&data[0]);
-}
 
 int main(int argc, char **argv)
 {
-    size_t size[] = {100,45,0,0,123};
-    good_buffer_t* p = good_buffer_alloc(size,5,free_clean,NULL);
+   good_buffer_t *a = good_buffer_alloc(1000);
 
-    for (size_t i = 0; i < p->number; i++)
-    {
-        printf("size[%ld]=%ld,size1[%ld]=%ld\n",i,p->size[i],i,p->size1[i]);
+   good_buffer_printf(a,"12345678");
 
-        if(!p->size[i])
-            continue;
+   good_buffer_t *b = good_buffer_copy(a);
 
-        memset(p->data[i], 'A'+i, p->size[i]);
-        p->size1[i] = 34;
+   good_buffer_printf(b,"aaaaaa");
 
+    printf("a={%s}\n",(char*)a->data);
+    printf("b={%s}\n",(char*)b->data);
 
-    }
+   good_buffer_freep(&a);
+   good_buffer_freep(&b);
 
-    good_buffer_t* q =good_buffer_refer(p);
+   void* c = good_heap_alloc(1000);
 
+   good_buffer_t *d = good_heap_alloc(sizeof(good_buffer_t));
 
-    for(size_t i = 0;i<p->number;i++)
-    {
-        printf("size[%ld]=%ld,size1[%ld]=%ld\n",i,p->size[i],i,p->size1[i]);
+    d->data = c;
+    d->size = 1000;
 
-        if(!p->size[i])
-            continue;
+    good_buffer_printf(d,"aaaaaa");
 
-        memset(GOOD_PTR2PTR(char,q->data[i],1),'G',p->size[i]-2);
-    }
- 
-    good_buffer_unref(&p);
+    printf("d={%s}\n",(char*)d->data);
 
-    good_buffer_unref(&q);
+    good_buffer_freep(&d);
+    good_heap_freep(&c);
 
-
-    p = good_buffer_alloc(NULL,1,free_free,NULL);
-
-    p->data[0] = good_heap_alloc(123);
-
-
-    memset(p->data[0],'C',122);
-
-    good_buffer_unref(&p);
-
-    p = good_buffer_alloc3(1000);
-
-    q = good_buffer_refer(p);
-
-    good_buffer_unref(&p);
-
-    good_buffer_unref(&q);
-
-    return 0;
+   return 0;
 }

@@ -7,25 +7,7 @@
 #ifndef GOOD_UTIL_THREAD_H
 #define GOOD_UTIL_THREAD_H
 
-/**/
-#include <errno.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdatomic.h>
-#include <string.h>
-#include <time.h>
-#include <stdarg.h>
-#include <pthread.h>
-
-/**/
 #include "general.h"
-#include "buffer.h"
-
-/**
- * 
-*/
-__BEGIN_DECLS
 
 /**
  * 互斥量、事件
@@ -222,13 +204,5 @@ int good_thread_setname(const char* fmt,...);
  * 
 */
 int good_thread_getname(char name[16]);
-
-
-/**
- * 
-*/
-__END_DECLS
-
-
 
 #endif // GOOD_UTIL_THREAD_H

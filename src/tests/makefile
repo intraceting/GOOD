@@ -52,8 +52,8 @@ all: ${PROJECT_NAME}
 #
 ${PROJECT_NAME}: \
 	$(BUILD_PATH)/thread_test.exe \
-	$(BUILD_PATH)/buffer_test.exe \
-	$(BUILD_PATH)/tree_test.exe \
+	$(BUILD_PATH)/buffer_test.exe 
+#	$(BUILD_PATH)/tree_test.exe \
 	$(BUILD_PATH)/map_test.exe \
 	$(BUILD_PATH)/geometry_test.exe \
 	$(BUILD_PATH)/log_test.exe \

@@ -36,7 +36,7 @@ void good_heap_freep(void **data)
     *data = NULL;
 }
 
-void *good_heap_dup(const void *data, size_t size)
+void *good_heap_clone(const void *data, size_t size)
 {
     void *buf = NULL;
 

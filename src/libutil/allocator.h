@@ -8,69 +8,107 @@
 #define GOOD_UTIL_ALLOCATOR_H
 
 #include "general.h"
+#include "heap.h"
 
 /**
- * 获取内存块大小。
+ * 带引用计数器的内存块信息。
 */
-size_t good_size(void *mem);
+typedef struct _good_allocator
+{
+    /**
+     * 引用计数指针。
+    */
+    const atomic_uint *refcount;
+
+    /**
+     * 内存块数量。
+    */
+    size_t numbers;
+
+    /**
+     * 存放内存块大小的指针数组。
+     */
+    size_t *sizes;
+
+    /**
+     * 存放内存块指针的指针数组。
+     */
+    uint8_t **pptrs;
+
+} good_allocator_t;
 
 /**
- * 注册内存块释放前销毁回调方法。
- * 
- * @param destroy_cb 析构回调。NULL（0）忽略。
- * @param opaque 环境指针。
+ * 注册内存块析构函数。
+ *
 */
-void good_atfree(void *mem,
-                 void (*destroy_cb)(void *m, size_t size, void *opaque),
-                 void *opaque);
-                 
+void good_allocator_atfree(good_allocator_t *alloc,
+                           void (*destroy_cb)(good_allocator_t *alloc, void *opaque),
+                           void *opaque);
+
 /**
- * 申请指定大小的内存块。
+ * 申请多个内存块。
  * 
- * 并且引用计数器初始化为1。
+ * @param sizes 指定每个内存块的容量。NULL(0) 容量为0。
+ * @param numbers 数量。> 0 的正整数。
  * 
- * @param size 内存大小。
+ * @see good_heap_alloc()
+*/
+good_allocator_t *good_allocator_alloc(size_t *sizes,size_t numbers);
+
+/**
+ * 申请一个内存块。
  * 
- * @return !NULL(0) 成功，NULL(0) 失败。
+ * @param size 容量。>= 0 的正整数。
  * 
- * @see calloc()
- */
-void *good_alloc(size_t size);
+ * @see good_allocator_alloc()
+*/
+good_allocator_t *good_allocator_alloc2(size_t size);
 
 /**
  * 内存块引用。
  * 
- * 只增加引用计数，不对数据做任何修改。
+ * 复制内存块指针。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
  * 
 */
-void *good_refer(void *mem);
+good_allocator_t *good_allocator_refer(good_allocator_t *src);
 
 /**
  * 内存块释放。
  * 
- * 当引用计数大于1时，只减少引用计数，不对数据做任何修改。
- * 当引用计数减少至1时，首先执行析构回调方法，然后才释放内存块。
+ * 当前是最后一个引用者才会释放。
  * 
- * @param mem 内存块指针的指针。函数返回前修改为NULL(0);
+ * @param buf 指针的指针。函数返回前设置为NULL(0)。
  * 
- * @see free()
+ * @see good_heap_free()
 */
-void good_unref(void **mem);
+void good_allocator_unref(good_allocator_t **dst);
 
 /**
  * 内存块克隆。
  * 
- * 申请新的内存块，仅复制数据和大小。
+ * @return !NULL(0) 成功，NULL(0) 失败。
+ * 
+ * @see good_allocator_alloc()
+ * @see memcpy()
+*/
+good_allocator_t *good_allocator_clone(good_allocator_t *src);
+
+/**
+ * 内存块私有化。
+ * 
+ * 当前是唯一引用者时，直接返回。
+ * 当前不是唯一引用者时，执行克隆，然后执行释放。
+ *
+ * @param src 内存块指针的指针。私有化成功后，指针不可再被访问；如果私有化失败，指针依然有效。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
  * 
- * @see good_alloc()
- * @see memcpy()
+ * @see good_allocator_clone()
+ * @see good_allocator_unref()
 */
-void* good_clone(const void* data,size_t size);
-
+good_allocator_t * good_allocator_privatize(good_allocator_t **dst);
 
 
 #endif //GOOD_UTIL_ALLOCATOR_H

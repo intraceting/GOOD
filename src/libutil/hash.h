@@ -7,11 +7,6 @@
 #ifndef GOOD_UTIL_HASH_H
 #define GOOD_UTIL_HASH_H
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-
 #include "general.h"
 
 /**

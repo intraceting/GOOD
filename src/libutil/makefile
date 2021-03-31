@@ -44,19 +44,20 @@ OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
 #
 OBJ_FILES = \
 	${OBJ_PATH}/general.o \
+	${OBJ_PATH}/heap.o \
 	${OBJ_PATH}/allocator.o \
-	${OBJ_PATH}/buffer.o 
-#	${OBJ_PATH}/heap.o \
+	${OBJ_PATH}/bloom.o \
 	${OBJ_PATH}/hash.o \
 	${OBJ_PATH}/endian.o \
 	${OBJ_PATH}/thread.o \
-	${OBJ_PATH}/tree.o \
-	${OBJ_PATH}/map.o \
-	${OBJ_PATH}/geometry.o \
-	${OBJ_PATH}/bloom.o \
 	${OBJ_PATH}/crc32.o \
 	${OBJ_PATH}/time.o \
 	${OBJ_PATH}/clock.o \
+	${OBJ_PATH}/buffer.o
+	
+#	${OBJ_PATH}/tree.o \
+	${OBJ_PATH}/map.o \
+	${OBJ_PATH}/geometry.o \
 	${OBJ_PATH}/string.o \
 	${OBJ_PATH}/log.o \
 	${OBJ_PATH}/dirent.o \

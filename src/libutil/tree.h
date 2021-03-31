@@ -8,13 +8,6 @@
 #ifndef GOOD_UTIL_TREE_H
 #define GOOD_UTIL_TREE_H
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <assert.h>
-#include <stdarg.h>
-#include <string.h>
-
 #include "general.h"
 #include "buffer.h"
 #include "bloom.h"
@@ -60,29 +53,12 @@ typedef struct _good_tree
 #define GOOD_TREE_CHAIN_CHILD_LEAST     4
 
     /**
-     * 缓存，存放节点数据。
-     * 
+     * 节点数据。
+     *
      * @see good_buffer_alloc()
-     * @see good_buffer_alloc2()
-     * @see good_buffer_alloc3()
-     * @see good_buffer_refer()
      * @see good_buffer_unref()
-     */
+    */
     good_buffer_t *buf;
-
-    union
-    {
-        good_buffer_t stream;
-
-        struct
-        {
-
-            good_buffer_t first;
-
-            good_buffer_t second;
-
-        } pair;
-    } data;
 
 }good_tree_t;
 
@@ -99,8 +75,9 @@ typedef struct _good_tree_iterator
     /**
      * 栈。
      * 
+     * 如果无法确定填多少合适，就填0。 
     */
-    good_buffer_t *stack;
+    size_t stack_size;
 
     /**
      * 回显

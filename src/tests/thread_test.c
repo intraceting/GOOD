@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 
     sigset_t sig;
     sigfillset(&sig);
-    good_sigwaitinfo(&sig,-1,signal_cb,NULL);
+ //   good_sigwaitinfo(&sig,-1,signal_cb,NULL);
 
     return 0;
 }

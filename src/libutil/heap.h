@@ -7,12 +7,6 @@
 #ifndef GOOD_UTIL_HEAP_H
 #define GOOD_UTIL_HEAP_H
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-
 #include "general.h"
 
 /**
@@ -50,11 +44,11 @@ void good_heap_free(void *data);
 void good_heap_freep(void **data);
 
 /**
- * 内存复制。
+ * 内存克隆。
  * 
  * @see good_heap_alloc()
  * @see memcpy()
 */
-void* good_heap_dup(const void* data,size_t size);
+void* good_heap_clone(const void* data,size_t size);
 
 #endif //GOOD_UTIL_HEAP_H

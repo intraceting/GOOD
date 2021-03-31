@@ -7,11 +7,6 @@
 #ifndef GOOD_UTIL_ENDIAN_H
 #define GOOD_UTIL_ENDIAN_H
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-
 #include "general.h"
 
 /**
