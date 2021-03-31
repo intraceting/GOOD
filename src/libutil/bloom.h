@@ -7,11 +7,6 @@
 #ifndef GOOD_UTIL_BLOOM_H
 #define GOOD_UTIL_BLOOM_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdatomic.h>
-#include <assert.h>
-
 #include "general.h"
 
 /** 

@@ -49,7 +49,7 @@ void good_allocator_atfree(good_allocator_t *alloc,
  * 申请多个内存块。
  * 
  * @param sizes 指定每个内存块的容量。NULL(0) 容量为0。
- * @param numbers 数量。> 0 的正整数。
+ * @param numbers 数量。> 0 的整数。
  * 
  * @see good_heap_alloc()
 */
@@ -58,7 +58,7 @@ good_allocator_t *good_allocator_alloc(size_t *sizes,size_t numbers);
 /**
  * 申请一个内存块。
  * 
- * @param size 容量。>= 0 的正整数。
+ * @param size 容量。>= 0 的整数。
  * 
  * @see good_allocator_alloc()
 */
