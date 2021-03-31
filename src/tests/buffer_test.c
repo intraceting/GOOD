@@ -41,5 +41,18 @@ int main(int argc, char **argv)
     good_buffer_freep(&d);
     good_heap_freep(&c);
 
+    good_buffer_t *e = good_buffer_alloc(1000*100000);
+
+    good_buffer_t *f = good_buffer_copy(e);
+    good_buffer_t *g = good_buffer_copy(f);
+
+    good_buffer_t *h = good_buffer_clone(g);
+
+    good_buffer_freep(&e);
+    good_buffer_freep(&f);
+
+    good_buffer_freep(&g);
+    good_buffer_freep(&h);
+
    return 0;
 }
