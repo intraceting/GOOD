@@ -31,6 +31,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/file.h>
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -432,6 +433,22 @@ char* good_proc_dirname(char* buf,const char* append);
 */
 char* good_proc_basename(char* buf);
 
+/**
+ * 单实例模式运行。
+ * 
+ * 文件句柄在退出前不要关闭，否则会使文件解除锁定状态。
+ * 
+ * 进程ID以十进制文本格式写入文件，例：2021 。
+ * 
+ * @param pid 当接口返回时，被赋值正在运行的进程ID。NULL(0) 忽略。
+ * 
+ * @return >= 0 文件句柄(当前进程是唯一进程)，-1 已有实例正在运行。
+ * 
+ * @see flock()
+ * @see getpid()
+*/
+int good_proc_singleton(const char* lockfile,int* pid);
+
 /*------------------------------------------------------------------------------------------------*/
 
 /**
@@ -464,7 +481,6 @@ ssize_t good_write(int fd, const void *data, size_t size);
  * @return > 0 读取完成的大小，<= 0 读取失败或已到末尾。
  * 
  * @see read()
- * 
 */
 ssize_t good_read(int fd, void *data, size_t size);
 
