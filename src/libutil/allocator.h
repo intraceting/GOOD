@@ -11,6 +11,8 @@
 
 /**
  * 带引用计数器的内存块信息。
+ *
+ * 
 */
 typedef struct _good_allocator
 {
@@ -26,11 +28,15 @@ typedef struct _good_allocator
 
     /**
      * 存放内存块大小的指针数组。
+     *
+     * @warning 如果此项值被调用者覆盖，则需要调用者主动释放，或注册析构函数处理。
      */
     size_t *sizes;
 
     /**
      * 存放内存块指针的指针数组。
+     * 
+     * @warning 如果此项值被调用者覆盖，则需要调用者主动释放，或注册析构函数处理。
      */
     uint8_t **pptrs;
 
