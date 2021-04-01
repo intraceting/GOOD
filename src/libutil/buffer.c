@@ -132,7 +132,7 @@ ssize_t good_buffer_vprintf(good_buffer_t *buf, const char *fmt, va_list args)
     ssize_t wsize2 = 0;
 
     if (good_buffer_privatize(buf) != 0)
-        GOOD_ERRNO_AND_RETURN1(EMLINK, 0);
+        GOOD_ERRNO_AND_RETURN1(EMLINK, -1);
 
     assert(buf != NULL && fmt != NULL && args != NULL);
     assert(buf->data != NULL && buf->size > 0);
@@ -170,7 +170,7 @@ ssize_t good_buffer_write(good_buffer_t *buf, const void *data, size_t size)
     ssize_t wsize2 = 0;
 
     if (good_buffer_privatize(buf) != 0)
-        GOOD_ERRNO_AND_RETURN1(EMLINK, 0);
+        GOOD_ERRNO_AND_RETURN1(EMLINK, -1);
 
     assert(buf != NULL && data != NULL && size > 0);
     assert(buf->data != NULL && buf->size > 0);
@@ -190,7 +190,7 @@ ssize_t good_buffer_fill(good_buffer_t *buf, uint8_t stuffing)
     ssize_t wsize2 = 0;
 
     if (good_buffer_privatize(buf) != 0)
-        GOOD_ERRNO_AND_RETURN1(EMLINK, 0);
+        GOOD_ERRNO_AND_RETURN1(EMLINK, -1);
 
     assert(buf != NULL);
     assert(buf->data != NULL && buf->size > 0);
