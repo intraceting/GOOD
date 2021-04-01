@@ -7,17 +7,8 @@
 #ifndef GOOD_UTIL_MAP_H
 #define GOOD_UTIL_MAP_H
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <assert.h>
-#include <string.h>
-#include <errno.h>
-
 #include "general.h"
-#include "buffer.h"
 #include "tree.h"
-#include "hash.h"
 
 /**
  * MAP表。
@@ -62,25 +53,15 @@ typedef struct _good_map
     /**
      * 比较函数。
      * 
-     * @return > 0 is key1 > key2，0 is key1 == key2，< 0 is key1 < key2。
-     * 
      * @see good_map_compare()
     */
     int (*compare_cb)(const void *key1, const void *key2, size_t size,void *opaque);
 
     /**
-     * 释放
-     * 
-     * @note NULL(0) 忽略。
-    */
-    void (*free_cb)(size_t number,uint8_t **data,size_t *size,void *opaque);
-
-    /**
-     * 私有指针
-     * 
+    * 环境指针。
     */
     void *opaque;
-
+    
 }good_map_t;
 
 /**

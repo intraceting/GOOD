@@ -52,45 +52,13 @@ typedef struct _good_tree
 #define GOOD_TREE_CHAIN_CHILD_LEAST     4
 
     /**
-     * 节点数据。
-     *
-     * @see good_buffer_alloc()
-     * @see good_buffer_unref()
+     * 数据。
+     * 
+     * 当节点被删除时，如果不为NULL(0)，自动调用good_allocator_unref()释放。
     */
-    good_buffer_t *buf;
+    good_allocator_t *alloc;
 
 }good_tree_t;
-
-/**
- * 迭代器。
-*/
-typedef struct _good_tree_iterator
-{
-    /**
-     * Must be 0.
-    */
-    int flags;
-
-    /**
-     * 栈。
-     * 
-     * 如果无法确定填多少合适，就填0。 
-    */
-    size_t stack_size;
-
-    /**
-     * 回显
-     * 
-     * @return -1 终止，0 忽略孩子，1 继续。
-    */
-    int (*dump_cb)(size_t deep,const good_tree_t *node, void *opaque);
-
-    /**
-     * 环境指针
-    */
-    void *opaque;
-
-} good_tree_iterator;
 
 /**
  * 获取自己的父节指针。
@@ -147,47 +115,31 @@ void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first);
  * @param root 节点指针的指针。当接口返回时，被赋值NULL(0)。
 
  * @see good_heap_free()
- * @see good_buffer_unref()
+ * @see good_allocator_unref()
 */
 void good_tree_free(good_tree_t **root);
 
 /**
  * 创建节点。
  * 
- * 可以附带创建缓存区用于数据存储。
- * 
- * @param size 缓存大小(数组)。NULL(0) 缓存空间为0。
- * @param number 缓存数量。0 不创建缓存。
- * 
  * @see good_heap_calloc()
- * @see good_buffer_alloc2()
  * 
 */
-good_tree_t *good_tree_alloc(size_t size[],size_t number);
-
-/**
- * 创建节点。
- * 
- * 可以附带创建缓存区用于数据存储。
- * 
- * @param size 缓存大小(缓存数量为1。)。NULL(0) 缓存空间为0。
- * 
- * @see good_tree_alloc()
- * 
-*/
-good_tree_t *good_tree_alloc2(size_t size);
+good_tree_t *good_tree_alloc();
 
 /**
  * 扫描树节点。
  * 
  * 深度优先遍历节点，也可以通过迭代器控制遍历方向。
  * 
- * 如果没有准备迭代堆栈，内部自动创建2048高度的堆栈。
- * 
- * @param it 迭代器。
+ * @param stack_deep 栈深度。如果无法确定填多少合适，就填0。 
+ * @param dump_cb 回显函数。-1 终止，0 忽略孩子，1 继续。
+ * @param opaque 环境指针。
  * 
 */
-void good_tree_scan(const good_tree_t *root,good_tree_iterator* it);
+void good_tree_scan(const good_tree_t *root,size_t stacks,
+                    int (*dump_cb)(size_t deep, const good_tree_t *node, void *opaque),
+                    void *opaque);
 
 /**
  * 格式化输出。

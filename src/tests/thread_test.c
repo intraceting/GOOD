@@ -10,7 +10,6 @@
 #include "libutil/thread.h"
 #include "libutil/crc32.h"
 #include "libutil/clock.h"
-#include "libutil/process.h"
 #include "libutil/signal.h"
 
 void* specific_cb(void* args)
@@ -74,7 +73,7 @@ int main(int argc, char **argv)
 
     sigset_t sig;
     sigfillset(&sig);
- //   good_sigwaitinfo(&sig,-1,signal_cb,NULL);
+    good_sigwaitinfo(&sig,-1,signal_cb,NULL);
 
     return 0;
 }

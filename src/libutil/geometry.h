@@ -7,12 +7,6 @@
 #ifndef GOOD_UTIL_GEOMETRY_H
 #define GOOD_UTIL_GEOMETRY_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <math.h>
-#include <ctype.h>
-
 #include "general.h"
 
 /**

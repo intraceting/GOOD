@@ -210,7 +210,7 @@ void good_tree_free(good_tree_t **root)
             {
                 good_tree_unlink(node);
 
-                good_buffer_unref(&node->buf);
+                good_allocator_unref(&node->alloc);
                 good_heap_freep((void**)&node);
             }
         }
@@ -223,27 +223,24 @@ void good_tree_free(good_tree_t **root)
         }
     }
 
-    good_buffer_unref(&(*root)->buf);
+    good_allocator_unref(&(*root)->alloc);
     good_heap_freep((void**)root);
 
 }
 
-good_tree_t *good_tree_alloc(size_t size[], size_t number)
+good_tree_t *good_tree_alloc()
 {
-    good_tree_t *node = (good_tree_t *)good_alloc(sizeof(good_tree_t));
+    good_tree_t *node = (good_tree_t *)good_heap_alloc(sizeof(good_tree_t));
 
     if (!node)
         GOOD_ERRNO_AND_RETURN1(ENOMEM,NULL);
 
-    if (number > 0)
-        node->buf = good_buffer_alloc2(size, number);
-    else
-        node->buf = NULL;
-
     return node;
 }
 
-void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
+void good_tree_scan(const good_tree_t *root,size_t stack_deep,
+                    int (*dump_cb)(size_t deep, const good_tree_t *node, void *opaque),
+                    void *opaque)
 {
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
@@ -251,22 +248,22 @@ void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
     size_t deep = 0;// begin 0
     int chk;
 
-    assert(root && it && it->dump_cb);
+    assert(root && dump_cb);
         
     /*
-     * 如果没有准备，则在内部准备。
+     * 如果调用者不确定，则在内部自动确定。
     */
-    if (it->stack_size <= 0)
-        it->stack_size = 2048;
+    if (stack_deep <= 0)
+        stack_deep = PATH_MAX/2;
 
-    stack = (good_tree_t **)good_alloc(it->stack_size * sizeof(good_tree_t *));
+    stack = (good_tree_t **)good_heap_alloc(stack_deep * sizeof(good_tree_t *));
     if (!stack)
         goto final;
 
     /*
      * 根
     */
-    chk = it->dump_cb(0,root,it->opaque);
+    chk = dump_cb(0,root,opaque);
     if(chk == 0)
         goto final;
 
@@ -277,7 +274,7 @@ void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
 
     while(node)
     {
-        chk = it->dump_cb(deep + 1, node, it->opaque);
+        chk = dump_cb(deep + 1, node, opaque);
         if (chk < 0)
             goto final;
 
@@ -288,7 +285,7 @@ void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
 
         if(child)
         {
-            assert(it->stack_size > deep);
+            assert(stack_deep > deep);
 
             stack[deep++] = node;
 
@@ -308,7 +305,7 @@ void good_tree_scan(const good_tree_t *root, good_tree_iterator *it)
 
 final:
 
-    good_unref((void**)&stack);
+    good_heap_freep((void**)&stack);
 
 }
 
@@ -325,7 +322,7 @@ void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* 
 void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args)
 {
     good_tree_t *tmp = NULL;
-    good_buffer_t *stack = NULL;
+    good_tree_t **stack = NULL;
 
     assert(fp && node && fmt);
 
@@ -338,18 +335,18 @@ void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char*
         /*
          * 准备堆栈。
         */
-        stack = good_buffer_alloc2(NULL,deep);
+        stack = good_heap_alloc(deep * sizeof(good_tree_t *));
         if(!stack)
             GOOD_ERRNO_AND_RETURN0(ENOMEM);
 
         tmp = (good_tree_t *)node;
 
         for (size_t i = 1; i < deep; i++)
-            stack->data[deep-i] = (uint8_t*)(tmp = good_tree_father(tmp));
+            stack[deep-i] = (tmp = good_tree_father(tmp));
 
         for (size_t i = 1; i < deep; i++)
         {
-            if (good_tree_sibling((good_tree_t *)stack->data[i], 0))
+            if (good_tree_sibling((good_tree_t *)stack[i], 0))
                 fprintf(fp, "│   ");
             else
                 fprintf(fp, "    ");
@@ -363,5 +360,5 @@ void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char*
         vfprintf(fp,fmt,args);
     }
 
-    good_buffer_unref(&stack);
+    good_heap_freep((void**)&stack);
 }

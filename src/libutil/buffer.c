@@ -158,7 +158,7 @@ ssize_t good_buffer_printf(good_buffer_t *buf, const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
 
-    good_buffer_vprintf(buf, fmt, args);
+    wsize2 = good_buffer_vprintf(buf, fmt, args);
 
     va_end(args);
 

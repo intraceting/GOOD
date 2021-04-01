@@ -56,9 +56,9 @@ typedef struct _good_allocator_hdr
 #define GOOD_ALLOCATOR_PTR_IN2OUT(PTR) \
     GOOD_PTR2PTR(good_allocator_t, (PTR), sizeof(good_allocator_hdr) - sizeof(good_allocator_t))
 
-void good_atfree(good_allocator_t *alloc,
-                 void (*destroy_cb)(good_allocator_t *alloc, void *opaque),
-                 void *opaque)
+void good_allocator_atfree(good_allocator_t *alloc,
+                           void (*destroy_cb)(good_allocator_t *alloc, void *opaque),
+                           void *opaque)
 {
     good_allocator_hdr *in_p = NULL;
 

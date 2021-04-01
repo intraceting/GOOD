@@ -7,12 +7,6 @@
 #ifndef GOOD_UTIL_LOG_H
 #define GOOD_UTIL_LOG_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <syslog.h>
-#include <stdarg.h>
-
 #include "general.h"
 
 /**

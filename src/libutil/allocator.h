@@ -45,6 +45,7 @@ typedef struct _good_allocator
 /**
  * 注册内存块析构函数。
  *
+ * @param opaque 环境指针。
 */
 void good_allocator_atfree(good_allocator_t *alloc,
                            void (*destroy_cb)(good_allocator_t *alloc, void *opaque),
