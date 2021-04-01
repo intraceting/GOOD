@@ -7,10 +7,6 @@
 #ifndef GOOD_UTIL_CRC32_H
 #define GOOD_UTIL_CRC32_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-
 #include "general.h"
 
 /**

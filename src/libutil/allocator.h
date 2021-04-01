@@ -8,7 +8,6 @@
 #define GOOD_UTIL_ALLOCATOR_H
 
 #include "general.h"
-#include "heap.h"
 
 /**
  * 带引用计数器的内存块信息。
@@ -16,7 +15,7 @@
 typedef struct _good_allocator
 {
     /**
-     * 引用计数指针。
+     * 引用计数器指针。
     */
     const atomic_uint *refcount;
 

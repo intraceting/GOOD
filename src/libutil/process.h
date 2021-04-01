@@ -21,32 +21,7 @@
 #include "file.h"
 #include "string.h"
 
-/**
- * 获取当前程序的完整路径和文件名。
- *
- * /proc/self/exe
- * 
- * @see readlink()
-*/
-char* good_proc_pathfile(char* buf);
 
-/**
- * 获取当前程序的完整路径。
- * 
- * @param append 拼接目录或文件名。NULL(0) 忽略。
- * 
- * @see good_app_pathfile()
- * @see good_dirname()
-*/
-char* good_proc_dirname(char* buf,const char* append);
-
-/**
- * 获取当前程序的文件名。
- * 
- * @see good_app_pathfile()
- * @see good_basename()
-*/
-char* good_proc_basename(char* buf);
 
 /**
  * 单实例模式运行。

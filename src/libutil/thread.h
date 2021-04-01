@@ -9,10 +9,12 @@
 
 #include "general.h"
 
+/*------------------------------------------------------------------------------------------------*/
+
 /**
- * 互斥量、事件
+ * 互斥量、事件。
  * 
- * @note 如果需要支持跨进程特性，需要让结构体数据运行在共享内存中。
+ * 如果需要支持跨进程特性，需要让结构体数据运行在共享内存中。
 */
 typedef struct _good_mutex
 {
@@ -38,10 +40,10 @@ typedef struct _good_mutex
 
 } good_mutex_t;
 
+/*------------------------------------------------------------------------------------------------*/
 
 /**
- * 线程句柄和返回值
- * 
+ * 线程句柄和返回值。
  * 
 */
 typedef struct _good_thread_t
@@ -69,6 +71,8 @@ typedef struct _good_thread_t
     void *opaque;
 
 } good_thread_t;
+
+/*------------------------------------------------------------------------------------------------*/
 
 /**
  * 销毁互斥量及属性。
@@ -154,7 +158,9 @@ int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
  * @see pthread_cond_broadcast()
  * @see pthread_cond_signal()
 */
-int good_mutex_signal(good_mutex_t *ctx, int broadcast);
+int good_mutex_notice(good_mutex_t *ctx, int broadcast);
+
+/*------------------------------------------------------------------------------------------------*/
 
 /**
  * 创建线程。
@@ -183,6 +189,8 @@ int good_thread_create(good_thread_t *ctx,int joinable);
 */
 int good_thread_join(good_thread_t* ctx);
 
+/*------------------------------------------------------------------------------------------------*/
+
 /**
  * 设置当前线程名字。
  * 
@@ -204,5 +212,7 @@ int good_thread_setname(const char* fmt,...);
  * 
 */
 int good_thread_getname(char name[16]);
+
+/*------------------------------------------------------------------------------------------------*/
 
 #endif // GOOD_UTIL_THREAD_H

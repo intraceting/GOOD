@@ -6,22 +6,23 @@
  */
 #include "mman.h"
 
-void _good_munmap_cb(size_t number,uint8_t **data,size_t* size,void *opaque)
+void _good_munmap_cb(good_allocator_t *alloc, void *opaque)
 {
-    assert(data[0] != MAP_FAILED);
-    assert(size[0] > 0);
+    assert(alloc);
+    assert(alloc->pptrs[0] != MAP_FAILED);
+    assert(alloc->sizes[0] > 0);
 
-    assert(munmap(data[0],size[0])==0);
+    assert(munmap(alloc->pptrs[0],alloc->sizes[0])==0);
 }
 
-good_buffer_t* good_mmap(int fd,int rw,int share)
+good_allocator_t* good_mmap(int fd,int rw,int share)
 {
     void* mmptr = MAP_FAILED;
     int prot = PROT_READ;
     int flags = MAP_PRIVATE;
     struct stat attr;
 
-    good_buffer_t *buf = NULL;
+    good_allocator_t *alloc = NULL;
 
     assert(fd>=0);
 
@@ -40,30 +41,34 @@ good_buffer_t* good_mmap(int fd,int rw,int share)
     if(mmptr == MAP_FAILED)
         return NULL;
 
-    buf = good_buffer_alloc(NULL,1,NULL,NULL);
-    if (buf)
+    alloc = good_allocator_alloc(NULL,1);
+    if (alloc)
     {
         /*
          * 绑定内存和特定的释放函数，用于支持引用计数器。
         */
-        buf->data[0] = mmptr;
-        buf->size[0] = attr.st_size;
-        buf->free_cb = _good_munmap_cb;
+        alloc->pptrs[0] = mmptr;
+        alloc->sizes[0] = attr.st_size;
+
+        /*
+         * 注册特定的析构函数。
+        */
+        good_allocator_atfree(alloc,_good_munmap_cb,NULL);
     }
 
 final:
 
-    if(!buf && mmptr != MAP_FAILED)
+    if(!alloc && mmptr != MAP_FAILED)
         munmap(mmptr,attr.st_size);
 
-    return buf;
+    return alloc;
 }
 
-good_buffer_t *good_mmap2(const char *name, int rw, int share)
+good_allocator_t *good_mmap2(const char *name, int rw, int share)
 {
     int fd = -1;
 
-    good_buffer_t *buf = NULL;
+    good_allocator_t *alloc = NULL;
 
     assert(name);
 
@@ -71,53 +76,30 @@ good_buffer_t *good_mmap2(const char *name, int rw, int share)
     if (fd < 0)
         return NULL;
 
-    buf = good_mmap(fd,rw,share);
+    alloc = good_mmap(fd,rw,share);
 
     good_closep(&fd);
     
-    return buf;
+    return alloc;
 }
 
-int good_msync(good_buffer_t *buf, int async)
+int good_msync(good_allocator_t *alloc, int async)
 {
     int flags = MS_SYNC;
 
-    assert(buf);
-    assert(buf->data[0] != MAP_FAILED && buf->size[0] > 0);
+    assert(alloc);
+    assert(alloc->pptrs[0] != MAP_FAILED && alloc->sizes[0] > 0);
 
     if (async)
         flags = MS_ASYNC;
 
-    return msync(buf->data[0], buf->size[0], flags);
+    return msync(alloc->pptrs[0], alloc->sizes[0], flags);
 }
 
-void good_munmap(good_buffer_t** buf)
+void good_munmap(good_allocator_t** alloc)
 {
-    if(!buf || !*buf)
+    if(!alloc || !*alloc)
         GOOD_ERRNO_AND_RETURN0(EINVAL);
 
-    good_buffer_unref(buf);
-}
-
-int good_shm_open(const char* name,int rw, int create)
-{
-    int flag = O_RDONLY;
-    mode_t mode = S_IRUSR | S_IWUSR;
-
-    assert(name);
-
-    if (rw)
-        flag = O_RDWR;
-
-    if (rw && create)
-        flag |= O_CREAT;
-
-    return shm_open(name,flag,mode);
-}
-
-int good_shm_unlink(const char* name)
-{
-    assert(name);
-
-    return shm_unlink(name);
+    good_allocator_unref(alloc);
 }

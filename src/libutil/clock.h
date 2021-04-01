@@ -7,16 +7,8 @@
 #ifndef GOOD_UTIL_CLOCK_H
 #define GOOD_UTIL_CLOCK_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <time.h>
-#include <math.h>
-
 #include "general.h"
 #include "thread.h"
-#include "heap.h"
-#include "time.h"
 
 /**
  * 计时器-重置

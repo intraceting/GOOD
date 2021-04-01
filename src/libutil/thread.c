@@ -113,7 +113,7 @@ int good_mutex_wait(good_mutex_t* ctx,time_t timeout)
 }
 
 
-int good_mutex_signal(good_mutex_t* ctx,int broadcast)
+int good_mutex_notice(good_mutex_t* ctx,int broadcast)
 {
     int err = -1;
 

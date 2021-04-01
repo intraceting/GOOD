@@ -9,8 +9,7 @@
 #define GOOD_UTIL_TREE_H
 
 #include "general.h"
-#include "buffer.h"
-#include "bloom.h"
+#include "allocator.h"
 
 
 /**

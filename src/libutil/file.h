@@ -63,55 +63,6 @@ ssize_t good_write_trailer(int fd, int fill, uint8_t stuffing, good_buffer_t *bu
 */
 ssize_t good_read(int fd, void *data, size_t size, good_buffer_t *buf);
 
-/**
- * 关闭文件句柄。
- * 
- * @see close()
-*/
-void good_closep(int *fd);
-
-/**
- * 打开文件。
- * 
- * @return >= 0 句柄，-1 失败。
- * 
- * @see open()
- * 
-*/
-int good_open(const char *file, int rw, int nonblock, int create);
-
-/**
- * 打开文件2。
- * 
- * 已打开的文件会被关闭，新打开的文件会绑定到fd2句柄。
- * 
- * @param fd2 已打开的句柄。
- * 
- * @return fd2 成功，-1 失败。
- * 
- * @see open()
- * @see dup2()
- * 
-*/
-int good_open2(int fd2,const char *file, int rw, int nonblock, int create);
-
-/**
- * 添加标记。
- * 
- * @return 0 成功，-1 失败。
- * 
- * @see fcntl()
-*/
-int good_fflag_add(int fd,int flag);
-
-/**
- * 删除标记。
- * 
- * @return 0 成功，-1 失败。
- * 
- * @see fcntl()
-*/
-int good_fflag_del(int fd,int flag);
 
 
 
