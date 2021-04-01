@@ -34,23 +34,23 @@ void traversal(const good_tree_t *root)
 int main(int argc, char **argv)
 {
 
-    good_tree_t *d = good_tree_alloc();
+    good_tree_t *d = good_tree_alloc(NULL);
 
     d->alloc = good_allocator_alloc2(1);
 
-    good_tree_t *n = good_tree_alloc();
+    good_tree_t *n = good_tree_alloc(NULL);
 
     n->alloc = good_allocator_alloc2(2);
 
     good_tree_insert2(d, n,1);
 
-    good_tree_t *n2 = n = good_tree_alloc();
+    good_tree_t *n2 = n = good_tree_alloc(NULL);
 
     n->alloc = good_allocator_alloc2(3);
 
     good_tree_insert2(d, n,1);
 
-    n = good_tree_alloc();
+    n = good_tree_alloc(NULL);
 
     n->alloc = good_allocator_alloc2(4);
 
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 
     traversal(d);
 
-    good_tree_t *m = good_tree_alloc();
+    good_tree_t *m = good_tree_alloc(NULL);
 
     m->alloc = good_allocator_alloc2(5);
 
@@ -66,31 +66,31 @@ int main(int argc, char **argv)
 
     traversal(d);
 
-    m = good_tree_alloc();
+    m = good_tree_alloc(NULL);
 
     m->alloc = good_allocator_alloc2(6);
 
     good_tree_insert2(n, m,0);
 
-    good_tree_t *m6 = m = good_tree_alloc();
+    good_tree_t *m6 = m = good_tree_alloc(NULL);
 
     m->alloc = good_allocator_alloc2(7);
 
     good_tree_insert2(n, m,0);
 
-    good_tree_t *k = good_tree_alloc();
+    good_tree_t *k = good_tree_alloc(NULL);
 
     k->alloc = good_allocator_alloc2(8);
 
     good_tree_insert2(m, k,0);
 
-    k = good_tree_alloc();
+    k = good_tree_alloc(NULL);
 
     k->alloc = good_allocator_alloc2(9);
 
     good_tree_insert2(m, k,0);
 
-    good_tree_t *u = good_tree_alloc();
+    good_tree_t *u = good_tree_alloc(NULL);
 
     u->alloc = good_allocator_alloc2(10);
 

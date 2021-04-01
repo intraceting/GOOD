@@ -29,19 +29,22 @@ typedef struct _good_map
     good_tree_t *table;
 
     /**
-     * Index 字段索引
+     * Bucket 索引
     */
-#define GOOD_MAP_INDEX  0
+#define GOOD_MAP_BUCKET_DATA        0
+#define GOOD_MAP_BUCKET_SIZE        1
 
     /**
-     * Key 字段索引
+     * Key 索引
     */
-#define GOOD_MAP_KEY    0
+#define GOOD_MAP_KEY_DATA           0
+#define GOOD_MAP_KEY_SIZE           1
 
     /**
-     * Value 字段索引
+     * Value 索引
     */
-#define GOOD_MAP_VALUE  1
+#define GOOD_MAP_VALUE_DATA         2
+#define GOOD_MAP_VALUE_SIZE         3
 
     /**
      * HASH函数。
@@ -56,6 +59,11 @@ typedef struct _good_map
      * @see good_map_compare()
     */
     int (*compare_cb)(const void *key1, const void *key2, size_t size,void *opaque);
+
+    /**
+     * 销毁函数。
+    */
+    void (*destroy_cb)(good_allocator_t *alloc, void *opaque);
 
     /**
     * 环境指针。

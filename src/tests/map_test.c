@@ -18,11 +18,12 @@ int dump(size_t deep, const good_tree_t *node, void *opaque)
     if(deep==0)
         good_tree_fprintf(stderr,deep,node,"%s\n","map");
     else if(deep ==1)
-        good_tree_fprintf(stderr,deep,node,"%lu\n",*GOOD_PTR2PTR(uint64_t, node->buf->data[GOOD_MAP_INDEX], 0));
+        good_tree_fprintf(stderr,deep,node,"%lu\n",
+            *GOOD_PTR2PTR(uint64_t, node->alloc->pptrs[GOOD_MAP_BUCKET_DATA], 0));
     else
         good_tree_fprintf(stderr, deep, node, "%d:%s\n",
-                          *GOOD_PTR2PTR(int, node->buf->data[GOOD_MAP_KEY], 0),
-                          GOOD_PTR2PTR(char, node->buf->data[GOOD_MAP_VALUE], 0));
+                          *GOOD_PTR2PTR(int, node->alloc->pptrs[GOOD_MAP_KEY_DATA], 0),
+                          GOOD_PTR2PTR(char, node->alloc->pptrs[GOOD_MAP_VALUE_DATA], 0));
 
     return 1;
 }
@@ -32,11 +33,12 @@ int dump2(size_t deep, const good_tree_t *node, void *opaque)
     if(deep==0)
         good_tree_fprintf(stderr,deep,node,"%s\n","map");
     else if(deep ==1)
-        good_tree_fprintf(stderr,deep,node,"%lu\n",*GOOD_PTR2PTR(uint64_t, node->buf->data[GOOD_MAP_INDEX], 0));
+        good_tree_fprintf(stderr,deep,node,"%lu\n",
+            *GOOD_PTR2PTR(uint64_t, node->alloc->pptrs[GOOD_MAP_BUCKET_DATA], 0));
     else
         good_tree_fprintf(stderr, deep, node, "%s:%s\n",
-                          GOOD_PTR2PTR(char, node->buf->data[GOOD_MAP_KEY], 0),
-                          GOOD_PTR2PTR(char, node->buf->data[GOOD_MAP_VALUE], 0));
+                          GOOD_PTR2PTR(char, node->alloc->pptrs[GOOD_MAP_KEY_DATA], 0),
+                          GOOD_PTR2PTR(char, node->alloc->pptrs[GOOD_MAP_VALUE_DATA], 0));
 
     return 1;
 }
@@ -45,10 +47,7 @@ void traversal(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator it = {0};
-    it.dump_cb = dump;
-
-    good_tree_scan(root, &it);
+    good_tree_scan(root,0,dump,NULL);
 
     printf("\n-------------------------------------\n");
 }
@@ -57,10 +56,7 @@ void traversal2(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator it = {0};
-    it.dump_cb = dump2;
-
-    good_tree_scan(root, &it);
+    good_tree_scan(root,0,dump2,NULL);
 
     printf("\n-------------------------------------\n");
 }
@@ -95,9 +91,9 @@ int main(int argc, char **argv)
     good_map_t m = {NULL,map_hash,NULL,NULL,NULL};
 
 
-    good_map_init(&m,1000);
+    good_map_init(&m,100);
 
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < 100; i++)
     {
         //int d = rand();
         int d = i;
@@ -105,7 +101,8 @@ int main(int argc, char **argv)
         if(!n)
             break;
         
-        memset(n->buf->data[GOOD_MAP_VALUE],'A'+i%26,n->buf->size[GOOD_MAP_VALUE]-1);
+        memset(n->alloc->pptrs[GOOD_MAP_VALUE_DATA],'A'+i%26,n->alloc->sizes[GOOD_MAP_VALUE_DATA]-1);
+        
     }
 
     traversal(m.table);
@@ -135,7 +132,7 @@ int main(int argc, char **argv)
         if(!n)
             continue;
             
-        memset(n->buf->data[GOOD_MAP_VALUE],'A'+i%26,n->buf->size[GOOD_MAP_VALUE]-1);
+        memset(n->alloc->pptrs[GOOD_MAP_VALUE_DATA],'A'+i%26,n->alloc->sizes[GOOD_MAP_VALUE_DATA]-1);
     }
 
     traversal2(m.table);

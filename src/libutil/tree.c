@@ -228,15 +228,46 @@ void good_tree_free(good_tree_t **root)
 
 }
 
-good_tree_t *good_tree_alloc()
+good_tree_t *good_tree_alloc(good_allocator_t *alloc)
 {
     good_tree_t *node = (good_tree_t *)good_heap_alloc(sizeof(good_tree_t));
 
     if (!node)
         GOOD_ERRNO_AND_RETURN1(ENOMEM,NULL);
 
+    node->alloc = alloc;
+
     return node;
 }
+
+good_tree_t *good_tree_alloc2(size_t *sizes, size_t numbers)
+{
+    good_tree_t *node = good_tree_alloc(NULL);
+    good_allocator_t *alloc = good_allocator_alloc(sizes, numbers);
+
+    if (!node || !alloc)
+        goto final_error;
+
+    node->alloc = alloc;
+    
+    return node;
+
+final_error:
+
+    /*
+     * 走到这里出错了。
+    */
+    good_tree_free(&node);
+    good_allocator_unref(&alloc);
+    
+    GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
+}
+
+good_tree_t *good_tree_alloc3(size_t size)
+{
+    return good_tree_alloc2(&size,1);
+}
+
 
 void good_tree_scan(const good_tree_t *root,size_t stack_deep,
                     int (*dump_cb)(size_t deep, const good_tree_t *node, void *opaque),

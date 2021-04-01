@@ -36,7 +36,7 @@ int good_map_init(good_map_t *map, size_t size)
     /*
      * 创建树节点，用于表格。
     */
-    map->table = good_tree_alloc(NULL, size);
+    map->table = good_tree_alloc2(NULL, size);
 
     if (!map->table)
         GOOD_ERRNO_AND_RETURN1(ENOMEM,-1);
@@ -57,7 +57,7 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     good_tree_t *it = NULL;
     good_tree_t *node = NULL;
     uint64_t hash = 0;
-    uint64_t index = -1;
+    uint64_t bucket = -1;
     int chk = 0;
 
     assert(map && key && ksize > 0);
@@ -67,28 +67,27 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     assert(map->compare_cb);
 
     hash = map->hash_cb(key, ksize,map->opaque);
-    index = hash % map->table->buf->number;
+    bucket = hash % map->table->alloc->numbers;
 
     /*
      * 查找桶，不存在创建。
     */
-    it = (good_tree_t *)map->table->buf->data[index];
+    it = (good_tree_t *)map->table->alloc->pptrs[bucket];
     if(!it)
     {
-        it = good_tree_alloc2(sizeof(index));
+        it = good_tree_alloc3(sizeof(bucket));
         if(it)
         {
             /*
-             * 桶的BUF存放索引值。
+             * 存放桶的索引值。
             */
-            *GOOD_PTR2PTR(uint64_t,it->buf->data[GOOD_MAP_INDEX],0) = index;
-            it->buf->size1[GOOD_MAP_INDEX] = sizeof(index);
+            *GOOD_PTR2PTR(uint64_t,it->alloc->pptrs[GOOD_MAP_BUCKET_DATA],0) = bucket;
 
             /*
              * 桶加和入到表格中。
             */
             good_tree_insert2(map->table,it,0);
-            map->table->buf->data[index] = (uint8_t*)it;
+            map->table->alloc->pptrs[bucket] = (uint8_t*)it;
         }
     }
 
@@ -101,9 +100,9 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     node = good_tree_child(it,1);
     while(node)
     {
-        if (node->buf->size1[GOOD_MAP_KEY] == ksize)
+        if (*GOOD_PTR2PTR(size_t,node->alloc->pptrs[GOOD_MAP_KEY_SIZE],0) == ksize)
         {
-            chk = map->compare_cb(node->buf->data[GOOD_MAP_KEY], key, ksize, map->opaque);
+            chk = map->compare_cb(node->alloc->pptrs[GOOD_MAP_KEY_DATA], key, ksize, map->opaque);
             if (chk == 0)
                 break;
         }
@@ -116,17 +115,17 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     */
     if (!node && vsize > 0)
     {
-        size_t size[2] = {ksize + 1, vsize + 1};
-        node = good_tree_alloc(size, 2);
+        size_t sizes[4] = {ksize + 1,sizeof(size_t),vsize + 1,sizeof(size_t)};
+        node = good_tree_alloc2(sizes, 4);
 
         if(!node)
             GOOD_ERRNO_AND_RETURN1(ENOMEM,NULL);
 
-        node->buf->free_cb = map->free_cb;
-        node->buf->opaque = map->opaque;
+        if(map->destroy_cb)
+            good_allocator_atfree(node->alloc,map->destroy_cb,map->opaque);
 
-        memcpy(node->buf->data[GOOD_MAP_KEY],key,ksize);
-        node->buf->size1[GOOD_MAP_KEY] = ksize;
+        memcpy(node->alloc->pptrs[GOOD_MAP_KEY_DATA],key,ksize);
+        *GOOD_PTR2PTR(size_t,node->alloc->pptrs[GOOD_MAP_KEY_SIZE],0) = ksize;
 
         good_tree_insert2(it,node,1);
     }

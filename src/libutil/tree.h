@@ -122,10 +122,27 @@ void good_tree_free(good_tree_t **root);
 /**
  * 创建节点。
  * 
- * @see good_heap_calloc()
+ * @param alloc 内存块指针，可以为NULL(0)。仅做指针复制。
+ * 
+ * @see good_heap_alloc()
  * 
 */
-good_tree_t *good_tree_alloc();
+good_tree_t *good_tree_alloc(good_allocator_t *alloc);
+
+/**
+ * 创建节点，同时申请数据内存块。
+ * 
+ * @see good_tree_alloc()
+ * @see good_allocator_alloc()
+*/
+good_tree_t *good_tree_alloc2(size_t *sizes,size_t numbers);
+
+/**
+ * 创建节点，同时申请数据内存块。
+ * 
+ * @see good_tree_alloc2()
+*/
+good_tree_t *good_tree_alloc3(size_t size);
 
 /**
  * 扫描树节点。
@@ -137,7 +154,7 @@ good_tree_t *good_tree_alloc();
  * @param opaque 环境指针。
  * 
 */
-void good_tree_scan(const good_tree_t *root,size_t stacks,
+void good_tree_scan(const good_tree_t *root,size_t stack_deep,
                     int (*dump_cb)(size_t deep, const good_tree_t *node, void *opaque),
                     void *opaque);
 
