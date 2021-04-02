@@ -85,13 +85,12 @@ good_allocator_t *good_mmap2(const char *name, int rw, int shared)
 
 int good_msync(good_allocator_t *alloc, int async)
 {
-    int flags = MS_SYNC;
+    int flags;
 
     assert(alloc);
     assert(alloc->pptrs[0] != MAP_FAILED && alloc->sizes[0] > 0);
 
-    if (async)
-        flags = MS_ASYNC;
+    flags = (async?MS_ASYNC:MS_SYNC);
 
     return msync(alloc->pptrs[0], alloc->sizes[0], flags);
 }
