@@ -139,7 +139,7 @@ int good_mutex_unlock(good_mutex_t *ctx);
 /**
  * 等待事件通知。
  * 
- * @param timeout >= 0 当通知到达或时间(毫秒)过期即返回，< 0 直到通知到达或出错返回。
+ * @param timeout 超时(毫秒)。< 0 忽略。
  * 
  * @return 0 成功；!0 出错。
  * 
@@ -151,7 +151,7 @@ int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
 /**
  * 发出事件通知。
  * 
- * @param broadcast 0 通知一个等待线程，!0 通知所有等待线程。
+ * @param broadcast 是否广播事件通知。0 否，!0 是。
  * 
  * @return 0 成功；!0 出错。
  * 

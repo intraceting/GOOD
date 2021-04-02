@@ -22,7 +22,7 @@
  * @see good_allocator_atfree()
  *
 */
-good_allocator_t* good_mmap(int fd,int rw,int share);
+good_allocator_t* good_mmap(int fd,int rw,int shared);
 
 /**
  * 映射文件到内存页面。
@@ -34,7 +34,7 @@ good_allocator_t* good_mmap(int fd,int rw,int share);
  * @see good_closep()
  *  
 */
-good_allocator_t* good_mmap2(const char* name,int rw,int share);
+good_allocator_t* good_mmap2(const char* name,int rw,int shared);
 
 /**
  * 刷新数据。

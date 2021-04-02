@@ -8,8 +8,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/process.h"
-#include "libutil/user.h"
+#include "libutil/general.h"
+#include "libutil/signal.h"
 
 static int lock_fd = -1;
 static char lock_file[] = {"/tmp/test_process.lock"};
@@ -21,6 +21,21 @@ void exit_befor()
     remove(lock_file);
 }
 
+int signal_cb(const siginfo_t *info, void *opaque)
+{
+    printf("signo=%d,errno=%d,code =%d\n",info->si_signo,info->si_errno,info->si_code);
+
+    switch(info->si_code)
+    {
+        case SI_USER:
+        {
+            printf("pid=%d,uid=%d\n",info->si_pid,info->si_uid);
+        }
+        break;
+    }
+
+    return 0;
+}
 
 int main(int argc, char **argv)
 {
@@ -55,12 +70,17 @@ int main(int argc, char **argv)
         atexit(exit_befor);
 
         printf("运行中……，按任意键结束。\n");
-        getchar();
+
+        sigset_t sig;
+        sigfillset(&sig);
+        good_sigwaitinfo(&sig,-1,signal_cb,NULL);
     }
     else
     {
         printf("进程(PID=%d)已经运行。\n",pid);
     }
+
+        
 
     return 0;
 }

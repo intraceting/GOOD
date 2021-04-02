@@ -15,7 +15,7 @@ void _good_munmap_cb(good_allocator_t *alloc, void *opaque)
     assert(munmap(alloc->pptrs[0],alloc->sizes[0])==0);
 }
 
-good_allocator_t* good_mmap(int fd,int rw,int share)
+good_allocator_t* good_mmap(int fd,int rw,int shared)
 {
     void* mmptr = MAP_FAILED;
     int prot = PROT_READ;
@@ -34,7 +34,7 @@ good_allocator_t* good_mmap(int fd,int rw,int share)
 
     if(rw)
         prot = PROT_READ | PROT_WRITE;
-    if(share)
+    if(shared)
         flags = MAP_SHARED;
 
     mmptr = mmap(0,attr.st_size,prot,flags,fd,0);
@@ -64,7 +64,7 @@ final:
     return alloc;
 }
 
-good_allocator_t *good_mmap2(const char *name, int rw, int share)
+good_allocator_t *good_mmap2(const char *name, int rw, int shared)
 {
     int fd = -1;
 
@@ -76,7 +76,7 @@ good_allocator_t *good_mmap2(const char *name, int rw, int share)
     if (fd < 0)
         return NULL;
 
-    alloc = good_mmap(fd,rw,share);
+    alloc = good_mmap(fd,rw,shared);
 
     good_closep(&fd);
     

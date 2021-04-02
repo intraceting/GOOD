@@ -29,6 +29,7 @@
 #include <fnmatch.h>
 #include <limits.h>
 #include <dirent.h>
+#include <poll.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -469,6 +470,16 @@ char* good_user_dirname(char* buf,const char* append);
 /*------------------------------------------------------------------------------------------------*/
 
 /**
+ * 在描述符上等待事件。
+ * 
+ * @param event 事件。0x01 读，0x02 写，0x03读写。
+ * @param timeout 超时(毫秒)。< 0 忽略。
+ * 
+ * @return > 0 有事件，0 超时，< 0 出错。
+*/
+int good_poll(int fd, int event,time_t timeout);
+
+/**
  * 写数据。
  * 
  * @return > 0 写入完成的大小，<= 0 写入失败或空间不足。
@@ -535,6 +546,22 @@ int good_fflag_add(int fd,int flag);
  * @see fcntl()
 */
 int good_fflag_del(int fd,int flag);
+
+/*------------------------------------------------------------------------------------------------*/
+
+/**
+ * 创建子进程，用于执行shell。
+ *
+ * @param cmd 命令行字符串指针。
+ * @param envp 环境变量的组数指针，不影响父进程。{"KEY=VALUE","...",NULL}。
+ * @param stdin_fd 输入句柄指针，NULL(0) 忽略。
+ * @param stdout_fd 输出句柄指针，NULL(0) 忽略。
+ * @param stderr_fd 出错句柄指针，NULL(0) 忽略。
+ * 
+ * @return 子进程ID 成功，-1 失败。
+*/
+pid_t good_popen(const char* cmd,char * const envp[],int* stdin_fd, int* stdout_fd, int* stderr_fd);
+
 
 /*------------------------------------------------------------------------------------------------*/
 
