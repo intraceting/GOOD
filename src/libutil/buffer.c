@@ -205,6 +205,23 @@ ssize_t good_buffer_fill(good_buffer_t *buf, uint8_t stuffing)
     return wsize2;
 }
 
+ssize_t good_buffer_read(good_buffer_t *buf, void *data, size_t size)
+{
+    ssize_t rsize2 = 0;
+
+    assert(buf != NULL && data != NULL && size > 0);
+    assert(buf->data != NULL && buf->size > 0);
+
+    if (buf->rsize >= buf->wsize)
+        GOOD_ERRNO_AND_RETURN1(ESPIPE, 0);
+
+    rsize2 = GOOD_MIN(buf->wsize - buf->rsize,size);
+    memcpy(data, GOOD_PTR2PTR(void, buf->data, buf->rsize),rsize2);
+    buf->rsize += rsize2;
+
+    return rsize2;
+}
+
 void good_buffer_read_vacuum(good_buffer_t *buf)
 {
     assert(good_buffer_privatize(buf) == 0);
@@ -217,6 +234,7 @@ void good_buffer_read_vacuum(good_buffer_t *buf)
     if (buf->rsize > 0)
     {
         buf->wsize -= buf->rsize;
-        memmove(buf->data, GOOD_PTR2PTR(void, buf->data, buf->rsize), buf->wsize);
+        memmove(buf->data, GOOD_PTR2PTR(void, buf->data, buf->rsize),buf->wsize);
+        buf->rsize = 0;
     }
 }

@@ -10,10 +10,9 @@
 #include <string.h>
 #include "libutil/buffer.h"
 
-
-int main(int argc, char **argv)
+void test1()
 {
-   good_buffer_t *a = good_buffer_alloc(1000);
+    good_buffer_t *a = good_buffer_alloc(1000);
 
    good_buffer_printf(a,"12345678");
 
@@ -53,6 +52,37 @@ int main(int argc, char **argv)
 
     good_buffer_freep(&g);
     good_buffer_freep(&h);
+}
+
+void test2()
+{
+    good_buffer_t *a = good_buffer_alloc(10);
+
+    printf("%lu\n",good_buffer_write(a,"aaaaaa",6));
+
+    printf("%lu\n",good_buffer_printf(a,"%s","bb"));
+
+    printf("%lu\n",good_buffer_fill(a,'c'));
+
+    printf("%lu\n",good_buffer_write(a,"dddd",6));
+
+    char buf[11] = {0};
+
+    printf("%lu\n",good_buffer_read(a,buf,7));
+
+    good_buffer_read_vacuum(a);
+
+    printf("%lu\n",good_buffer_read(a,buf,7));
+
+    good_buffer_freep(&a);
+}
+
+int main(int argc, char **argv)
+{
+   
+ //  test1();
+
+   test2();
 
    return 0;
 }

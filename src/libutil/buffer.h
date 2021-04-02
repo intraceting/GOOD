@@ -139,6 +139,15 @@ ssize_t good_buffer_write(good_buffer_t *buf, const void *data, size_t size);
 ssize_t good_buffer_fill(good_buffer_t *buf,uint8_t stuffing);
 
 /**
+ * 从缓存中读取。
+ * 
+ * @return 读取长度(Bytes)，= 0 末尾，< 0 出错。
+ * 
+ * @see memcpy();
+*/
+ssize_t good_buffer_read(good_buffer_t *buf, void *data, size_t size);
+
+/**
  * 吸收已读数据，未读数据移动到缓存首地址。
 */
 void good_buffer_read_vacuum(good_buffer_t *buf);
