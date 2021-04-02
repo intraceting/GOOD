@@ -81,7 +81,7 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
             /*
              * 存放桶的索引值。
             */
-            *GOOD_PTR2PTR(uint64_t,it->alloc->pptrs[GOOD_MAP_BUCKET_DATA],0) = bucket;
+            *GOOD_PTR2PTR(uint64_t,it->alloc->pptrs[GOOD_MAP_BUCKET],0) = bucket;
 
             /*
              * 桶加和入到表格中。
@@ -100,9 +100,9 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     node = good_tree_child(it,1);
     while(node)
     {
-        if (*GOOD_PTR2PTR(size_t,node->alloc->pptrs[GOOD_MAP_KEY_SIZE],0) == ksize)
+        if (node->alloc->sizes[GOOD_MAP_KEY] == ksize)
         {
-            chk = map->compare_cb(node->alloc->pptrs[GOOD_MAP_KEY_DATA], key, ksize, map->opaque);
+            chk = map->compare_cb(node->alloc->pptrs[GOOD_MAP_KEY], key, ksize, map->opaque);
             if (chk == 0)
                 break;
         }
@@ -115,17 +115,19 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
     */
     if (!node && vsize > 0)
     {
-        size_t sizes[4] = {ksize + 1,sizeof(size_t),vsize + 1,sizeof(size_t)};
-        node = good_tree_alloc2(sizes, 4);
+        size_t sizes[2] = {ksize,vsize};
+        node = good_tree_alloc2(sizes, 2);
 
         if(!node)
             GOOD_ERRNO_AND_RETURN1(ENOMEM,NULL);
 
+        /*
+         * 只为数据节点注册析构函数。
+        */
         if(map->destroy_cb)
             good_allocator_atfree(node->alloc,map->destroy_cb,map->opaque);
 
-        memcpy(node->alloc->pptrs[GOOD_MAP_KEY_DATA],key,ksize);
-        *GOOD_PTR2PTR(size_t,node->alloc->pptrs[GOOD_MAP_KEY_SIZE],0) = ksize;
+        memcpy(node->alloc->pptrs[GOOD_MAP_KEY],key,ksize);
 
         good_tree_insert2(it,node,1);
     }

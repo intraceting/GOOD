@@ -7,26 +7,8 @@
 #ifndef GOOD_UTIL_DIRENT_H
 #define GOOD_UTIL_DIRENT_H
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <time.h>
-#include <math.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <libgen.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
 #include "general.h"
-#include "buffer.h"
 #include "tree.h"
-#include "string.h"
-
-
-
 
 /**
  * 目录扫描。
@@ -43,7 +25,6 @@
  * @see good_tree_vfprintf()
  * 
 */
-void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs);
-
+void good_dirscan(good_tree_t *tree, const char *path, size_t deep, int onefs);
 
 #endif //GOOD_UTIL_DIRENT_H

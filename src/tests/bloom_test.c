@@ -8,8 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/bloom.h"
-#include "libutil/heap.h"
+#include "libutil/general.h"
 
 
 int main(int argc, char **argv)

@@ -28,6 +28,7 @@
 #include <libgen.h>
 #include <fnmatch.h>
 #include <limits.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>

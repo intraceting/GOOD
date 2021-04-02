@@ -10,8 +10,6 @@
 #include <string.h>
 #include <limits.h>
 #include "libutil/dirent.h"
-#include "libutil/file.h"
-#include "libutil/string.h"
 #include "libutil/mman.h"
 
 void test_dir()
@@ -62,15 +60,15 @@ int dump2(size_t deep, const good_tree_t *node, void *opaque)
 {
 #if 1
     if(deep==0)
-        good_tree_fprintf(stderr,deep,node,"%s\n",node->buf->data[0]);
+        good_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[0]);
     else 
     {
         char name[NAME_MAX] ={0};
-        good_basename(name,node->buf->data[0]);
+        good_basename(name,node->alloc->pptrs[0]);
         good_tree_fprintf(stderr,deep,node,"%s\n",name);
     }
 #else 
-    fprintf(stderr,"%s\n",node->buf->data[0]);
+    fprintf(stderr,"%s\n",node->alloc->pptrs[0]);
 #endif 
 
 
@@ -81,30 +79,27 @@ void traversal(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator it = {0};
-    it.dump_cb = dump2;
-
-    good_tree_scan(root, &it);
+    good_tree_scan(root,0,dump2,NULL);
 
     printf("\n-------------------------------------\n");
 }
 
 void test_dirscan()
 {
-    good_tree_t * t = good_tree_alloc2(PATH_MAX);
+    good_tree_t * t = good_tree_alloc3(PATH_MAX);
 
-  //  strcpy(t->buf->data[0],"/tmp/");
-  //  good_dirscan(t,t->buf->data[0],100,0);
+  //  strcpy(t->alloc->pptrs[0],"/tmp/");
+  //  good_dirscan(t,t->alloc->pptrs[0],100,0);
 
 
-    strcpy(t->buf->data[0],"/usr/include");
-    good_dirscan(t,t->buf->data[0],100,0);
+    //strcpy(t->alloc->pptrs[0],"/usr/include");
+    //good_dirscan(t,t->alloc->pptrs[0],100,0);
 
-    //strcpy(t->buf->data[0],"/mnt");
-    //good_dirscan(t,t->buf->data[0],100,1);
+    strcpy(t->alloc->pptrs[0],"/mnt");
+    good_dirscan(t,t->alloc->pptrs[0],4,0);
 
-  //  strcpy(t->buf->data[0],"/tmp");
-  //  good_dirscan(t,t->buf->data[0],1,0);
+  //  strcpy(t->alloc->pptrs[0],"/tmp");
+  //  good_dirscan(t,t->alloc->pptrs[0],1,0);
 
     traversal(t);
 
@@ -112,49 +107,49 @@ void test_dirscan()
     
 }
 
-void test_file(const char* f1,const char* f2)
+void test_file(const char *f1, const char *f2)
 {
-    good_mkdir(f2,0);
+    // good_mkdir(f2, 0);
 
-    int fd1 = good_open(f1,0,1,0);
-    int fd2 = good_open(f2,1,1,1);
+    // int fd1 = good_open(f1, 0, 1, 0);
+    // int fd2 = good_open(f2, 1, 1, 1);
 
-    assert(fd1 >= 0 && fd2 >= 0);
+    // assert(fd1 >= 0 && fd2 >= 0);
 
-    good_buffer_t *rbuf = good_buffer_alloc3(512*1024);
-    good_buffer_t *wbuf = good_buffer_alloc3(256);
+    // good_buffer_t *rbuf = good_buffer_alloc3(512 * 1024);
+    // good_buffer_t *wbuf = good_buffer_alloc3(256);
 
-    while (1)
-    {
-        char buf[1023];
-        ssize_t rsize = good_read(fd1,buf,1023,rbuf);
-        if(rsize<=0)
-            break;
-        
-        ssize_t wsize = good_write(fd2,buf,rsize,wbuf);
+    // while (1)
+    // {
+    //     char buf[1023];
+    //     ssize_t rsize = good_read(fd1, buf, 1023, rbuf);
+    //     if (rsize <= 0)
+    //         break;
 
-        assert(wsize == rsize);
-    }
-    
-    assert(good_write_trailer(fd2,1,0,wbuf)==0);
+    //     ssize_t wsize = good_write(fd2, buf, rsize, wbuf);
 
-  //  assert(good_write_trailer(fd2,0,0,wbuf)==0);
+    //     assert(wsize == rsize);
+    // }
 
-    good_buffer_unref(&rbuf);
-    good_buffer_unref(&wbuf);
+    // assert(good_write_trailer(fd2, 1, 0, wbuf) == 0);
 
-    good_closep(&fd1);
-    good_closep(&fd2);
+    // //  assert(good_write_trailer(fd2,0,0,wbuf)==0);
+
+    // good_buffer_unref(&rbuf);
+    // good_buffer_unref(&wbuf);
+
+    // good_closep(&fd1);
+    // good_closep(&fd2);
 }
 
 void test_mman()
 {
-    good_buffer_t * buf = good_mmap2("/tmp/test_mman.txt",1,1);
+    good_allocator_t * buf = good_mmap2("/tmp/test_mman.txt",1,1);
 
     /*支持引用访问。*/
-    good_buffer_t * buf2 = good_buffer_refer(buf);
+    good_allocator_t * buf2 = good_allocator_refer(buf);
 
-    memset(buf->data[0],'A',buf->size[0]);
+    memset(buf->pptrs[0],'A',buf->sizes[0]);
 
     good_munmap(&buf);
 
@@ -164,9 +159,9 @@ void test_mman()
 
 
     /*如果映射的内存页面是私有模式，则对内存数据修改不会影响原文件。*/
-    good_buffer_t * buf3 = good_mmap2("/tmp/test_mman.txt",1,0);
+    good_allocator_t * buf3 = good_mmap2("/tmp/test_mman.txt",1,0);
 
-    memset(buf3->data[0],'B',buf3->size[0]);
+    memset(buf3->pptrs[0],'B',buf3->sizes[0]);
 
     assert(good_msync(buf3,0)==0);
 
@@ -176,13 +171,13 @@ void test_mman()
     int fd = good_shm_open("test_mman",1,1);
 
     /*划拔点内存空间。*/
-  //  ftruncate(fd,100);
+    ftruncate(fd,100);
 
-    good_buffer_t * buf4 = good_mmap(fd,1,1);
+    good_allocator_t * buf4 = good_mmap(fd,1,1);
 
-    memset(buf4->data[0],'C',buf4->size[0]);
+    memset(buf4->pptrs[0],'C',buf4->sizes[0]);
 
-    good_buffer_t * buf5  = good_buffer_refer(buf4);
+    good_allocator_t * buf5  = good_allocator_refer(buf4);
 
     good_munmap(&buf4);
 
@@ -190,9 +185,9 @@ void test_mman()
 
     good_munmap(&buf5);
 
-    good_buffer_t * buf6 = good_mmap(fd,1,0);
+    good_allocator_t * buf6 = good_mmap(fd,1,0);
 
-    printf("%s\n",buf6->data[0]);
+    printf("%s\n",buf6->pptrs[0]);
 
     good_munmap(&buf6);
 

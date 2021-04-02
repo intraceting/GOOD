@@ -26,30 +26,6 @@ typedef struct _good_tree
     */
     struct _good_tree *chain[5];
 
-    /**
-    * 父。
-    */
-#define GOOD_TREE_CHAIN_FATHER          0
-
-    /**
-    * 兄长。
-    */
-#define GOOD_TREE_CHAIN_SIBLING_PREV    1
-
-    /**
-    * 小弟。
-    */
-#define GOOD_TREE_CHAIN_SIBLING_NEXT    2
-
-    /**
-    * 大娃。
-    */
-#define GOOD_TREE_CHAIN_CHILD_FIRST     3
-
-    /**
-    * 么娃。
-    */
-#define GOOD_TREE_CHAIN_CHILD_LEAST     4
 
     /**
      * 数据。
@@ -59,6 +35,43 @@ typedef struct _good_tree
     good_allocator_t *alloc;
 
 }good_tree_t;
+
+/**
+ * 树节点关系。
+*/
+enum _good_tree_chain
+{
+
+    /**
+    * 父。
+    */
+   GOOD_TREE_CHAIN_FATHER = 0,
+#define GOOD_TREE_CHAIN_FATHER          GOOD_TREE_CHAIN_FATHER
+
+    /**
+    * 兄长。
+    */
+   GOOD_TREE_CHAIN_SIBLING_PREV = 1,
+#define GOOD_TREE_CHAIN_SIBLING_PREV    GOOD_TREE_CHAIN_SIBLING_PREV
+
+    /**
+    * 小弟。
+    */
+   GOOD_TREE_CHAIN_SIBLING_NEXT = 2,
+#define GOOD_TREE_CHAIN_SIBLING_NEXT    GOOD_TREE_CHAIN_SIBLING_NEXT
+
+    /**
+    * 大娃。
+    */
+   GOOD_TREE_CHAIN_CHILD_FIRST = 3,
+#define GOOD_TREE_CHAIN_CHILD_FIRST     GOOD_TREE_CHAIN_CHILD_FIRST
+
+    /**
+    * 么娃。
+    */
+   GOOD_TREE_CHAIN_CHILD_LEAST = 4
+#define GOOD_TREE_CHAIN_CHILD_LEAST     GOOD_TREE_CHAIN_CHILD_LEAST
+};
 
 /**
  * 获取自己的父节指针。
@@ -147,7 +160,7 @@ good_tree_t *good_tree_alloc3(size_t size);
 /**
  * 扫描树节点。
  * 
- * 深度优先遍历节点，也可以通过迭代器控制遍历方向。
+ * 深度优先遍历节点。
  * 
  * @param stack_deep 栈深度。如果无法确定填多少合适，就填0。 
  * @param dump_cb 回显函数。-1 终止，0 忽略孩子，1 继续。

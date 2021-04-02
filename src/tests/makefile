@@ -54,12 +54,12 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/thread_test.exe \
 	$(BUILD_PATH)/buffer_test.exe \
 	$(BUILD_PATH)/tree_test.exe \
-	$(BUILD_PATH)/map_test.exe
-#	$(BUILD_PATH)/geometry_test.exe \
+	$(BUILD_PATH)/map_test.exe \
+	$(BUILD_PATH)/geometry_test.exe \
 	$(BUILD_PATH)/log_test.exe \
 	$(BUILD_PATH)/bloom_test.exe \
-	$(BUILD_PATH)/file_test.exe \
-	$(BUILD_PATH)/process_test.exe \
+	$(BUILD_PATH)/file_test.exe 
+#	$(BUILD_PATH)/process_test.exe \
 	$(BUILD_PATH)/popen_test.exe
 
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o

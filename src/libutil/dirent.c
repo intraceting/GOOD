@@ -13,7 +13,7 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs)
     struct dirent *c_dir = NULL;
     struct stat f_attr;
     struct stat c_attr;
-    good_tree_t *tmp = NULL;
+    good_tree_t *node = NULL;
 
     assert(tree && path);
 
@@ -32,20 +32,26 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs)
         if (good_strcmp(c_dir->d_name, ".", 1) == 0 || good_strcmp(c_dir->d_name, "..", 1) == 0)
             continue;
 
-        tmp = good_tree_alloc2(PATH_MAX);
-        if (!tmp)
+        node = good_tree_alloc3(PATH_MAX);
+        if (!node)
             break;
 
-        good_dirdir(tmp->buf->data[0], path);
-        good_dirdir(tmp->buf->data[0], c_dir->d_name);
+        good_dirdir(node->alloc->pptrs[0], path);
+        good_dirdir(node->alloc->pptrs[0], c_dir->d_name);
       
-        good_tree_insert2(tree, tmp, 0);
+        /*
+         * 加入到树节点。
+        */
+        good_tree_insert2(tree, node, 0);
 
         /*
          * node->d_type 有些文件系统有BUG未设置有效值，因此不能直接使用，这里用替待方案。
          */
-        if (lstat(tmp->buf->data[0], &c_attr) == -1)
+        if (lstat(node->alloc->pptrs[0], &c_attr) == -1)
+        {
+            good_tree_free(&node);
             break;
+        }
 
         /*
          * 如果不是目录，下面的代码不需要执行。
@@ -68,7 +74,7 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs)
         /*
          * 递归
         */
-        good_dirscan(tmp, tmp->buf->data[0], deep - 1, onefs);
+        good_dirscan(node, node->alloc->pptrs[0], deep - 1, onefs);
     }
 
     if (f_dir)

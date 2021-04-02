@@ -11,9 +11,9 @@
 #include "tree.h"
 
 /**
- * MAP表。
+ * MAP。
  * 
- * HASH桶和DEQUE链式存储结构。
+ * HASH和DEQUE存储结构。
 */
 typedef struct _good_map
 {
@@ -27,24 +27,6 @@ typedef struct _good_map
      * @see good_tree_vfprintf()
     */
     good_tree_t *table;
-
-    /**
-     * Bucket 索引
-    */
-#define GOOD_MAP_BUCKET_DATA        0
-#define GOOD_MAP_BUCKET_SIZE        1
-
-    /**
-     * Key 索引
-    */
-#define GOOD_MAP_KEY_DATA           0
-#define GOOD_MAP_KEY_SIZE           1
-
-    /**
-     * Value 索引
-    */
-#define GOOD_MAP_VALUE_DATA         2
-#define GOOD_MAP_VALUE_SIZE         3
 
     /**
      * HASH函数。
@@ -71,6 +53,30 @@ typedef struct _good_map
     void *opaque;
     
 }good_map_t;
+
+/**
+ * MAP索引
+*/
+enum _good_map_index
+{
+    /**
+     * Bucket 索引
+    */
+   GOOD_MAP_BUCKET = 0,
+#define GOOD_MAP_BUCKET     GOOD_MAP_BUCKET
+
+    /**
+     * Key 索引
+    */
+   GOOD_MAP_KEY = 0,
+#define GOOD_MAP_KEY        GOOD_MAP_KEY
+
+    /**
+     * Value 索引
+    */
+   GOOD_MAP_VALUE = 1
+#define GOOD_MAP_VALUE      GOOD_MAP_VALUE
+};
 
 /**
  * HASH函数。
