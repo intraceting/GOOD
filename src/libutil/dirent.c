@@ -62,7 +62,7 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs)
         /*
          * 递归深度。
         */
-        if (deep <= 1)
+        if (deep <= 0)
             continue;
 
         /*

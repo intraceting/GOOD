@@ -96,7 +96,7 @@ void test_dirscan()
     //good_dirscan(t,t->alloc->pptrs[0],100,0);
 
     strcpy(t->alloc->pptrs[0],"/mnt");
-    good_dirscan(t,t->alloc->pptrs[0],4,0);
+    good_dirscan(t,t->alloc->pptrs[0],2,0);
 
   //  strcpy(t->alloc->pptrs[0],"/tmp");
   //  good_dirscan(t,t->alloc->pptrs[0],1,0);
