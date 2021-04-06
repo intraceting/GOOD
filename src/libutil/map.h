@@ -109,7 +109,7 @@ int good_map_init(good_map_t* map,size_t size);
 /**
  * 查找或创建。
  * 
- * @param ksize Key size
+ * @param ksize Key size。
  * @param vsize Value size。 0 仅查找，>0 不存在则创建。
 */
 good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t vsize);

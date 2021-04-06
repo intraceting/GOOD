@@ -127,6 +127,80 @@ int good_buffer_privatize(good_buffer_t *dst)
     return 0;
 }
 
+ssize_t good_buffer_write(good_buffer_t *buf, const void *data, size_t size)
+{
+    ssize_t wsize2 = 0;
+
+    if (good_buffer_privatize(buf) != 0)
+        GOOD_ERRNO_AND_RETURN1(EMLINK, -1);
+
+    assert(buf != NULL && data != NULL && size > 0);
+    assert(buf->data != NULL && buf->size > 0);
+
+    if (buf->wsize >= buf->size)
+        GOOD_ERRNO_AND_RETURN1(ENOSPC, 0);
+
+    wsize2 = GOOD_MIN(buf->size - buf->wsize, size);
+    memcpy(GOOD_PTR2PTR(void, buf->data, buf->wsize), data, wsize2);
+    buf->wsize += wsize2;
+
+    return wsize2;
+}
+
+ssize_t good_buffer_read(good_buffer_t *buf, void *data, size_t size)
+{
+    ssize_t rsize2 = 0;
+
+    assert(buf != NULL && data != NULL && size > 0);
+    assert(buf->data != NULL && buf->size > 0);
+
+    if (buf->rsize >= buf->wsize)
+        GOOD_ERRNO_AND_RETURN1(ESPIPE, 0);
+
+    rsize2 = GOOD_MIN(buf->wsize - buf->rsize,size);
+    memcpy(data, GOOD_PTR2PTR(void, buf->data, buf->rsize),rsize2);
+    buf->rsize += rsize2;
+
+    return rsize2;
+}
+
+void good_buffer_drain(good_buffer_t *buf)
+{
+    assert(good_buffer_privatize(buf) == 0);
+
+    assert(buf != NULL);
+    assert(buf->data != NULL && buf->size > 0);
+
+    assert(buf->rsize <= buf->wsize);
+
+    if (buf->rsize > 0)
+    {
+        buf->wsize -= buf->rsize;
+        memmove(buf->data, GOOD_PTR2PTR(void, buf->data, buf->rsize),buf->wsize);
+        buf->rsize = 0;
+    }
+}
+
+ssize_t good_buffer_fill(good_buffer_t *buf, uint8_t stuffing)
+{
+    ssize_t wsize2 = 0;
+
+    if (good_buffer_privatize(buf) != 0)
+        GOOD_ERRNO_AND_RETURN1(EMLINK, -1);
+
+    assert(buf != NULL);
+    assert(buf->data != NULL && buf->size > 0);
+
+    if (buf->wsize >= buf->size)
+        GOOD_ERRNO_AND_RETURN1(ENOSPC, 0);
+
+    wsize2 = buf->size - buf->wsize;
+    memset(GOOD_PTR2PTR(void, buf->data, buf->wsize), stuffing, wsize2);
+    buf->wsize += wsize2;
+
+    return wsize2;
+}
+
 ssize_t good_buffer_vprintf(good_buffer_t *buf, const char *fmt, va_list args)
 {
     ssize_t wsize2 = 0;
@@ -165,76 +239,60 @@ ssize_t good_buffer_printf(good_buffer_t *buf, const char *fmt, ...)
     return wsize2;
 }
 
-ssize_t good_buffer_write(good_buffer_t *buf, const void *data, size_t size)
+ssize_t good_buffer_import(good_buffer_t *buf,int fd)
+{
+    struct stat attr = {0};
+
+    assert(buf != NULL && fd >= 0);
+
+    if(fstat(fd,&attr)==-1)
+        GOOD_ERRNO_AND_RETURN1(EBADF,-1);
+
+    return good_buffer_import_atmost(buf,fd,attr.st_size);
+}
+
+ssize_t good_buffer_import_atmost(good_buffer_t *buf,int fd,size_t howmuch)
 {
     ssize_t wsize2 = 0;
+    ssize_t wsize3 = 0;
 
     if (good_buffer_privatize(buf) != 0)
         GOOD_ERRNO_AND_RETURN1(EMLINK, -1);
 
-    assert(buf != NULL && data != NULL && size > 0);
+    assert(buf != NULL && fd >= 0 && howmuch > 0);
     assert(buf->data != NULL && buf->size > 0);
 
     if (buf->wsize >= buf->size)
         GOOD_ERRNO_AND_RETURN1(ENOSPC, 0);
 
-    wsize2 = GOOD_MIN(buf->size - buf->wsize, size);
-    memcpy(GOOD_PTR2PTR(void, buf->data, buf->wsize), data, wsize2);
-    buf->wsize += wsize2;
+    wsize2 = GOOD_MIN(buf->size - buf->wsize, howmuch);
+    wsize3 = good_read(fd, GOOD_PTR2PTR(void, buf->data, buf->wsize), wsize2);
+    if (wsize3 > 0)
+        buf->wsize += wsize3;
 
-    return wsize2;
+    return wsize3;
 }
 
-ssize_t good_buffer_fill(good_buffer_t *buf, uint8_t stuffing)
+ssize_t good_buffer_export(good_buffer_t *buf,int fd)
 {
-    ssize_t wsize2 = 0;
-
-    if (good_buffer_privatize(buf) != 0)
-        GOOD_ERRNO_AND_RETURN1(EMLINK, -1);
-
-    assert(buf != NULL);
-    assert(buf->data != NULL && buf->size > 0);
-
-    if (buf->wsize >= buf->size)
-        GOOD_ERRNO_AND_RETURN1(ENOSPC, 0);
-
-    wsize2 = buf->size - buf->wsize;
-    memset(GOOD_PTR2PTR(void, buf->data, buf->wsize), stuffing, wsize2);
-    buf->wsize += wsize2;
-
-    return wsize2;
+    return good_buffer_export_atmost(buf, fd,INT16_MAX);
 }
 
-ssize_t good_buffer_read(good_buffer_t *buf, void *data, size_t size)
+ssize_t good_buffer_export_atmost(good_buffer_t *buf,int fd,size_t howmuch)
 {
     ssize_t rsize2 = 0;
+    ssize_t rsize3 = 0;
 
-    assert(buf != NULL && data != NULL && size > 0);
+    assert(buf != NULL && fd >= 0 && howmuch > 0);
     assert(buf->data != NULL && buf->size > 0);
 
     if (buf->rsize >= buf->wsize)
         GOOD_ERRNO_AND_RETURN1(ESPIPE, 0);
 
-    rsize2 = GOOD_MIN(buf->wsize - buf->rsize,size);
-    memcpy(data, GOOD_PTR2PTR(void, buf->data, buf->rsize),rsize2);
-    buf->rsize += rsize2;
+    rsize2 = GOOD_MIN(buf->wsize - buf->rsize,howmuch);
+    rsize3 = good_write(fd, GOOD_PTR2PTR(void, buf->data, buf->rsize), rsize2);
+    if (rsize3 > 0)
+        buf->rsize += rsize3;
 
-    return rsize2;
-}
-
-void good_buffer_read_vacuum(good_buffer_t *buf)
-{
-    assert(good_buffer_privatize(buf) == 0);
-
-    assert(buf != NULL);
-    assert(buf->data != NULL && buf->size > 0);
-
-    assert(buf->rsize <= buf->wsize);
-
-    if (buf->rsize > 0)
-    {
-        buf->wsize -= buf->rsize;
-        memmove(buf->data, GOOD_PTR2PTR(void, buf->data, buf->rsize),buf->wsize);
-        buf->rsize = 0;
-    }
+    return rsize3;
 }

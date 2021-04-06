@@ -50,7 +50,7 @@ int good_msync(good_allocator_t* alloc,int async);
 /**
  * 解除内存页面映射。
  * 
- * 当引用计数为0时才会解除映射，因此引用计数大于0时，不会影向其它使用者。
+ * 当前是最后一个引用者才会释放。
  * 
  * @param alloc 指针的指针。当接口返回时，被赋值NULL(0)。
  * 

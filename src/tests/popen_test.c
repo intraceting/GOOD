@@ -39,6 +39,8 @@ int main(int argc, char **argv)
                 break;
 
             printf("%s", buf);
+
+            fflush(stdout);
         }
 
         printf("aa\n");

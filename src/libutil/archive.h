@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_FILE_H
-#define GOOD_UTIL_FILE_H
+#ifndef GOOD_UTIL_ARCHIVE_H
+#define GOOD_UTIL_ARCHIVE_H
 
 #include "general.h"
 #include "buffer.h"
@@ -19,9 +19,9 @@
  * 
  * @return > 0 写入完成的大小，<= 0 写入失败或空间不足。
  * 
- * @see good_buffer_alloc3()
+ * @see good_buffer_alloc()
 */
-ssize_t good_write(int fd, const void *data, size_t size, good_buffer_t *buf);
+ssize_t good_archive_write(int fd, const void *data, size_t size, good_buffer_t *buf);
 
 /**
  * 写数据尾。
@@ -34,7 +34,7 @@ ssize_t good_write(int fd, const void *data, size_t size, good_buffer_t *buf);
  * @see good_write()
  * 
 */
-ssize_t good_write_trailer(int fd, int fill, uint8_t stuffing, good_buffer_t *buf);
+ssize_t good_archive_write_trailer(int fd, int fill, uint8_t stuffing, good_buffer_t *buf);
 
 /**
  * 读数据。
@@ -48,9 +48,9 @@ ssize_t good_write_trailer(int fd, int fill, uint8_t stuffing, good_buffer_t *bu
  * @see good_buffer_alloc3()
  * 
 */
-ssize_t good_read(int fd, void *data, size_t size, good_buffer_t *buf);
+ssize_t good_archive_read(int fd, void *data, size_t size, good_buffer_t *buf);
 
 
 
 
-#endif //GOOD_UTIL_FILE_H
+#endif //GOOD_UTIL_ARCHIVE_H
