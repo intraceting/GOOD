@@ -153,14 +153,14 @@ ssize_t good_buffer_vprintf(good_buffer_t *buf,const char * fmt, va_list args);
 ssize_t good_buffer_printf(good_buffer_t *buf,const char * fmt,...);
 
 /**
- * 导入数据。
+ * 从文件导入数据。
  * 
  * @param good_buffer_import_atmost()
 */
 ssize_t good_buffer_import(good_buffer_t *buf,int fd);
 
 /**
- * 导入数据。
+ * 从文件导入数据。
  * 
  * @param good_buffer_write()
  * @param good_read()
@@ -168,14 +168,14 @@ ssize_t good_buffer_import(good_buffer_t *buf,int fd);
 ssize_t good_buffer_import_atmost(good_buffer_t *buf,int fd,size_t howmuch);
 
 /**
- * 导出数据。
+ * 导出数据到文件。
  * 
  * @param good_buffer_export_atmost()
 */
 ssize_t good_buffer_export(good_buffer_t *buf,int fd);
 
 /**
- * 导出数据。
+ * 导出数据到文件。
  * 
  * @param good_buffer_read()
  * @param good_write()

@@ -55,9 +55,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/buffer.o \
 	${OBJ_PATH}/tree.o \
 	${OBJ_PATH}/map.o \
-	${OBJ_PATH}/dirent.o \
-	${OBJ_PATH}/archive.o 
-
+	${OBJ_PATH}/dirent.o 
 
 
 #

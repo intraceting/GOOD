@@ -70,7 +70,7 @@ void test2()
 
     printf("%lu\n",good_buffer_read(a,buf,7));
 
-    good_buffer_read_vacuum(a);
+    good_buffer_drain(a);
 
     printf("%lu\n",good_buffer_read(a,buf,7));
 
