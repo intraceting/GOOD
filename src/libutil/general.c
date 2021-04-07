@@ -771,7 +771,7 @@ int good_proc_singleton(const char *lockfile,int* pid)
     }
 
     /*
-     * 进程ID需要从锁定文件中读取。
+     * 程序已经运行，进程ID需要从锁定文件中读取。
     */
     if(pid)
     {

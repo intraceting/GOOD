@@ -49,7 +49,7 @@ typedef struct _good_buffer
 /**
  * 申请。
  * 
- * @param size 缓存大小。
+ * @param size 缓存大小(Bytes)。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
  * 
@@ -61,7 +61,7 @@ typedef struct _good_buffer
 good_buffer_t *good_buffer_alloc(size_t size);
 
 /**
- * 缓存。
+ * 释放。
  * 
  * @param dst 缓存指针的指针。函数返回前修改为NULL(0);
  * 
@@ -71,7 +71,7 @@ good_buffer_t *good_buffer_alloc(size_t size);
 void good_buffer_freep(good_buffer_t **dst);
 
 /**
- * 缓存。
+ * 复制。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
  * 
@@ -83,7 +83,7 @@ void good_buffer_freep(good_buffer_t **dst);
 good_buffer_t *good_buffer_copy(good_buffer_t *src);
 
 /**
- * 缓存。
+ * 克隆。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
  * 
@@ -94,6 +94,8 @@ good_buffer_t *good_buffer_clone(good_buffer_t *src);
 
 /**
  * 私有化。
+ * 
+ * 用于写前复制，或直接克隆引用内存块。如果是非引用内存块，直接返回成功。
  * 
  * @return 0 成功，-1 失败。
  * 
@@ -121,6 +123,8 @@ ssize_t good_buffer_read(good_buffer_t *buf, void *data, size_t size);
 
 /**
  * 排出已读数据，未读数据移动到缓存首地址。
+ * 
+ * @see memmove();
 */
 void good_buffer_drain(good_buffer_t *buf);
 

@@ -58,30 +58,23 @@ good_buffer_t *good_buffer_copy(good_buffer_t *src)
     assert(src);
     assert(src->data && src->size > 0);
 
-    if (src->alloc)
-        buf = good_heap_alloc(sizeof(good_buffer_t));
-    else
-        buf = good_buffer_alloc(src->size);
-
+    /*
+     * 如果不支持引用，则执行克隆。
+    */
+    if (!src->alloc)
+        return buf = good_buffer_clone(src);
+        
+    buf = good_buffer_alloc(src->size);
     if (!buf)
         return NULL;
+    
+    buf->alloc = good_allocator_refer(src->alloc);
+    buf->size = buf->alloc->sizes[0];
+    buf->data = buf->alloc->pptrs[0];
 
-    buf->size = src->size;
     buf->rsize = src->rsize;
     buf->wsize = src->wsize;
 
-    if (src->alloc)
-    {
-        buf->alloc = good_allocator_refer(src->alloc);
-        buf->data = src->data;
-    }
-    else
-    {
-        /*
-         * 如果源内存块不支持引用，还需要复制数据。
-        */
-        memcpy(buf->data, src->data, src->size);
-    }
 
     return buf;
 }
@@ -122,6 +115,7 @@ int good_buffer_privatize(good_buffer_t *dst)
         */
         dst->alloc = new_p;
         dst->data = new_p->pptrs[0];
+        dst->size = new_p->sizes[0];
     }
 
     return 0;

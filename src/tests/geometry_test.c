@@ -70,7 +70,7 @@ void GuestLocation(const good_point_t *p1,const good_point_t *p2,double xspeed,g
 void test3()
 {
     good_point_t p1 = {45,45,0};
-    good_point_t p2 = {45,45,0};
+    good_point_t p2 = {0,0,0};
     good_point_t p3 = {0,0,0};
 
     GuestLocation(&p1,&p2,1,&p3);
