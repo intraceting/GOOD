@@ -48,6 +48,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/thread.o \
 	${OBJ_PATH}/signal.o \
 	${OBJ_PATH}/crc32.o \
+	${OBJ_PATH}/base64.o \
 	${OBJ_PATH}/clock.o \
 	${OBJ_PATH}/geometry.o \
 	${OBJ_PATH}/allocator.o \
