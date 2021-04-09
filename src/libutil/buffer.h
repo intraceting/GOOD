@@ -166,6 +166,8 @@ ssize_t good_buffer_import(good_buffer_t *buf,int fd);
 /**
  * 从文件导入数据。
  * 
+ * 阻塞模式的句柄，可能会因为导入数据不足而阻塞。
+ * 
  * @param good_buffer_write()
  * @param good_read()
 */
