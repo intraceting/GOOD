@@ -863,8 +863,8 @@ ssize_t good_read(int fd, void *data, size_t size)
         if (rsize < size)
         {
             /*
-                * 有的系统超过2GB，需要分段读取。
-                */
+            * 有的系统超过2GB，需要分段读取。
+            */
             rsize2 = good_read(fd, GOOD_PTR2PTR(char, data, rsize), size - rsize);
             if (rsize2 > 0)
                 rsize += rsize2;

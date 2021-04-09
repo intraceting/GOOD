@@ -11,6 +11,7 @@
 #include <limits.h>
 #include "libutil/dirent.h"
 #include "libutil/mman.h"
+#include "libutil/notify.h"
 
 void test_dir()
 {
@@ -197,17 +198,70 @@ void test_mman()
     good_shm_unlink("test_mman");
 }
 
+void test_notify()
+{
+    int fd = good_notify_init(1);
+
+    good_notify_event_t t = {0};
+
+    t.buf = good_buffer_alloc(4096);
+
+    //int wd = good_notify_add(fd,"/tmp/",IN_ALL_EVENTS);
+    int wd = good_notify_add(fd,"/tmp/",IN_CREATE|IN_DELETE|IN_MOVE_SELF|IN_MOVE);
+
+    for(;;)
+    {
+        
+
+        if(good_notify_watch(fd,&t,-1)<0)
+            break;
+
+        if(t.event.mask & IN_ACCESS )
+            printf("Access:");
+        if(t.event.mask & IN_MODIFY )
+            printf("Modify:");
+        if(t.event.mask & IN_ATTRIB )
+            printf("Metadata changed:");
+        if(t.event.mask & IN_CLOSE )
+            printf("Close:");
+        if(t.event.mask & IN_OPEN )
+            printf("Open:");
+        if(t.event.mask & IN_MOVED_FROM )
+            printf("Moved from(%u):",t.event.cookie);
+        if(t.event.mask & IN_MOVED_TO )
+            printf("Moved to(%u):",t.event.cookie);
+        if(t.event.mask & IN_CREATE )
+            printf("Created:");
+        if(t.event.mask & IN_DELETE )
+            printf("Deleted:");
+        if(t.event.mask & IN_MOVE_SELF )
+            printf("Deleted self:");
+        if(t.event.mask & IN_UNMOUNT )
+            printf("Umount:");
+        if(t.event.mask & IN_IGNORED )
+            printf("Ignored:");
+
+        printf("%s\n",t.name);
+    }
+
+    good_buffer_freep(&t.buf);
+
+    good_closep(&fd);
+}
+
 int main(int argc, char **argv)
 {
     
-    test_dir();
+    // test_dir();
 
-    test_dirscan();
+    // test_dirscan();
 
-    if(argc>=3)
-        test_file(argv[1],argv[2]);
+    // if(argc>=3)
+    //     test_file(argv[1],argv[2]);
 
-    test_mman();
+    // test_mman();
+
+    test_notify();
 
     return 0;
 }

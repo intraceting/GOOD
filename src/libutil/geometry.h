@@ -43,10 +43,11 @@ double good_geom_p2p_distance(const good_point_t *p1, const good_point_t *p2);
 /**
  * 计算射线弧度。
  * 
- * @param axis 仅支持X轴或者Y轴。
+ * Z轴忽略。
  * 
- * @note Z轴忽略。
- * @note 角度=弧度*180/PI(3.1415926...)
+ * 角度=弧度*180/PI(3.1415926...)。
+ * 
+ * @param axis 仅支持X轴或者Y轴。
  * 
  * @see atan2()
  * 
@@ -55,13 +56,13 @@ double good_geom_halfline_radian(const good_point_t *p1, const good_point_t *p2,
 
 /**
  * 点移动。
- *  
+ * 
+ * Z轴忽略。
+ * 
  * @param p1 
  * @param radian 弧度
  * @param dist 距离
  * @param p2 
- * 
- * @note Z轴忽略。
  * 
  * @see good_geom_p2p_distance()
  * @see good_geom_halfline_radian()
