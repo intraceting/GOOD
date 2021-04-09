@@ -49,7 +49,7 @@ int good_notify_init(int nonblock);
 /**
  * 添加一个监视对象(文件或目录)。
  * 
- * @return != -1 成功(WD)，= -1 错误。
+ * @return >= 0 成功(WD)，< 0 错误。
  * 
  * @see inotify_add_watch()
 */
