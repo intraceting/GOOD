@@ -69,7 +69,7 @@ int good_notify_remove(int fd,int wd);
  * 
  * 阻塞模式的句柄，响应可能会有延迟。
  * 
- * @param timeout 超时。>= 0 事件到来或时间过期返回，< 0 直到事件到来返回。
+ * @param timeout 超时(毫秒)。>= 0 事件到来或时间过期返回，< 0 直到事件到来返回。
  * 
  * @return 0 成功，!0 超时或失败。
  * 
