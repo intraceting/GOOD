@@ -30,6 +30,17 @@ typedef union _good_sockaddr
     struct sockaddr_in6 addr6;
 } good_sockaddr_t;
 
+/*
+ * Interface Name
+ */
+typedef struct _good_ifname
+{
+    char name[IF_NAMESIZE];
+    good_sockaddr_t addr;
+    good_sockaddr_t mark;
+    good_sockaddr_t broa;
+} good_ifname_t;
+
 /**
  * 域名解析。
  * 
@@ -43,7 +54,7 @@ typedef union _good_sockaddr
  * @see freeaddrinfo()
  * @see good_heap_alloc()
 */
-ssize_t good_gethostbyname(const char* name,sa_family_t family,good_sockaddr_t *addrs,size_t max,char** canonname);
+int good_gethostbyname(const char* name,sa_family_t family,good_sockaddr_t *addrs,int max,char** canonname);
 
 /**
  * IP字符串转IP地址。
@@ -62,5 +73,14 @@ int good_inet_pton(const char* name,sa_family_t family,good_sockaddr_t *addr);
  * @see inet_ntop()
 */
 char* good_inet_ntop(good_sockaddr_t *addr,char* name,size_t max);
+
+/**
+ * 获取网络接口信息
+ * 
+ * @param ex_loopback 0 包括回环接口，!0 排除回环信接口。
+ * 
+ * @return >= 0 网络接口数量， < 0 出错。
+*/
+int good_ifname_fetch(good_ifname_t *ifnames,int max,int ex_loopback);
 
 #endif //GOOD_UTIL_SOCKET_H

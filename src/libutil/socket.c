@@ -6,13 +6,13 @@
  */
 #include "socket.h"
 
-ssize_t good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *addrs, size_t max,char** canonname)
+int good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *addrs, int max,char** canonname)
 {
     struct addrinfo *results = NULL;
     struct addrinfo *it = NULL;
     struct addrinfo hint = {0};
     int chk;
-    ssize_t count = 0;
+    int count = 0;
 
     assert(name != NULL && (family == GOOD_IPV4 || family == GOOD_IPV6) && addrs != NULL && max > 0);
 
@@ -72,4 +72,60 @@ char* good_inet_ntop(good_sockaddr_t *addr,char* name,size_t max)
         return inet_ntop(addr->family, &addr->addr6.sin6_addr,name, max);
 
     return NULL;
+}
+
+int good_ifname_fetch(good_ifname_t *ifnames, int max,int ex_loopback)
+{
+    struct ifaddrs *results = NULL;
+    struct ifaddrs *it = NULL;
+    good_ifname_t* p = NULL;
+    int chk;
+    int count = 0;
+
+    assert(ifnames != NULL && max > 0);
+
+    chk = getifaddrs(&results);
+    if(chk != 0 || results == NULL)
+        return -1;
+
+    for (it = results; it != NULL && count < max; it = it->ifa_next)
+    {
+        if (it->ifa_addr == NULL)
+            continue;
+
+        if (it->ifa_addr->sa_family != GOOD_IPV4 && it->ifa_addr->sa_family != GOOD_IPV6)
+            continue;
+
+        if ((it->ifa_flags & IFF_LOOPBACK) && ex_loopback)
+            continue;
+
+        p = &ifnames[count++];
+
+        strncpy(p->name, it->ifa_name, IFNAMSIZ);
+
+        if(GOOD_IPV4 == it->ifa_addr->sa_family)
+        {
+            memcpy(&p->addr, it->ifa_addr, sizeof (struct sockaddr_in));
+            memcpy(&p->mark, it->ifa_netmask, sizeof (struct sockaddr_in));
+
+            if (it->ifa_flags & IFF_BROADCAST)
+                memcpy(&p->broa, it->ifa_broadaddr, sizeof(struct sockaddr_in));
+            else 
+                p->broa.family = PF_UNSPEC;
+        }
+        else if(GOOD_IPV6 == it->ifa_addr->sa_family)
+        {
+            memcpy(&p->addr, it->ifa_addr, sizeof (struct sockaddr_in6));
+            memcpy(&p->mark, it->ifa_netmask, sizeof (struct sockaddr_in6));
+
+            // if (it->ifa_flags & IFF_BROADCAST)
+            //     memcpy(&p->broa, it->ifa_broadaddr, sizeof(struct sockaddr_in6));
+            // else 
+                p->broa.family = PF_UNSPEC;
+        }
+    }
+
+    freeifaddrs(results);
+
+    return count;
 }
