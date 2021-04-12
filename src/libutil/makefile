@@ -58,7 +58,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/map.o \
 	${OBJ_PATH}/dirent.o \
 	${OBJ_PATH}/notify.o \
-	${OBJ_PATH}/iconv.o
+	${OBJ_PATH}/iconv.o \
+	${OBJ_PATH}/socket.o
 
 
 #
@@ -70,7 +71,7 @@ ${PROJECT_NAME}: $(BUILD_PATH)/libgood_util.so
 $(BUILD_PATH)/libgood_util.so: $(OBJ_FILES)
 	mkdir -p $(BUILD_PATH)
 	rm -f $@
-	$(CCC) $^ $(LINK_FLAGS) -shared -o "$@"
+	$(CCC) -o "$@" $^ $(LINK_FLAGS) -shared
 
 #
 $(OBJ_PATH)/%.o: %.c
