@@ -30,6 +30,7 @@
 #include <limits.h>
 #include <dirent.h>
 #include <poll.h>
+#include <iconv.h>
 #include <sys/inotify.h>
 #include <sys/stat.h>
 #include <sys/types.h>

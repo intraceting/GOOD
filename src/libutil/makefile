@@ -57,7 +57,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/tree.o \
 	${OBJ_PATH}/map.o \
 	${OBJ_PATH}/dirent.o \
-	${OBJ_PATH}/notify.o
+	${OBJ_PATH}/notify.o \
+	${OBJ_PATH}/iconv.o
 
 
 #

@@ -12,6 +12,7 @@
 #include "libutil/dirent.h"
 #include "libutil/mman.h"
 #include "libutil/notify.h"
+#include "libutil/iconv.h"
 
 void test_dir()
 {
@@ -249,6 +250,19 @@ void test_notify()
     good_closep(&fd);
 }
 
+void test_iconv()
+{
+    char src[100] = {"我爱我家"};
+    char dst[100] = {0};
+
+    iconv_t cd = iconv_open("GBK","UTF8");
+
+    size_t remain = 0;
+    size_t n = good_iconv(cd,src,strlen(src),dst,4,&remain);
+
+    iconv_close(cd);
+}
+
 int main(int argc, char **argv)
 {
     
@@ -261,7 +275,9 @@ int main(int argc, char **argv)
 
     // test_mman();
 
-    test_notify();
+    //test_notify();
+
+    test_iconv();
 
     return 0;
 }
