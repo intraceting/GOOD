@@ -926,6 +926,13 @@ int good_open2(int fd2, const char *file, int rw, int nonblock, int create)
     return fd3;
 }
 
+int good_fflag_get(int fd)
+{
+    assert(fd >= 0);
+
+    return fcntl(fd, F_GETFL, 0);
+}
+
 int good_fflag_add(int fd, int flag)
 {
     int old;

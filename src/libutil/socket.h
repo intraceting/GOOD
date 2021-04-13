@@ -106,5 +106,43 @@ int good_socket_ioctl(uint32_t cmd,void* args);
 */
 char *good_mac_fetch(const char* ifname,char addr[12]);
 
+/**
+ * 创建一个SOCKET句柄。
+ * 
+ * @param udp 0 创建TCP句柄，!0 创建UDP句柄。
+ * 
+ * @return >=0 成功(SOCKET句柄)，-1 失败。
+ * 
+ * @see socket()
+*/
+int good_socket(sa_family_t family,int udp);
+
+/**
+ * 绑定地址到SOCKET句柄。
+ *
+ * @return 0 成功(SOCKET句柄)，!0 失败。
+*/
+int good_bind(int fd,const good_sockaddr_t *addr);
+
+/**
+ * 接收一个已经连接的SOCKET句柄。
+ * 
+ * @param addr 远程地址的指针，NULL(0) 忽略。
+ * 
+ * @return >=0 成功(SOCKET句柄)，-1 失败。
+ * 
+ * @see accept()
+*/
+int good_accept(int fd,good_sockaddr_t *addr);
+
+/**
+ * 创建一个连接到远程的SOCKET句柄。
+ * 
+ * @return >=0 成功(SOCKET句柄)，-1 失败。
+ * 
+ * @see connect()
+ * 
+*/
+int good_connect(int fd,good_sockaddr_t *addr);
 
 #endif //GOOD_UTIL_SOCKET_H

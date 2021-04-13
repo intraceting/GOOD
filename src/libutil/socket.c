@@ -168,3 +168,51 @@ char *good_mac_fetch(const char* ifname,char addr[12])
 
     return addr;
 }
+
+int good_socket(sa_family_t family,int udp)
+{
+    int type = SOCK_CLOEXEC;
+
+    assert(family == GOOD_IPV4 || family == GOOD_IPV6);
+
+    type |= (udp ? SOCK_DGRAM : SOCK_STREAM);
+
+    return socket(family,type, 0);
+}
+
+int good_bind(int fd, const good_sockaddr_t *addr)
+{
+    assert(fd >= 0 && addr != NULL);
+
+    return bind(fd, &addr->addr, sizeof (good_sockaddr_t));
+}
+
+int good_accept(int fd, good_sockaddr_t *addr)
+{
+    int sub_fd = -1;
+    socklen_t addrlen = sizeof(good_sockaddr_t);
+
+    assert(fd >= 0);
+
+    if (addr)
+        sub_fd = accept(fd, &addr->addr, &addrlen);
+    else
+        sub_fd = accept(fd, NULL, NULL);
+
+    if (sub_fd < 0)
+        return -1;
+
+    /*
+     * 不需要关注这个结果。
+    */
+    good_fflag_add(sub_fd,SOCK_CLOEXEC);
+
+    return sub_fd;
+}
+
+int good_connect(int fd,good_sockaddr_t *addr)
+{
+    assert(fd >= 0 && addr != NULL);
+
+    return connect(fd, &addr->addr, sizeof (good_sockaddr_t));
+}

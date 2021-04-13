@@ -541,7 +541,16 @@ int good_open(const char *file, int rw, int nonblock, int create);
 int good_open2(int fd2,const char *file, int rw, int nonblock, int create);
 
 /**
- * 添加标记。
+ * 获取标志。
+ * 
+ * @return !- 成功(标志)，-1 失败。
+ * 
+ * @see fcntl()
+*/
+int good_fflag_get(int fd);
+
+/**
+ * 添加标志。
  * 
  * @return 0 成功，-1 失败。
  * 
@@ -550,7 +559,7 @@ int good_open2(int fd2,const char *file, int rw, int nonblock, int create);
 int good_fflag_add(int fd,int flag);
 
 /**
- * 删除标记。
+ * 删除标志。
  * 
  * @return 0 成功，-1 失败。
  * 
