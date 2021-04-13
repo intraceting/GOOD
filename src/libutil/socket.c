@@ -149,3 +149,22 @@ final:
 
     return chk;
 }
+
+char *good_mac_fetch(const char* ifname,char addr[12])
+{
+    struct ifreq args = {0};
+    int chk;
+
+    assert(ifname != NULL && addr != NULL);
+
+    strncpy(args.ifr_ifrn.ifrn_name, ifname, IFNAMSIZ);
+
+    chk = good_socket_ioctl(SIOCGIFHWADDR,&args);
+    if(chk == -1)
+        return NULL;
+
+    for (int i = 0; i < 6; i++)
+        sprintf(addr + 2 * i, "%02X", (uint8_t) args.ifr_hwaddr.sa_data[i]);
+
+    return addr;
+}

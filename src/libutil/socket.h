@@ -94,4 +94,17 @@ int good_ifname_fetch(good_ifname_t *ifnames,int max,int ex_loopback);
 */
 int good_socket_ioctl(uint32_t cmd,void* args);
 
+/**
+ * 查询网卡地址。
+ * 
+ * 格式化为十六进制字符串。
+ * 
+ * @return !NULL(0) 成功(网卡地址字符串的指针)，NULL(0) 失败。
+ * 
+ * @see good_socket_ioctl()
+ * 
+*/
+char *good_mac_fetch(const char* ifname,char addr[12]);
+
+
 #endif //GOOD_UTIL_SOCKET_H

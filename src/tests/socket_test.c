@@ -43,6 +43,7 @@ void test_ifname()
         char addr[100];
         char mark[100];
         char broa[100];
+        char mac[100];
 
         assert(good_inet_ntop(&names[i].addr, addr, 100) == addr);
         assert(good_inet_ntop(&names[i].mark, mark, 100));
@@ -54,6 +55,11 @@ void test_ifname()
         printf("Addr: %s\n",addr);
         printf("Mark: %s\n",mark);
         printf("Broa: %s\n",broa);
+
+        assert(good_mac_fetch(names[i].name,mac)==mac);
+
+        printf("MAC: %s\n",mac);
+
     }
 
     good_heap_free(names);
