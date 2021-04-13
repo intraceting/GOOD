@@ -44,7 +44,7 @@ void test_ifname()
         char mark[100];
         char broa[100];
 
-        assert(good_inet_ntop(&names[i].addr, addr, 100));
+        assert(good_inet_ntop(&names[i].addr, addr, 100) == addr);
         assert(good_inet_ntop(&names[i].mark, mark, 100));
 
         if(names[i].broa.family == GOOD_IPV4 || names[i].broa.family == GOOD_IPV6)

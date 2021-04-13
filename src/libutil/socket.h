@@ -77,10 +77,21 @@ char* good_inet_ntop(good_sockaddr_t *addr,char* name,size_t max);
 /**
  * 获取网络接口信息
  * 
- * @param ex_loopback 0 包括回环接口，!0 排除回环信接口。
+ * @param ex_loopback 0 包括回环接口，!0 排除回环接口。
  * 
  * @return >= 0 网络接口数量， < 0 出错。
 */
 int good_ifname_fetch(good_ifname_t *ifnames,int max,int ex_loopback);
+
+/**
+ * SOCKET IO control
+ * 
+ * @see ioctl()
+ * @see socket()
+ * @see good_closep()
+ * 
+ * @return !-1 成功，-1 失败。
+*/
+int good_socket_ioctl(uint32_t cmd,void* args);
 
 #endif //GOOD_UTIL_SOCKET_H
