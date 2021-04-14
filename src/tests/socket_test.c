@@ -65,12 +65,35 @@ void test_ifname()
     good_heap_free(names);
 }
 
+void test_connect()
+{
+    good_sockaddr_t addr={0};
+
+    //int n = good_gethostbyname("www.taobao.com",GOOD_IPV4,&addr,1,NULL);
+    //int n = good_gethostbyname("localhost",GOOD_IPV4,&addr,1,NULL);
+    good_inet_pton("192.168.100.4",GOOD_IPV4,&addr);
+    addr.addr4.sin_port = good_endian_hton16(8090);
+
+    int s = good_socket(GOOD_IPV4,0);
+
+  //  good_fflag_add(s,O_NONBLOCK);
+    
+    assert(good_connect(s,&addr,10000)==0);
+    
+
+
+
+    good_closep(&s);
+}
+
 
 int main(int argc, char **argv)
 {
     //test_gethostbyname();
 
-    test_ifname();
+    //test_ifname();
+
+    test_connect();
 
     return 0;
 }

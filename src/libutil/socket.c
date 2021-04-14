@@ -6,7 +6,7 @@
  */
 #include "socket.h"
 
-int good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *addrs, int max,char** canonname)
+int good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *addrs, int max, char **canonname)
 {
     struct addrinfo *results = NULL;
     struct addrinfo *it = NULL;
@@ -20,10 +20,10 @@ int good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *ad
     hint.ai_family = family;
 
     chk = getaddrinfo(name, NULL, &hint, &results);
-    if(chk != 0 || results == NULL)
+    if (chk != 0 || results == NULL)
         return -1;
 
-    for (it = results; it != NULL && count < max ; it = it->ai_next)
+    for (it = results; it != NULL && count < max; it = it->ai_next)
     {
         if (it->ai_socktype != SOCK_STREAM || it->ai_protocol != IPPROTO_TCP)
             continue;
@@ -34,15 +34,15 @@ int good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *ad
         memcpy(&addrs[count++], it->ai_addr, it->ai_addrlen);
     }
 
-    if(canonname && results->ai_canonname)
-        *canonname = good_heap_clone(results->ai_canonname,strlen(results->ai_canonname)+1);
+    if (canonname && results->ai_canonname)
+        *canonname = good_heap_clone(results->ai_canonname, strlen(results->ai_canonname) + 1);
 
     freeaddrinfo(results);
 
     return count;
 }
 
-int good_inet_pton(const char* name,sa_family_t family,good_sockaddr_t *addr)
+int good_inet_pton(const char *name, sa_family_t family, good_sockaddr_t *addr)
 {
     assert(name != NULL && (family == GOOD_IPV4 || family == GOOD_IPV6) && addr != NULL);
 
@@ -51,41 +51,41 @@ int good_inet_pton(const char* name,sa_family_t family,good_sockaddr_t *addr)
     */
     addr->family = family;
 
-    if(addr->family == GOOD_IPV4)
+    if (addr->family == GOOD_IPV4)
         return inet_pton(family, name, &addr->addr4.sin_addr);
-    if(addr->family == GOOD_IPV6)
+    if (addr->family == GOOD_IPV6)
         return inet_pton(family, name, &addr->addr6.sin6_addr);
 
     return -1;
 }
 
-char* good_inet_ntop(good_sockaddr_t *addr,char* name,size_t max)
+char *good_inet_ntop(good_sockaddr_t *addr, char *name, size_t max)
 {
-    assert(addr != NULL && name != NULL && max > 0); 
+    assert(addr != NULL && name != NULL && max > 0);
     assert(addr->family == GOOD_IPV4 || addr->family == GOOD_IPV6);
     assert((addr->family == GOOD_IPV4) ? (max >= INET_ADDRSTRLEN) : 1);
     assert((addr->family == GOOD_IPV6) ? (max >= INET6_ADDRSTRLEN) : 1);
 
-    if(addr->family == GOOD_IPV4)
-        return (char*)inet_ntop(addr->family, &addr->addr4.sin_addr,name, max);
-    if(addr->family == GOOD_IPV6)
-        return (char*)inet_ntop(addr->family, &addr->addr6.sin6_addr,name, max);
+    if (addr->family == GOOD_IPV4)
+        return (char *)inet_ntop(addr->family, &addr->addr4.sin_addr, name, max);
+    if (addr->family == GOOD_IPV6)
+        return (char *)inet_ntop(addr->family, &addr->addr6.sin6_addr, name, max);
 
     return NULL;
 }
 
-int good_ifname_fetch(good_ifname_t *ifnames, int max,int ex_loopback)
+int good_ifname_fetch(good_ifname_t *ifnames, int max, int ex_loopback)
 {
     struct ifaddrs *results = NULL;
     struct ifaddrs *it = NULL;
-    good_ifname_t* p = NULL;
+    good_ifname_t *p = NULL;
     int chk;
     int count = 0;
 
     assert(ifnames != NULL && max > 0);
 
     chk = getifaddrs(&results);
-    if(chk != 0 || results == NULL)
+    if (chk != 0 || results == NULL)
         return -1;
 
     for (it = results; it != NULL && count < max; it = it->ifa_next)
@@ -103,20 +103,20 @@ int good_ifname_fetch(good_ifname_t *ifnames, int max,int ex_loopback)
 
         strncpy(p->name, it->ifa_name, IFNAMSIZ);
 
-        if(GOOD_IPV4 == it->ifa_addr->sa_family)
+        if (GOOD_IPV4 == it->ifa_addr->sa_family)
         {
-            memcpy(&p->addr, it->ifa_addr, sizeof (struct sockaddr_in));
-            memcpy(&p->mark, it->ifa_netmask, sizeof (struct sockaddr_in));
+            memcpy(&p->addr, it->ifa_addr, sizeof(struct sockaddr_in));
+            memcpy(&p->mark, it->ifa_netmask, sizeof(struct sockaddr_in));
 
             if (it->ifa_flags & IFF_BROADCAST)
                 memcpy(&p->broa, it->ifa_broadaddr, sizeof(struct sockaddr_in));
-            else 
+            else
                 p->broa.family = PF_UNSPEC;
         }
-        else if(GOOD_IPV6 == it->ifa_addr->sa_family)
+        else if (GOOD_IPV6 == it->ifa_addr->sa_family)
         {
-            memcpy(&p->addr, it->ifa_addr, sizeof (struct sockaddr_in6));
-            memcpy(&p->mark, it->ifa_netmask, sizeof (struct sockaddr_in6));
+            memcpy(&p->addr, it->ifa_addr, sizeof(struct sockaddr_in6));
+            memcpy(&p->mark, it->ifa_netmask, sizeof(struct sockaddr_in6));
 
             /*
              * IPv6 not support.
@@ -141,7 +141,7 @@ int good_socket_ioctl(uint32_t cmd, void *args)
     if (sock == -1)
         return -1;
 
-    chk = ioctl(sock,cmd,args);
+    chk = ioctl(sock, cmd, args);
 
 final:
 
@@ -150,7 +150,7 @@ final:
     return chk;
 }
 
-char *good_mac_fetch(const char* ifname,char addr[12])
+char *good_mac_fetch(const char *ifname, char addr[12])
 {
     struct ifreq args = {0};
     int chk;
@@ -159,17 +159,35 @@ char *good_mac_fetch(const char* ifname,char addr[12])
 
     strncpy(args.ifr_ifrn.ifrn_name, ifname, IFNAMSIZ);
 
-    chk = good_socket_ioctl(SIOCGIFHWADDR,&args);
-    if(chk == -1)
+    chk = good_socket_ioctl(SIOCGIFHWADDR, &args);
+    if (chk == -1)
         return NULL;
 
     for (int i = 0; i < 6; i++)
-        sprintf(addr + 2 * i, "%02X", (uint8_t) args.ifr_hwaddr.sa_data[i]);
+        sprintf(addr + 2 * i, "%02X", (uint8_t)args.ifr_hwaddr.sa_data[i]);
 
     return addr;
 }
 
-int good_socket(sa_family_t family,int udp)
+int good_getsockopt_int(int fd,int level, int name,int *flag)
+{
+    socklen_t flen = sizeof(int);
+
+    assert(fd >= 0 && flag != NULL);
+
+    return getsockopt(fd,level,name,flag,&flen);
+}
+
+int good_setsockopt_int(int fd,int level, int name,int flag)
+{
+    socklen_t flen = sizeof(int);
+
+    assert(fd >= 0);
+
+    return setsockopt(fd,level,name,&flag,flen);
+}
+
+int good_socket(sa_family_t family, int udp)
 {
     int type = SOCK_CLOEXEC;
 
@@ -177,14 +195,14 @@ int good_socket(sa_family_t family,int udp)
 
     type |= (udp ? SOCK_DGRAM : SOCK_STREAM);
 
-    return socket(family,type, 0);
+    return socket(family, type, 0);
 }
 
 int good_bind(int fd, const good_sockaddr_t *addr)
 {
     assert(fd >= 0 && addr != NULL);
 
-    return bind(fd, &addr->addr, sizeof (good_sockaddr_t));
+    return bind(fd, &addr->addr, sizeof(good_sockaddr_t));
 }
 
 int good_accept(int fd, good_sockaddr_t *addr)
@@ -203,16 +221,63 @@ int good_accept(int fd, good_sockaddr_t *addr)
         return -1;
 
     /*
-     * 不需要关注这个结果。
+     * 添加个非必要标志，忽略可能的出错信息。
     */
-    good_fflag_add(sub_fd,SOCK_CLOEXEC);
+    good_fflag_add(sub_fd, SOCK_CLOEXEC);
 
     return sub_fd;
 }
 
-int good_connect(int fd,good_sockaddr_t *addr)
+int good_connect(int fd, good_sockaddr_t *addr, time_t timeout)
 {
+    int flags = 0;
+    int eno = 0;
+    int chk;
+
     assert(fd >= 0 && addr != NULL);
 
-    return connect(fd, &addr->addr, sizeof (good_sockaddr_t));
+    flags = good_fflag_get(fd);
+    if (flags == -1)
+        return -1;
+
+    /*
+     * 添加非阻塞标志，用于异步连接。
+    */
+    if (flags & O_NONBLOCK)
+        chk = 0;
+    else
+        chk = good_fflag_add(fd, O_NONBLOCK);
+
+    if (chk != 0)
+        return -1;
+
+    chk = connect(fd, &addr->addr, sizeof(good_sockaddr_t));
+    if(chk == 0)
+        goto final;
+
+    if (errno != EINPROGRESS && errno != EWOULDBLOCK && errno != EAGAIN)
+        goto final;
+
+    /*
+     * 等待写事件(允许)。
+    */
+    chk = (good_poll(fd, 0x02, timeout) > 0 ? 0 : -1);
+    if(chk != 0)
+        goto final;
+
+    /*
+     * 获取SOCKET句柄的出错码。
+    */
+    chk = good_getsockopt_int(fd, SOL_SOCKET, SO_ERROR, &eno);
+    chk = (eno == 0 ? 0 : -1);
+
+final:
+    
+    /*
+     * 恢复原有的标志，忽略可能的出错信息。
+    */
+    if (!(flags & O_NONBLOCK))
+        good_fflag_del(fd, O_NONBLOCK);
+
+    return chk;
 }
