@@ -243,9 +243,8 @@ int good_connect(int fd, good_sockaddr_t *addr, time_t timeout)
     /*
      * 添加非阻塞标志，用于异步连接。
     */
-    if (flags & O_NONBLOCK)
-        chk = 0;
-    else
+    chk = 0;
+    if (!(flags & O_NONBLOCK))
         chk = good_fflag_add(fd, O_NONBLOCK);
 
     if (chk != 0)
