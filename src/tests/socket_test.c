@@ -34,9 +34,9 @@ void test_gethostbyname()
 
 void test_ifname()
 {
-    good_ifname_t * names = good_heap_alloc(sizeof(good_ifname_t)*10);
+    good_ifaddrs_t * addrs = good_heap_alloc(sizeof(good_ifaddrs_t)*10);
 
-    int n = good_ifname_fetch(names,10,0);
+    int n = good_ifname_fetch(addrs,10,0);
 
     for (int i = 0; i < n; i++)
     {
@@ -45,24 +45,24 @@ void test_ifname()
         char broa[100];
         char mac[100];
 
-        assert(good_inet_ntop(&names[i].addr, addr, 100) == addr);
-        assert(good_inet_ntop(&names[i].mark, mark, 100));
+        assert(good_inet_ntop(&addrs[i].addr, addr, 100) == addr);
+        assert(good_inet_ntop(&addrs[i].mark, mark, 100));
 
-        if(names[i].broa.family == GOOD_IPV4 || names[i].broa.family == GOOD_IPV6)
-            assert(good_inet_ntop(&names[i].broa, broa, 100));
+        if(addrs[i].broa.family == GOOD_IPV4 || addrs[i].broa.family == GOOD_IPV6)
+            assert(good_inet_ntop(&addrs[i].broa, broa, 100));
 
-        printf("Name: %s\n",names[i].name);
+        printf("Name: %s\n",addrs[i].name);
         printf("Addr: %s\n",addr);
         printf("Mark: %s\n",mark);
         printf("Broa: %s\n",broa);
 
-        assert(good_mac_fetch(names[i].name,mac)==mac);
+        assert(good_mac_fetch(addrs[i].name,mac)==mac);
 
         printf("MAC: %s\n",mac);
 
     }
 
-    good_heap_free(names);
+    good_heap_free(addrs);
 }
 
 void test_connect()

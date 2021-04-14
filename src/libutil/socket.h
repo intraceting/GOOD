@@ -20,26 +20,60 @@
 #define GOOD_IPV6 AF_INET6
 
 /**
- * Socket Address
+ * Socket地址
 */
 typedef union _good_sockaddr
 {
+    /**
+     * 协议。
+    */
     sa_family_t family;
+
+    /**
+     * 通用的地址。
+    */
     struct sockaddr addr;
+
+    /**
+     * IPv4地址。
+    */
     struct sockaddr_in addr4;
+
+    /**
+     * IPv6地址。
+    */
     struct sockaddr_in6 addr6;
 } good_sockaddr_t;
 
 /*
- * Interface Name
+ * 网卡接口地址。
  */
-typedef struct _good_ifname
+typedef struct _good_ifaddrs
 {
+    /**
+     * 接口名称
+    */
     char name[IF_NAMESIZE];
+
+    /**
+     * 接口地址。
+     * 
+    */
     good_sockaddr_t addr;
+
+    /**
+     * 掩码地址。
+     * 
+    */
     good_sockaddr_t mark;
+
+    /**
+     * 广播地址。
+     * 
+     * @warning IPv6无效。
+    */
     good_sockaddr_t broa;
-} good_ifname_t;
+} good_ifaddrs_t;
 
 /**
  * 域名解析。
@@ -81,7 +115,7 @@ char *good_inet_ntop(good_sockaddr_t *addr, char *name, size_t max);
  * 
  * @return >= 0 网络接口数量， < 0 出错。
 */
-int good_ifname_fetch(good_ifname_t *ifnames, int max, int ex_loopback);
+int good_ifname_fetch(good_ifaddrs_t *addrs, int max, int ex_loopback);
 
 /**
  * SOCKET IO control

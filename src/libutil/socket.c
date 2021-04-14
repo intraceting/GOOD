@@ -74,15 +74,15 @@ char *good_inet_ntop(good_sockaddr_t *addr, char *name, size_t max)
     return NULL;
 }
 
-int good_ifname_fetch(good_ifname_t *ifnames, int max, int ex_loopback)
+int good_ifname_fetch(good_ifaddrs_t *addrs, int max, int ex_loopback)
 {
     struct ifaddrs *results = NULL;
     struct ifaddrs *it = NULL;
-    good_ifname_t *p = NULL;
+    good_ifaddrs_t *p = NULL;
     int chk;
     int count = 0;
 
-    assert(ifnames != NULL && max > 0);
+    assert(addrs != NULL && max > 0);
 
     chk = getifaddrs(&results);
     if (chk != 0 || results == NULL)
@@ -99,7 +99,7 @@ int good_ifname_fetch(good_ifname_t *ifnames, int max, int ex_loopback)
         if ((it->ifa_flags & IFF_LOOPBACK) && ex_loopback)
             continue;
 
-        p = &ifnames[count++];
+        p = &addrs[count++];
 
         strncpy(p->name, it->ifa_name, IFNAMSIZ);
 
