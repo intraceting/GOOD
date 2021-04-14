@@ -45,6 +45,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <net/if.h>
+#include <sys/epoll.h>
 
 /*------------------------------------------------------------------------------------------------*/
 
