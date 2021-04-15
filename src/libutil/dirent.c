@@ -7,7 +7,7 @@
 #include "dirent.h"
 
 
-void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs)
+void good_dirscan(good_tree_t *tree, const char *path, size_t depth,int onefs)
 {
     DIR *f_dir = NULL;
     struct dirent *c_dir = NULL;
@@ -62,7 +62,7 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs)
         /*
          * 递归深度。
         */
-        if (deep <= 0)
+        if (depth <= 0)
             continue;
 
         /*
@@ -74,7 +74,7 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t deep,int onefs)
         /*
          * 递归
         */
-        good_dirscan(node, node->alloc->pptrs[0], deep - 1, onefs);
+        good_dirscan(node, node->alloc->pptrs[0], depth - 1, onefs);
     }
 
     if (f_dir)

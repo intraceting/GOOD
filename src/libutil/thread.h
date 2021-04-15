@@ -19,22 +19,22 @@
 typedef struct _good_mutex
 {
     /**
-     * 事件属性
+     * 事件属性。
     */
     pthread_condattr_t condattr;
 
     /**
-     * 事件
+     * 事件。
     */
     pthread_cond_t cond;
 
     /**
-     * 互斥量属性
+     * 互斥量属性。
     */
     pthread_mutexattr_t mutexattr;
 
     /**
-     * 互斥量
+     * 互斥量。
     */
     pthread_mutex_t mutex;
 
@@ -49,23 +49,27 @@ typedef struct _good_mutex
 typedef struct _good_thread_t
 {
     /**
-     * 句柄
+     * 句柄。
      * 
     */
     pthread_t handle;
 
     /**
-     * 返回值
+     * 返回值。
      * 
     */
     void* result;
 
     /**
+     * 线程函数。
+     * 
      * @see pthared_create() 
      */
     void *(*routine)(void *opaque);
 
     /**
+     * 环境指针。
+     * 
      * @see pthared_create() 
      */
     void *opaque;

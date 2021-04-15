@@ -268,44 +268,43 @@ good_tree_t *good_tree_alloc3(size_t size)
     return good_tree_alloc2(&size,1);
 }
 
-
-void good_tree_scan(const good_tree_t *root,size_t stack_deep,
-                    int (*dump_cb)(size_t deep, const good_tree_t *node, void *opaque),
-                    void *opaque)
+void good_tree_scan(good_tree_iterator_t* it)
 {
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;
     good_tree_t **stack = NULL;
-    size_t deep = 0;// begin 0
+    size_t stack_size = PATH_MAX/2;
+    size_t depth = 0;// begin 0
     int chk;
 
-    assert(root && dump_cb);
+    assert(it != NULL);
+    assert(it->root != NULL && it->dump_cb!= NULL);
         
     /*
      * 如果调用者不确定，则在内部自动确定。
     */
-    if (stack_deep <= 0)
-        stack_deep = PATH_MAX/2;
+    if (it->depth_max > stack_size)
+        stack_size = it->depth_max;
 
-    stack = (good_tree_t **)good_heap_alloc(stack_deep * sizeof(good_tree_t *));
+    stack = (good_tree_t **)good_heap_alloc(stack_size * sizeof(good_tree_t *));
     if (!stack)
         goto final;
 
     /*
      * 根
     */
-    chk = dump_cb(0,root,opaque);
+    chk = it->dump_cb(0,it->root,it->opaque);
     if(chk == 0)
         goto final;
 
     /*
      * 从第一个孩子开始遍历。
     */
-    node = good_tree_child(root,1);
+    node = good_tree_child(it->root,1);
 
     while(node)
     {
-        chk = dump_cb(deep + 1, node, opaque);
+        chk = it->dump_cb(depth + 1, node, it->opaque);
         if (chk < 0)
             goto final;
 
@@ -316,9 +315,9 @@ void good_tree_scan(const good_tree_t *root,size_t stack_deep,
 
         if(child)
         {
-            assert(stack_deep > deep);
+            assert(stack_size > depth);
 
-            stack[deep++] = node;
+            stack[depth++] = node;
 
             node = child;
         }
@@ -326,9 +325,9 @@ void good_tree_scan(const good_tree_t *root,size_t stack_deep,
         {
             node = good_tree_sibling(node,0);
 
-            while (!node && deep > 0)
+            while (!node && depth > 0)
             {
-                node = stack[--deep];
+                node = stack[--depth];
                 node = good_tree_sibling(node,0);
             }
         }
@@ -340,24 +339,24 @@ final:
 
 }
 
-void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,...)
+void good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...)
 {
     va_list vaptr;
     va_start(vaptr, fmt);
 
-    good_tree_vfprintf(fp,deep,node,fmt,vaptr);
+    good_tree_vfprintf(fp,depth,node,fmt,vaptr);
 
     va_end(vaptr);
 }
 
-void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args)
+void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args)
 {
     good_tree_t *tmp = NULL;
     good_tree_t **stack = NULL;
 
     assert(fp && node && fmt);
 
-    if (deep <= 0)
+    if (depth <= 0)
     {
         vfprintf(fp,fmt,args);
     }
@@ -366,16 +365,16 @@ void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char*
         /*
          * 准备堆栈。
         */
-        stack = good_heap_alloc(deep * sizeof(good_tree_t *));
+        stack = good_heap_alloc(depth * sizeof(good_tree_t *));
         if(!stack)
             GOOD_ERRNO_AND_RETURN0(ENOMEM);
 
         tmp = (good_tree_t *)node;
 
-        for (size_t i = 1; i < deep; i++)
-            stack[deep-i] = (tmp = good_tree_father(tmp));
+        for (size_t i = 1; i < depth; i++)
+            stack[depth-i] = (tmp = good_tree_father(tmp));
 
-        for (size_t i = 1; i < deep; i++)
+        for (size_t i = 1; i < depth; i++)
         {
             if (good_tree_sibling((good_tree_t *)stack[i], 0))
                 fprintf(fp, "│   ");

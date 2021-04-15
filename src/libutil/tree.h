@@ -26,7 +26,6 @@ typedef struct _good_tree
     */
     struct _good_tree *chain[5];
 
-
     /**
      * 数据。
      * 
@@ -72,6 +71,37 @@ enum _good_tree_chain
    GOOD_TREE_CHAIN_CHILD_LEAST = 4
 #define GOOD_TREE_CHAIN_CHILD_LEAST     GOOD_TREE_CHAIN_CHILD_LEAST
 };
+
+/**
+ * 树节点迭代器。
+ * 
+*/
+typedef struct _good_tree_iterator
+{
+    /**
+     * 树的根节点。
+    */
+    const good_tree_t *root;
+
+    /** 
+     * 最大深度。如果无法确定填多少合适，就填0。
+    */
+    size_t depth_max;
+
+    /**
+     * 回显函数。
+     * 
+     * @return -1 终止，0 忽略孩子，1 继续。
+    */
+    int (*dump_cb)(size_t depth, const good_tree_t *node, void *opaque);
+
+    /**
+     * 环境指针。
+    */
+    void *opaque;
+
+} good_tree_iterator_t;
+
 
 /**
  * 获取自己的父节指针。
@@ -135,7 +165,7 @@ void good_tree_free(good_tree_t **root);
 /**
  * 创建节点。
  * 
- * @param alloc 内存块指针，可以为NULL(0)。仅做指针复制。
+ * @param alloc 内存块指针，可以为NULL(0)。仅复制指针，不是指针对像引用。
  * 
  * @see good_heap_alloc()
  * 
@@ -162,36 +192,30 @@ good_tree_t *good_tree_alloc3(size_t size);
  * 
  * 深度优先遍历节点。
  * 
- * @param stack_deep 栈深度。如果无法确定填多少合适，就填0。 
- * @param dump_cb 回显函数。-1 终止，0 忽略孩子，1 继续。
- * @param opaque 环境指针。
- * 
 */
-void good_tree_scan(const good_tree_t *root,size_t stack_deep,
-                    int (*dump_cb)(size_t deep, const good_tree_t *node, void *opaque),
-                    void *opaque);
+void good_tree_scan(good_tree_iterator_t* it);
 
 /**
  * 格式化输出。
  * 
  * 输出有层次感的树形图。
  * 
- * @note 不会在末尾添加'\n'(换行)字符。
+ * @warning 不会在末尾添加'\n'(换行)字符。
  * 
  * @see fprintf()
 */
-void good_tree_fprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,...);
+void good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...);
 
 /**
  * 格式化输出。
  * 
  * 输出有层次感的树形图。
  * 
- * @note 不会在末尾添加'\n'(换行)字符。
+ * @warning 不会在末尾添加'\n'(换行)字符。
  * 
  * @see vfprintf()
 */
-void good_tree_vfprintf(FILE* fp,size_t deep,const good_tree_t *node,const char* fmt,va_list args);
+void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args);
 
 
 #endif //GOOD_UTIL_TREE_H

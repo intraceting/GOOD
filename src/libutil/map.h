@@ -29,23 +29,30 @@ typedef struct _good_map
     good_tree_t *table;
 
     /**
-     * HASH函数。
+     * KEY哈希函数。
      * 
      * @see good_map_hash()
     */
     uint64_t (*hash_cb)(const void* key,size_t size,void *opaque);
 
     /**
-     * 比较函数。
+     * KEY比较函数。
      * 
      * @see good_map_compare()
     */
     int (*compare_cb)(const void *key1, const void *key2, size_t size,void *opaque);
 
     /**
-     * 销毁函数。
+     * 擦除函数。
     */
-    void (*destroy_cb)(good_allocator_t *alloc, void *opaque);
+    void (*erase_cb)(good_allocator_t *alloc, void *opaque);
+
+    /**
+     * 回显函数。
+     * 
+     * @return -1 终止，1 继续。
+    */
+    int (*dump_cb)(const good_allocator_t *alloc, void *opaque);
 
     /**
     * 环境指针。
@@ -88,7 +95,7 @@ uint64_t good_map_hash(const void* data,size_t size,void *opaque);
 /**
  * 比较函数。
  * 
- * @return > 0 is key1 > key2，0 is key1 == key2，< 0 is key1 < key2。
+ * @return > 0 is data1 > data2，0 is data1 == data2，< 0 is data1 < data2。
  * 
  * @see memcmp()
 */
@@ -112,7 +119,7 @@ int good_map_init(good_map_t* map,size_t size);
  * @param ksize Key size。
  * @param vsize Value size。 0 仅查找，>0 不存在则创建。
 */
-good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t vsize);
+good_allocator_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t vsize);
 
 /**
  * 擦除。
@@ -121,5 +128,12 @@ good_tree_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t v
 */
 void good_map_erase(good_map_t* map,const void* key,size_t ksize);
 
+/**
+ * 扫描节点。
+ * 
+ * 深度优先遍历节点。
+ * 
+*/
+void good_map_scan(good_map_t *map);
 
 #endif //GOOD_UTIL_MAP_H

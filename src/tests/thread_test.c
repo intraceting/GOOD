@@ -71,9 +71,12 @@ int main(int argc, char **argv)
     good_thread_create(&p,1);
     good_thread_join(&p);
 
-    sigset_t sig;
-    sigfillset(&sig);
-    good_sigwaitinfo(&sig,-1,signal_cb,NULL);
+    good_signal_t sig;
+    sigfillset(&sig.signals);
+    sig.signal_cb = signal_cb;
+    sig.opaque = NULL;
+     
+    good_sigwaitinfo(&sig,-1);
 
     return 0;
 }

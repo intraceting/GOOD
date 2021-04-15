@@ -6,9 +6,7 @@
  */
 #include "signal.h"
 
-int good_sigwaitinfo(sigset_t *sig, time_t timeout,
-                     int (*signal_cb)(const siginfo_t *info, void *opaque), 
-                     void *opaque)
+void good_sigwaitinfo(good_signal_t *sig, time_t timeout)
 {
     sigset_t old;
     struct timespec tout;
@@ -17,9 +15,9 @@ int good_sigwaitinfo(sigset_t *sig, time_t timeout,
 
     assert(sig);
 
-    chk = pthread_sigmask(SIG_BLOCK, sig, &old);
+    chk = pthread_sigmask(SIG_BLOCK, &sig->signals, &old);
     if (chk != 0)
-        return chk;
+        return;
 
     while (1)
     {
@@ -27,27 +25,27 @@ int good_sigwaitinfo(sigset_t *sig, time_t timeout,
         {
             tout.tv_sec = timeout / 1000;
             tout.tv_nsec = (timeout % 1000) * 1000000;
-            chk = sigtimedwait(sig, &info, &tout);
+            chk = sigtimedwait(&sig->signals, &info, &tout);
         }
         else
         {
-            chk = sigwaitinfo(sig, &info);
+            chk = sigwaitinfo(&sig->signals, &info);
         }
 
         if (chk == -1)
             break;
         
-        if(signal_cb)
-            chk = signal_cb(&info,opaque);
+        if(sig->signal_cb)
+            chk = sig->signal_cb(&info,sig->opaque);
 
         /*
-         * 0 结束。
+         * -1 终止。
         */
-        if(!chk)
+        if(chk == -1)
             break;
     }
     
     pthread_sigmask(SIG_BLOCK,&old,NULL);
 
-    return chk;
+    return;
 }

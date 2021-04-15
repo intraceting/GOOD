@@ -34,7 +34,7 @@ int signal_cb(const siginfo_t *info, void *opaque)
         break;
     }
 
-    return 0;
+    return (info->si_signo==SIGINT?-1:1);
 }
 
 int main(int argc, char **argv)
@@ -69,11 +69,15 @@ int main(int argc, char **argv)
     {
         atexit(exit_befor);
 
-        printf("运行中……，按任意键结束。\n");
+        printf("进程(PID=%d)运行中……，Ctrl + c 结束。\n",pid);
 
-        sigset_t sig;
-        sigfillset(&sig);
-        good_sigwaitinfo(&sig,-1,signal_cb,NULL);
+        good_signal_t sig;
+        sigfillset(&sig.signals);
+        //sigdelset(&sig.signals,SIGINT);
+        sig.signal_cb = signal_cb;
+        sig.opaque = NULL;
+
+        good_sigwaitinfo(&sig, -1);
     }
     else
     {

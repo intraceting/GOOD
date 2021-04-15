@@ -24,7 +24,9 @@ void traversal(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_scan(root,0,dump,NULL);
+    good_tree_iterator_t it = {root,0,dump,NULL};
+
+    good_tree_scan(&it);
 
  //   good_heap_freep((void **)&it.stack);
 
