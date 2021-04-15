@@ -24,7 +24,7 @@ typedef struct _good_buffer
     good_allocator_t *alloc;
 
     /**
-     * 缓存指针。
+     * 内存指针。
     */
     void* data;
 

@@ -126,13 +126,25 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
             GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
 
         /*
-         * 注册数据节点擦除函数。
+         * 注册数据节点的析构函数。
         */
-        if (map->erase_cb)
-            good_allocator_atfree(node->alloc, map->erase_cb, map->opaque);
+        if (map->destructor_cb)
+            good_allocator_atfree(node->alloc, map->destructor_cb, map->opaque);
 
+        /*
+         * 复制KEY。
+        */
         memcpy(node->alloc->pptrs[GOOD_MAP_KEY], key, ksize);
 
+        /*
+         * 也许有构造函数要处理一下。
+        */
+        if(map->construct_cb)
+            map->construct_cb(node->alloc,map->opaque);
+
+        /*
+         * 加入到链表头。
+        */
         good_tree_insert2(it, node, 1);
     }
 
@@ -165,7 +177,7 @@ void good_map_erase(good_map_t *map, const void *key, size_t ksize)
     }
 }
 
-int _good_map_scan_cb(size_t depth, const good_tree_t *node, void *opaque)
+static int _good_map_scan_cb(size_t depth, const good_tree_t *node, void *opaque)
 {
     good_map_t *map = (good_map_t *)opaque;
 
@@ -178,12 +190,12 @@ int _good_map_scan_cb(size_t depth, const good_tree_t *node, void *opaque)
     return map->dump_cb(node->alloc, map->opaque);
 }
 
-void good_map_scan(good_map_t *map)
+void good_map_scan(const good_map_t *map)
 {
     assert(map != NULL);
     assert(map->dump_cb != NULL);
 
-    good_tree_iterator_t it = {map->table,0,_good_map_scan_cb,map};
+    good_tree_iterator_t it = {map->table,0,_good_map_scan_cb,(void*)map};
 
     good_tree_scan(&it);
 }

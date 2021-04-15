@@ -6,7 +6,7 @@
  */
 #include "mman.h"
 
-void _good_munmap_cb(good_allocator_t *alloc, void *opaque)
+static void _good_munmap_cb(good_allocator_t *alloc, void *opaque)
 {
     assert(alloc);
     assert(alloc->pptrs[0] != MAP_FAILED);

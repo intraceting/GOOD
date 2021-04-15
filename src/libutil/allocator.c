@@ -220,7 +220,7 @@ good_allocator_t *good_allocator_clone(good_allocator_t *src)
     return dst;
 }
 
-good_allocator_t * good_allocator_privatize(good_allocator_t **dst)
+good_allocator_t *good_allocator_privatize(good_allocator_t **dst)
 {
     good_allocator_t *new_p = NULL;
     good_allocator_t *dst_p = NULL;

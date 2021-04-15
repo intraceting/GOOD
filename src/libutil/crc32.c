@@ -6,7 +6,7 @@
  */
 #include "crc32.h"
 
-int _good_crc32_init(void *opaque)
+static int _good_crc32_init(void *opaque)
 {
     uint32_t *table = (uint32_t *)opaque;
 

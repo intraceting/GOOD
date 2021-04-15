@@ -27,22 +27,32 @@ typedef struct _good_option
     */
     good_map_t table;
 
-    /*
-     * 主键前缀。
-    */
-    const char* prefix;
+} good_option_t;
 
-}good_option_t;
-
+/** 
+ * 选项的值。
+ *
+*/
 typedef struct _good_option_value
 {
+    /**
+     * 
+    */
+    char **texts;
+
+    /**
+     * 
+    */
     size_t count;
-    const char *text[1000];
+
 } good_option_value_t;
 
-void good_option_destroy(good_option_t* opt);
+void good_option_destroy(good_option_t *opt);
 
-int good_option_init(good_option_t* opt,const char* prefix);
+int good_option_init(good_option_t *opt);
 
+int good_option_set(good_option_t *opt, const char *key, const char *value);
+
+const good_option_value_t* good_option_get(const good_option_t *opt, const char *key);
 
 #endif //GOOD_UTIL_OPTION_H

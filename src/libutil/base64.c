@@ -6,7 +6,7 @@
  */
 #include "base64.h"
 
-char _good_base64_encode_table(int n)
+static char _good_base64_encode_table(int n)
 {
     return "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
            "abcdefghijklmnopqrstuvwxyz"
@@ -14,7 +14,7 @@ char _good_base64_encode_table(int n)
            "+/="[n];
 }
 
-int _good_base64_decode_table(char c)
+static int _good_base64_decode_table(char c)
 {
     if (c == '+')
         return 62;
@@ -176,7 +176,7 @@ ssize_t good_base64_decode(const char *src, size_t slen, uint8_t *dst, size_t dm
          * four bytes
          * a = 26,b = 27,c = 28,d = 28  (in decode table)
          * 
-         */
+        */
 
         /*1: a  */
         mark = _good_base64_decode_table(src[n]);
@@ -199,7 +199,7 @@ ssize_t good_base64_decode(const char *src, size_t slen, uint8_t *dst, size_t dm
     /*
      * TAIL four bytes
      * a b c = ; a b = = 
-     */
+    */
 
     /*1:   */
     mark = _good_base64_decode_table(src[formal]);
@@ -218,7 +218,8 @@ ssize_t good_base64_decode(const char *src, size_t slen, uint8_t *dst, size_t dm
 
     /*
      * only valid bytes
-     */
+    */
+
     /*1: */
     dst[dlen++] = (uint8_t)(mark >> 16 & 0x000000FF);
     /*2: */

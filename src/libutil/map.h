@@ -42,10 +42,15 @@ typedef struct _good_map
     */
     int (*compare_cb)(const void *key1, const void *key2, size_t size,void *opaque);
 
-    /**
-     * 擦除函数。
+    /** 
+     * 构造函数。
     */
-    void (*erase_cb)(good_allocator_t *alloc, void *opaque);
+    void (*construct_cb)(good_allocator_t *alloc, void *opaque);
+
+    /**
+     * 析构函数。
+    */
+    void (*destructor_cb)(good_allocator_t *alloc, void *opaque);
 
     /**
      * 回显函数。
@@ -103,6 +108,9 @@ int good_map_compare(const void *data1, const void *data2, size_t size,void *opa
 
 /**
  * 销毁。
+ * 
+ * @see good_tree_free()
+ * @see memset()
 */
 void good_map_destroy(good_map_t* map);
 
@@ -110,6 +118,10 @@ void good_map_destroy(good_map_t* map);
  * 初始化。
  * 
  * @return 0 成功，!0 失败。
+ * 
+ * @see good_tree_alloc2()
+ * @see good_map_hash()
+ * @see good_map_compare()
 */
 int good_map_init(good_map_t* map,size_t size);
 
@@ -118,6 +130,14 @@ int good_map_init(good_map_t* map,size_t size);
  * 
  * @param ksize Key size。
  * @param vsize Value size。 0 仅查找，>0 不存在则创建。
+ * 
+ * @see good_tree_alloc3()
+ * @see good_tree_insert2()
+ * @see good_tree_child()
+ * @see good_tree_sibling()
+ * @see good_tree_alloc2()
+ * @see good_allocator_atfree()
+ * @see memcpy()
 */
 good_allocator_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t vsize);
 
@@ -133,7 +153,8 @@ void good_map_erase(good_map_t* map,const void* key,size_t ksize);
  * 
  * 深度优先遍历节点。
  * 
+ * @see good_tree_scan()
 */
-void good_map_scan(good_map_t *map);
+void good_map_scan(const good_map_t *map);
 
 #endif //GOOD_UTIL_MAP_H
