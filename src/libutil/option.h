@@ -36,14 +36,9 @@ typedef struct _good_option
 typedef struct _good_option_value
 {
     /**
-     * 
+     * 文本。
     */
-    char **texts;
-
-    /**
-     * 
-    */
-    size_t count;
+    good_tree_t *text;
 
 } good_option_value_t;
 

@@ -24,18 +24,39 @@ void traversal(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator_t it = {root,0,dump,NULL};
+    good_tree_iterator_t it = {0,dump,NULL};
 
-    good_tree_scan(&it);
+    good_tree_scan(root,&it);
 
  //   good_heap_freep((void **)&it.stack);
 
     printf("\n-------------------------------------\n");
 }
 
-int main(int argc, char **argv)
+int dump2(size_t deep, const good_tree_t *node, void *opaque)
 {
+    good_tree_fprintf(stderr,deep,node,"%d\n",*GOOD_PTR2PTR(int,node->alloc->pptrs[0],0));
 
+    // if(deep>=1)
+    //     return 0;
+    return 1;
+}
+
+void traversal2(const good_tree_t *root)
+{
+    printf("\n-------------------------------------\n");
+
+    good_tree_iterator_t it = {0,dump2,NULL};
+
+    good_tree_scan(root,&it);
+
+ //   good_heap_freep((void **)&it.stack);
+
+    printf("\n-------------------------------------\n");
+}
+
+void test_tree()
+{
     good_tree_t *d = good_tree_alloc(NULL);
 
     d->alloc = good_allocator_alloc2(1);
@@ -116,6 +137,86 @@ int main(int argc, char **argv)
 
 
     good_tree_free(&d);
+}
+
+
+int compare_cb(const good_tree_t *node1, const good_tree_t *node2, void *opaque)
+{
+    int src = *GOOD_PTR2PTR(int, node1->alloc->pptrs[0], 0);
+    int dst = *GOOD_PTR2PTR(int, node2->alloc->pptrs[0], 0);
+    if( src > dst )
+        return 1;
+    if( src < dst )
+        return -1;
+
+    return 0;
+}
+
+void test_sort(good_tree_t *t,int by)
+{
+    good_tree_order_t o = {by,compare_cb,NULL};
+
+    good_tree_sort(t,&o);
+}
+
+
+void test_swap()
+{
+    good_tree_t *d1 = good_tree_alloc3(sizeof(int));
+    *GOOD_PTR2PTR(int,d1->alloc->pptrs[0],0) = 1;
+
+    good_tree_t *d2 = good_tree_alloc3(sizeof(int));
+    *GOOD_PTR2PTR(int,d2->alloc->pptrs[0],0) = 2;
+
+    good_tree_t *d3 = good_tree_alloc3(sizeof(int));
+    *GOOD_PTR2PTR(int,d3->alloc->pptrs[0],0) = 3;
+
+    good_tree_t *d4 = good_tree_alloc3(sizeof(int));
+    *GOOD_PTR2PTR(int,d4->alloc->pptrs[0],0) = 4;
+
+    good_tree_t *d5 = good_tree_alloc3(sizeof(int));
+    *GOOD_PTR2PTR(int,d5->alloc->pptrs[0],0) = 5;
+
+    good_tree_t *d6 = good_tree_alloc3(sizeof(int));
+    *GOOD_PTR2PTR(int,d6->alloc->pptrs[0],0) = 6;
+
+    good_tree_insert(d1,d2,NULL);
+    good_tree_insert(d1,d3,NULL);
+    good_tree_insert(d1,d4,NULL);
+    good_tree_insert(d1,d5,NULL);
+    good_tree_insert(d1,d6,NULL);
+
+    traversal2(d1);
+
+    good_tree_swap(d2,d3);
+
+    traversal2(d1);
+
+    good_tree_swap(d2,d5);
+
+    traversal2(d1);
+
+    good_tree_swap(d6,d2);
+
+    traversal2(d1);
+
+    test_sort(d1,0);
+
+    traversal2(d1);
+
+    test_sort(d1,1);
+
+    traversal2(d1);
+
+    good_tree_free(&d1);
+}
+
+int main(int argc, char **argv)
+{
+
+    test_tree();
+
+    test_swap();
 
     return 0;
 }

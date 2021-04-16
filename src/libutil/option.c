@@ -13,23 +13,12 @@ static void _good_option_construct_cb(good_allocator_t *alloc, void *opaque)
     good_option_value_t *val = (good_option_value_t *)alloc->pptrs[GOOD_MAP_VALUE];
     good_option_t *opt = (good_option_t *)opaque;
 
-    val->texts = (char **)(val + 1);
-    val->count = 0;
 }
 
 static void _good_option_destructor_cb(good_allocator_t *alloc, void *opaque)
 {
     good_option_value_t *val = (good_option_value_t *)alloc->pptrs[GOOD_MAP_VALUE];
 
-    for (size_t i = 0; i < val->count; i++)
-    {
-        good_heap_freep((void**)&val->texts[i]);
-    }
-
-    /*
-     * fill zero.
-    */    
-    memset(val,0,sizeof(*val));
 }
 
 void good_option_destroy(good_option_t* opt)
@@ -79,13 +68,6 @@ int good_option_set(good_option_t *opt, const char *key, const char *value)
 
     val = (good_option_value_t *)alloc->pptrs[GOOD_MAP_VALUE];
 
-    assert(val->count < GOOD_OPTION_VALUES_MAX);
-
-    value_cp = (char*)good_heap_clone(value, strlen(value) + 1);
-    if(!value_cp)
-        return -1;
-    
-    val->texts[val->count++] = value_cp;
 
     return 0;
 }

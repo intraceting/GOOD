@@ -65,9 +65,9 @@ void traversal_tree(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator_t it = {root,0,dump_tree,NULL};
+    good_tree_iterator_t it = {0,dump_tree,NULL};
 
-    good_tree_scan(&it);
+    good_tree_scan(root,&it);
 
     printf("\n-------------------------------------\n");
 }
@@ -76,9 +76,9 @@ void traversal2_tree(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator_t it = {root,0,dump2_tree,NULL};
+    good_tree_iterator_t it = {0,dump2_tree,NULL};
 
-    good_tree_scan(&it);
+    good_tree_scan(root,&it);
 
     printf("\n-------------------------------------\n");
 }

@@ -78,11 +78,6 @@ enum _good_tree_chain
 */
 typedef struct _good_tree_iterator
 {
-    /**
-     * 树的根节点。
-    */
-    const good_tree_t *root;
-
     /** 
      * 最大深度。如果无法确定填多少合适，就填0。
     */
@@ -102,6 +97,30 @@ typedef struct _good_tree_iterator
 
 } good_tree_iterator_t;
 
+/**
+ * 树节点排序规则。
+ * 
+*/
+typedef struct _good_tree_order
+{
+    /*
+     * 1 升序，降序。
+    */
+    int by;
+
+    /**
+     * 比较函数。
+     * 
+     * @return > 0 is node1 > node2，0 is node1 == node2，< 0 is node1 < node2。
+    */
+    int (*compare_cb)(const good_tree_t *node1, const good_tree_t *node2, void *opaque);
+
+    /**
+     * 环境指针。
+    */
+    void *opaque;
+
+} good_tree_order_t;
 
 /**
  * 获取自己的父节指针。
@@ -135,7 +154,7 @@ void good_tree_unlink(good_tree_t *self);
  * 
  * @param father 父。
  * @param child 孩子。
- * @param where NULL(0) 'child'为小弟，!NULL(0) 'child'为兄长。
+ * @param where NULL(0) 孩子为小弟，!NULL(0) 孩子为兄长。
  * 
 */
 void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *where);
@@ -145,10 +164,18 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
  * 
  * @param father 父。
  * @param child 孩子。
- * @param first 0 'child'为么娃，!0 'child'为大娃。
+ * @param first 0 孩子为么娃，!0 孩子为大娃。
  * 
 */
 void good_tree_insert2(good_tree_t *father, good_tree_t *child,int first); 
+
+/**
+ * 节点交换。
+ * 
+ * @warning 必须是同一个父节点的子节点。
+ * 
+*/
+void good_tree_swap(good_tree_t *src,good_tree_t *dst);
 
 /**
  * 删除节点。
@@ -193,7 +220,7 @@ good_tree_t *good_tree_alloc3(size_t size);
  * 深度优先遍历节点。
  * 
 */
-void good_tree_scan(good_tree_iterator_t* it);
+void good_tree_scan(const good_tree_t *root,good_tree_iterator_t* it);
 
 /**
  * 格式化输出。
@@ -216,6 +243,15 @@ void good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char*
  * @see vfprintf()
 */
 void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args);
+
+/** 
+ * 排序。
+ * 
+ * 选择法排序。
+ * 
+ * 仅对子节点排序，如需要对树排序，需要接合迭代器。
+*/
+void good_tree_sort(const good_tree_t *father,good_tree_order_t *order);
 
 
 #endif //GOOD_UTIL_TREE_H

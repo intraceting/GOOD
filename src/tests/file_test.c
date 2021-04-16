@@ -58,8 +58,26 @@ void test_dir()
     good_heap_free(path4);
 }
 
+int compare_cb(const good_tree_t *node1, const good_tree_t *node2, void *opaque)
+{
+    char* src = GOOD_PTR2PTR(char, node1->alloc->pptrs[0], 0);
+    char* dst = GOOD_PTR2PTR(char, node2->alloc->pptrs[0], 0);
+
+    return good_strcmp(src,dst,1);
+}
+
+void test_sort(const good_tree_t *t,int by)
+{
+    good_tree_order_t o = {by,compare_cb,NULL};
+
+    good_tree_sort(t,&o);
+}
+
 int dump2(size_t deep, const good_tree_t *node, void *opaque)
 {
+
+    test_sort(node,0);
+
 #if 1
     if(deep==0)
         good_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[0]);
@@ -81,8 +99,8 @@ void traversal(const good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator_t it = {root,0,dump2,NULL};
-    good_tree_scan(&it);
+    good_tree_iterator_t it = {0,dump2,NULL};
+    good_tree_scan(root,&it);
 
     printf("\n-------------------------------------\n");
 }
@@ -91,15 +109,17 @@ void test_dirscan()
 {
     good_tree_t * t = good_tree_alloc3(PATH_MAX);
 
-  //  strcpy(t->alloc->pptrs[0],"/tmp/");
-  //  good_dirscan(t,t->alloc->pptrs[0],100,0);
+ //   strcpy(t->alloc->pptrs[0],"/tmp/");
+ //   good_dirscan(t,t->alloc->pptrs[0],100,0);
 
+//    strcpy(t->alloc->pptrs[0],"/proc/");
+ //   good_dirscan(t,t->alloc->pptrs[0],5,0);
 
-    //strcpy(t->alloc->pptrs[0],"/usr/include");
-    //good_dirscan(t,t->alloc->pptrs[0],100,0);
+    strcpy(t->alloc->pptrs[0],"/usr");
+    good_dirscan(t,t->alloc->pptrs[0],100,0);
 
-    strcpy(t->alloc->pptrs[0],"/mnt");
-    good_dirscan(t,t->alloc->pptrs[0],2,0);
+ //   strcpy(t->alloc->pptrs[0],"/mnt");
+ //   good_dirscan(t,t->alloc->pptrs[0],100,1);
 
   //  strcpy(t->alloc->pptrs[0],"/tmp");
   //  good_dirscan(t,t->alloc->pptrs[0],1,0);
@@ -269,7 +289,7 @@ int main(int argc, char **argv)
     
     // test_dir();
 
-    // test_dirscan();
+     test_dirscan();
 
     // if(argc>=3)
     //     test_file(argv[1],argv[2]);
@@ -278,7 +298,7 @@ int main(int argc, char **argv)
 
     //test_notify();
 
-    test_iconv();
+   // test_iconv();
 
     return 0;
 }

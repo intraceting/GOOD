@@ -51,11 +51,6 @@ int good_map_init(good_map_t *map, size_t size)
     return 0;
 }
 
-/*
- * 查找或创建。
- * 
- * 仅供内部使用。
-*/
 static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksize, size_t vsize)
 {
     good_tree_t *it = NULL;
@@ -195,7 +190,7 @@ void good_map_scan(const good_map_t *map)
     assert(map != NULL);
     assert(map->dump_cb != NULL);
 
-    good_tree_iterator_t it = {map->table,0,_good_map_scan_cb,(void*)map};
+    good_tree_iterator_t it = {0,_good_map_scan_cb,(void*)map};
 
-    good_tree_scan(&it);
+    good_tree_scan(map->table,&it);
 }

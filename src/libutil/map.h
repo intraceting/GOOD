@@ -131,13 +131,17 @@ int good_map_init(good_map_t* map,size_t size);
  * @param ksize Key size。
  * @param vsize Value size。 0 仅查找，>0 不存在则创建。
  * 
+ * @return !NULL(0) 成功(复制的指针，不需要主动释放)，NULL(0) 不存在或创建失败。
+ * 
  * @see good_tree_alloc3()
  * @see good_tree_insert2()
  * @see good_tree_child()
  * @see good_tree_sibling()
  * @see good_tree_alloc2()
- * @see good_allocator_atfree()
  * @see memcpy()
+ * @see good_allocator_atfree()
+ * @see good_allocator_refer()
+ * 
 */
 good_allocator_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t vsize);
 
