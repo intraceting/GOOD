@@ -4,7 +4,6 @@
  * MIT License
  * 
  */
-
 #ifndef GOOD_UTIL_TREE_H
 #define GOOD_UTIL_TREE_H
 

@@ -47,9 +47,22 @@ typedef struct _good_buffer
 } good_buffer_t;
 
 /**
- * 申请。
+ * 创建。
  * 
- * @param size 缓存大小(Bytes)。
+ * @param alloc 内存块的指针。仅复制指针，不是指针对像引用。
+ * 
+ * @return !NULL(0) 成功，NULL(0) 失败。
+ * 
+ * @see good_heap_alloc()
+ * @see good_heap_freep()
+ * 
+ */
+good_buffer_t *good_buffer_alloc(good_allocator_t *alloc);
+
+/**
+ * 创建。
+ * 
+ * @param size 容量(Bytes)。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
  * 
@@ -58,7 +71,7 @@ typedef struct _good_buffer
  * @see good_allocator_alloc2()
  * 
  */
-good_buffer_t *good_buffer_alloc(size_t size);
+good_buffer_t *good_buffer_alloc2(size_t size);
 
 /**
  * 释放。
@@ -78,7 +91,6 @@ void good_buffer_freep(good_buffer_t **dst);
  * @see good_heap_alloc()
  * @see good_buffer_alloc()
  * @see good_allocator_refer()
- * @see memcpy()
  */
 good_buffer_t *good_buffer_copy(good_buffer_t *src);
 
@@ -87,7 +99,7 @@ good_buffer_t *good_buffer_copy(good_buffer_t *src);
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
  * 
- * @see good_buffer_alloc()
+ * @see good_buffer_alloc2()
  * @see memcpy()
  */
 good_buffer_t *good_buffer_clone(good_buffer_t *src);
@@ -95,13 +107,22 @@ good_buffer_t *good_buffer_clone(good_buffer_t *src);
 /**
  * 私有化。
  * 
- * 用于写前复制，或直接克隆引用内存块。如果是非引用内存块，直接返回成功。
+ * 用于写前复制，或克隆引用的内存块。如果是非引用内存块，直接返回成功。
  * 
  * @return 0 成功，-1 失败。
  * 
  * @see good_allocator_privatize()
 */
 int good_buffer_privatize(good_buffer_t *dst);
+
+/**
+ * 调整容量。
+ * 
+ * @return 0 成功，-1 失败。
+ * 
+ * @see  memcpy()
+*/
+int good_buffer_resize(good_buffer_t *buf,size_t size);
 
 /**
  * 写入数据。
@@ -159,7 +180,7 @@ ssize_t good_buffer_printf(good_buffer_t *buf,const char * fmt,...);
 /**
  * 从文件导入数据。
  * 
- * @param good_buffer_import_atmost()
+ * @see good_buffer_import_atmost()
 */
 ssize_t good_buffer_import(good_buffer_t *buf,int fd);
 
@@ -168,23 +189,23 @@ ssize_t good_buffer_import(good_buffer_t *buf,int fd);
  * 
  * 阻塞模式的句柄，可能会因为导入数据不足而阻塞。
  * 
- * @param good_buffer_write()
- * @param good_read()
+ * @see good_buffer_write()
+ * @see good_read()
 */
 ssize_t good_buffer_import_atmost(good_buffer_t *buf,int fd,size_t howmuch);
 
 /**
  * 导出数据到文件。
  * 
- * @param good_buffer_export_atmost()
+ * @see good_buffer_export_atmost()
 */
 ssize_t good_buffer_export(good_buffer_t *buf,int fd);
 
 /**
  * 导出数据到文件。
  * 
- * @param good_buffer_read()
- * @param good_write()
+ * @see good_buffer_read()
+ * @see good_write()
 */
 ssize_t good_buffer_export_atmost(good_buffer_t *buf,int fd,size_t howmuch);
 

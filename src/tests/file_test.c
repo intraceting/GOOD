@@ -226,7 +226,7 @@ void test_notify()
 
     good_notify_event_t t = {0};
 
-    t.buf = good_buffer_alloc(4096);
+    t.buf = good_buffer_alloc2(4096);
 
     //int wd = good_notify_add(fd,"/tmp/",IN_ALL_EVENTS);
     int wd = good_notify_add(fd,"/tmp/",IN_CREATE|IN_DELETE|IN_MOVE_SELF|IN_MOVE);

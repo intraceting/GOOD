@@ -9,6 +9,7 @@
 
 #include "general.h"
 #include "map.h"
+#include "vector.h"
 
 /**
  * 选项。
@@ -29,25 +30,12 @@ typedef struct _good_option
 
 } good_option_t;
 
-/** 
- * 选项的值。
- *
-*/
-typedef struct _good_option_value
-{
-    /**
-     * 文本。
-    */
-    good_tree_t *text;
-
-} good_option_value_t;
-
 void good_option_destroy(good_option_t *opt);
 
 int good_option_init(good_option_t *opt);
 
 int good_option_set(good_option_t *opt, const char *key, const char *value);
 
-const good_option_value_t* good_option_get(const good_option_t *opt, const char *key);
+const good_vector_t* good_option_get(const good_option_t *opt, const char *key);
 
 #endif //GOOD_UTIL_OPTION_H

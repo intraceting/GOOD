@@ -6,31 +6,62 @@
  */
 #include "buffer.h"
 
-good_buffer_t *good_buffer_alloc(size_t size)
+good_buffer_t *good_buffer_alloc(good_allocator_t *alloc)
 {
     good_buffer_t *buf = NULL;
-
-    assert(size > 0);
 
     buf = good_heap_alloc(sizeof(good_buffer_t));
     if (!buf)
         return NULL;
 
-    buf->rsize = buf->wsize = buf->size = 0;
-    buf->data = NULL;
-
-    buf->alloc = good_allocator_alloc2(size);
-    if (buf->alloc)
+    if (alloc)
     {
-        buf->size = buf->alloc->sizes[0];
+        assert(alloc->numbers > 0 && alloc->pptrs[0] != NULL && alloc->sizes[0] > 0);
+
+        /*
+        * 绑定内存块。
+        */
+        buf->alloc = alloc;
+
         buf->data = buf->alloc->pptrs[0];
+        buf->size = buf->alloc->sizes[0];
+
+        buf->rsize = buf->wsize = 0;
     }
     else
     {
-        good_heap_freep((void **)&buf);
+        /*
+         * 允许空的。
+        */
+        buf->alloc = buf->data = NULL;
+        buf->size = buf->rsize = buf->wsize = 0;
     }
 
     return buf;
+}
+
+good_buffer_t *good_buffer_alloc2(size_t size)
+{
+    good_buffer_t *buf = NULL;
+    good_allocator_t *alloc = NULL;
+
+    assert(size > 0);
+
+    alloc = good_allocator_alloc2(size);
+    if (!alloc)
+        return NULL;
+
+    buf = good_buffer_alloc(alloc);
+    if (!buf)
+        goto final_error;
+
+    return buf;
+
+final_error:
+
+    good_allocator_unref(&alloc);
+
+    return NULL;
 }
 
 void good_buffer_freep(good_buffer_t **dst)
@@ -42,11 +73,7 @@ void good_buffer_freep(good_buffer_t **dst)
 
     buf_p = *dst;
 
-    /*
-    * 有可能不是通过接口创建的。
-    */
-    if (buf_p->alloc)
-        good_allocator_unref(&buf_p->alloc);
+    good_allocator_unref(&buf_p->alloc);
 
     good_heap_freep((void **)dst);
 }
@@ -63,18 +90,13 @@ good_buffer_t *good_buffer_copy(good_buffer_t *src)
     */
     if (!src->alloc)
         return buf = good_buffer_clone(src);
-        
-    buf = good_buffer_alloc(src->size);
+
+    buf = good_buffer_alloc(good_allocator_refer(src->alloc));
     if (!buf)
         return NULL;
-    
-    buf->alloc = good_allocator_refer(src->alloc);
-    buf->size = buf->alloc->sizes[0];
-    buf->data = buf->alloc->pptrs[0];
 
     buf->rsize = src->rsize;
     buf->wsize = src->wsize;
-
 
     return buf;
 }
@@ -86,7 +108,7 @@ good_buffer_t *good_buffer_clone(good_buffer_t *src)
     assert(src);
     assert(src->data && src->size > 0);
 
-    buf = good_buffer_alloc(src->size);
+    buf = good_buffer_alloc2(src->size);
     if (!buf)
         return NULL;
 
@@ -95,7 +117,7 @@ good_buffer_t *good_buffer_clone(good_buffer_t *src)
     buf->wsize = src->wsize;
     memcpy(buf->data, src->data, src->size);
 
-    return buf;    
+    return buf;
 }
 
 int good_buffer_privatize(good_buffer_t *dst)
@@ -114,9 +136,49 @@ int good_buffer_privatize(good_buffer_t *dst)
          * 旧的指针换成新的指针。
         */
         dst->alloc = new_p;
+
         dst->data = new_p->pptrs[0];
         dst->size = new_p->sizes[0];
     }
+
+    return 0;
+}
+
+int good_buffer_resize(good_buffer_t *buf, size_t size)
+{
+    good_allocator_t *alloc_new = NULL;
+
+    assert(buf != NULL && size > 0);
+
+    if (buf->size == size)
+        return 0;
+
+    alloc_new = good_allocator_alloc2(size);
+    if (!alloc_new)
+        return -1;
+
+    /*
+     * 复制数据。
+    */
+    memcpy(alloc_new->pptrs[0], buf->data, buf->size);
+
+    /*
+     * 解除旧的内存块。
+     */
+    good_allocator_unref(&buf->alloc);
+
+    /*
+     * 绑定新的内存块。
+    */
+    buf->alloc = alloc_new;
+
+    buf->data = alloc_new->pptrs[0];
+    buf->size = alloc_new->sizes[0];
+
+    if (buf->wsize > size)
+        buf->wsize = size;
+    if (buf->rsize > size)
+        buf->rsize = size;
 
     return 0;
 }
@@ -151,8 +213,8 @@ ssize_t good_buffer_read(good_buffer_t *buf, void *data, size_t size)
     if (buf->rsize >= buf->wsize)
         GOOD_ERRNO_AND_RETURN1(ESPIPE, 0);
 
-    rsize2 = GOOD_MIN(buf->wsize - buf->rsize,size);
-    memcpy(data, GOOD_PTR2PTR(void, buf->data, buf->rsize),rsize2);
+    rsize2 = GOOD_MIN(buf->wsize - buf->rsize, size);
+    memcpy(data, GOOD_PTR2PTR(void, buf->data, buf->rsize), rsize2);
     buf->rsize += rsize2;
 
     return rsize2;
@@ -170,7 +232,7 @@ void good_buffer_drain(good_buffer_t *buf)
     if (buf->rsize > 0)
     {
         buf->wsize -= buf->rsize;
-        memmove(buf->data, GOOD_PTR2PTR(void, buf->data, buf->rsize),buf->wsize);
+        memmove(buf->data, GOOD_PTR2PTR(void, buf->data, buf->rsize), buf->wsize);
         buf->rsize = 0;
     }
 }
@@ -233,19 +295,19 @@ ssize_t good_buffer_printf(good_buffer_t *buf, const char *fmt, ...)
     return wsize2;
 }
 
-ssize_t good_buffer_import(good_buffer_t *buf,int fd)
+ssize_t good_buffer_import(good_buffer_t *buf, int fd)
 {
     struct stat attr = {0};
 
     assert(buf != NULL && fd >= 0);
 
-    if(fstat(fd,&attr)==-1)
-        GOOD_ERRNO_AND_RETURN1(EBADF,-1);
+    if (fstat(fd, &attr) == -1)
+        GOOD_ERRNO_AND_RETURN1(EBADF, -1);
 
-    return good_buffer_import_atmost(buf,fd,attr.st_size);
+    return good_buffer_import_atmost(buf, fd, attr.st_size);
 }
 
-ssize_t good_buffer_import_atmost(good_buffer_t *buf,int fd,size_t howmuch)
+ssize_t good_buffer_import_atmost(good_buffer_t *buf, int fd, size_t howmuch)
 {
     ssize_t wsize2 = 0;
     ssize_t wsize3 = 0;
@@ -267,12 +329,12 @@ ssize_t good_buffer_import_atmost(good_buffer_t *buf,int fd,size_t howmuch)
     return wsize3;
 }
 
-ssize_t good_buffer_export(good_buffer_t *buf,int fd)
+ssize_t good_buffer_export(good_buffer_t *buf, int fd)
 {
-    return good_buffer_export_atmost(buf, fd,INT16_MAX);
+    return good_buffer_export_atmost(buf, fd, INT16_MAX);
 }
 
-ssize_t good_buffer_export_atmost(good_buffer_t *buf,int fd,size_t howmuch)
+ssize_t good_buffer_export_atmost(good_buffer_t *buf, int fd, size_t howmuch)
 {
     ssize_t rsize2 = 0;
     ssize_t rsize3 = 0;
@@ -283,7 +345,7 @@ ssize_t good_buffer_export_atmost(good_buffer_t *buf,int fd,size_t howmuch)
     if (buf->rsize >= buf->wsize)
         GOOD_ERRNO_AND_RETURN1(ESPIPE, 0);
 
-    rsize2 = GOOD_MIN(buf->wsize - buf->rsize,howmuch);
+    rsize2 = GOOD_MIN(buf->wsize - buf->rsize, howmuch);
     rsize3 = good_write(fd, GOOD_PTR2PTR(void, buf->data, buf->rsize), rsize2);
     if (rsize3 > 0)
         buf->rsize += rsize3;

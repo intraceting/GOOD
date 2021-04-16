@@ -12,7 +12,7 @@
 
 void test1()
 {
-    good_buffer_t *a = good_buffer_alloc(1000);
+    good_buffer_t *a = good_buffer_alloc2(1000);
 
    good_buffer_printf(a,"12345678");
 
@@ -37,10 +37,13 @@ void test1()
 
     printf("d={%s}\n",(char*)d->data);
 
-    good_buffer_freep(&d);
-    good_heap_freep(&c);
+    good_buffer_t *d2 =good_buffer_copy(d);
 
-    good_buffer_t *e = good_buffer_alloc(1000*100000);
+    good_heap_freep((void**)&d);
+    good_heap_freep(&c);
+    good_buffer_freep(&d2);
+
+    good_buffer_t *e = good_buffer_alloc2(1000*100000);
 
     good_buffer_t *f = good_buffer_copy(e);
     good_buffer_t *g = good_buffer_copy(f);
@@ -56,26 +59,32 @@ void test1()
 
 void test2()
 {
-    good_buffer_t *a = good_buffer_alloc(10);
+    good_buffer_t *a = good_buffer_alloc2(10);
 
     printf("%lu\n",good_buffer_write(a,"aaaaaa",6));
 
     printf("%lu\n",good_buffer_printf(a,"%s","bb"));
 
-    printf("%lu\n",good_buffer_fill(a,'c'));
+    printf("\r%lu\n",good_buffer_fill(a,'c'));
 
-    printf("%lu\n",good_buffer_write(a,"dddd",6));
+    printf("%lu\n" ,good_buffer_write(a,"dddd",6));
 
     char buf[11] = {0};
 
-    printf("%lu\n",good_buffer_read(a,buf,7));
+    fprintf(stderr,"%lu\n",good_buffer_read(a,buf,7));
 
     good_buffer_drain(a);
 
-    printf("%lu\n",good_buffer_read(a,buf,7));
+    fprintf(stderr,"%lu\n",good_buffer_read(a,buf,7));
+
+    fprintf(stderr,"%lu\n",good_buffer_write(a,"abcdefg",6));
+
+    good_buffer_resize(a,1000);
 
     good_buffer_freep(&a);
 }
+
+
 
 int main(int argc, char **argv)
 {
@@ -83,6 +92,5 @@ int main(int argc, char **argv)
    test1();
 
    test2();
-
    return 0;
 }

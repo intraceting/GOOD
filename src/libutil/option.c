@@ -10,16 +10,31 @@
 
 static void _good_option_construct_cb(good_allocator_t *alloc, void *opaque)
 {
-    good_option_value_t *val = (good_option_value_t *)alloc->pptrs[GOOD_MAP_VALUE];
+    good_vector_t **val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
     good_option_t *opt = (good_option_t *)opaque;
 
+    *val = good_vector_alloc2(sizeof(char*),0);
 }
 
 static void _good_option_destructor_cb(good_allocator_t *alloc, void *opaque)
 {
-    good_option_value_t *val = (good_option_value_t *)alloc->pptrs[GOOD_MAP_VALUE];
+    good_vector_t **val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
+    char **text;
 
-}
+    if(*val == NULL)
+        return ;
+
+    for (size_t i = 0; i < (*val)->count; i++)
+    {
+        text = (char**)good_vector_at(*val, i);
+        if (text == NULL)
+            continue;
+
+        good_heap_freep((void**)text);
+    }
+
+    good_vector_freep(val);
+}   
 
 void good_option_destroy(good_option_t* opt)
 {
@@ -53,29 +68,35 @@ int good_option_init(good_option_t *opt)
 int good_option_set(good_option_t *opt, const char *key, const char *value)
 {
     good_allocator_t *alloc = NULL;
-    good_option_value_t *val = NULL;
+    good_vector_t **val = NULL;
     char *value_cp = NULL;
+    int chk;
 
     assert(opt != NULL && key != NULL && value != NULL);
     assert(key[0] != '\0' && value[0] != '\0');
+    
+    value_cp = good_heap_clone(value,strlen(value)+1);
+    if(!value_cp)
+        return -1;
 
     /*
      * 新的KEY在构造函数初始化，析构函数反初始化。
     */
-    alloc = good_map_find(&opt->table, key, strlen(key), sizeof(good_option_value_t) + GOOD_OPTION_VALUES_MAX * sizeof(char *));
+    alloc = good_map_find(&opt->table, key, strlen(key), sizeof(good_vector_t *));
     if (!alloc)
         return -1;
 
-    val = (good_option_value_t *)alloc->pptrs[GOOD_MAP_VALUE];
+    val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
+    
+    chk = good_vector_push_back(*val,&value_cp);
 
-
-    return 0;
+    return chk;
 }
 
-const good_option_value_t* good_option_get(const good_option_t *opt, const char *key)
+const good_vector_t* good_option_get(const good_option_t *opt, const char *key)
 {
     good_allocator_t *alloc = NULL;
-    good_option_value_t *val = NULL;
+    good_vector_t **val = NULL;
 
     assert(opt != NULL && key != NULL);
     assert(key[0] != '\0');
@@ -84,7 +105,7 @@ const good_option_value_t* good_option_get(const good_option_t *opt, const char 
     if (!alloc)
         GOOD_ERRNO_AND_RETURN1(EAGAIN,NULL);
 
-    val = (good_option_value_t *)alloc->pptrs[GOOD_MAP_VALUE];
+    val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
 
-    return val;
+    return *val;
 }
