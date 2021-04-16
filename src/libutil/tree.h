@@ -104,7 +104,7 @@ typedef struct _good_tree_iterator
 typedef struct _good_tree_order
 {
     /*
-     * 1 升序，降序。
+     * 顺序。!0 升序，0 降序。
     */
     int by;
 
@@ -249,7 +249,11 @@ void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char
  * 
  * 选择法排序。
  * 
- * 仅对子节点排序，如需要对树排序，需要接合迭代器。
+ * 只排序子节点，如需要对整颗树排序，需要接合迭代器。
+ * 
+ * @see good_tree_child()
+ * @see good_tree_sibling()
+ * @see good_tree_swap()
 */
 void good_tree_sort(const good_tree_t *father,good_tree_order_t *order);
 
