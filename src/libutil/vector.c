@@ -18,7 +18,7 @@ good_vector_t* good_vector_alloc(size_t type,good_allocator_t *alloc)
 
     if (alloc)
     {
-        assert(alloc->numbers > 1 && alloc->pptrs[0] != NULL && alloc->sizes[0] > type);
+        assert(alloc->numbers > 0 && alloc->pptrs[0] != NULL && alloc->sizes[0] > type);
 
         /*
          * 绑定内存块。
@@ -38,7 +38,7 @@ good_vector_t* good_vector_alloc(size_t type,good_allocator_t *alloc)
         /*
         * 允许空的。
         */
-        vec->alloc = alloc;
+        vec->alloc = vec->data = NULL;
         vec->type = type;
         vec->count = 0;
     }

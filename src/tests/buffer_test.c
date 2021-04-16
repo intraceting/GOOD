@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "libutil/buffer.h"
+#include "libutil/vector.h"
 
 void test1()
 {
@@ -97,6 +98,25 @@ void test3()
     good_buffer_freep(&c);
 }
 
+void test4()
+{
+    good_vector_t* v = good_vector_alloc2(10,0);
+    good_vector_t* v2 = good_vector_copy(v);
+    good_vector_t* v3 = good_vector_clone(v);
+
+    good_vector_freep(&v);
+    good_vector_freep(&v2);
+    good_vector_freep(&v3);
+
+    v = good_vector_alloc2(100,100);
+    v2 = good_vector_copy(v);
+    v3 = good_vector_clone(v);
+
+    good_vector_freep(&v);
+    good_vector_freep(&v2);
+    good_vector_freep(&v3);
+}
+
 int main(int argc, char **argv)
 {
    
@@ -105,6 +125,8 @@ int main(int argc, char **argv)
    test2();
 
     test3();
+
+    test4();
 
    return 0;
 }
