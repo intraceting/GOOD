@@ -6,8 +6,6 @@
  */
 #include "option.h"
 
-#define GOOD_OPTION_VALUES_MAX  1000
-
 static void _good_option_construct_cb(good_allocator_t *alloc, void *opaque)
 {
     good_vector_t **val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
