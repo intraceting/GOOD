@@ -83,20 +83,26 @@ good_buffer_t *good_buffer_copy(good_buffer_t *src)
     good_buffer_t *buf = NULL;
 
     assert(src);
-    assert(src->data && src->size > 0);
+    
+    if(src->data != NULL && src->size > 0)
+    {
+        /*
+        * 如果不支持引用，则执行克隆。
+        */
+        if (!src->alloc)
+            return buf = good_buffer_clone(src);
 
-    /*
-     * 如果不支持引用，则执行克隆。
-    */
-    if (!src->alloc)
-        return buf = good_buffer_clone(src);
+        buf = good_buffer_alloc(good_allocator_refer(src->alloc));
+        if (!buf)
+            return NULL;
 
-    buf = good_buffer_alloc(good_allocator_refer(src->alloc));
-    if (!buf)
-        return NULL;
-
-    buf->rsize = src->rsize;
-    buf->wsize = src->wsize;
+        buf->rsize = src->rsize;
+        buf->wsize = src->wsize;
+    }
+    else
+    {
+        buf = good_buffer_alloc(NULL);
+    }
 
     return buf;
 }
@@ -106,16 +112,22 @@ good_buffer_t *good_buffer_clone(good_buffer_t *src)
     good_buffer_t *buf = NULL;
 
     assert(src);
-    assert(src->data && src->size > 0);
 
-    buf = good_buffer_alloc2(src->size);
-    if (!buf)
-        return NULL;
+    if(src->data != NULL && src->size > 0)
+    {
+        buf = good_buffer_alloc2(src->size);
+        if (!buf)
+            return NULL;
 
-    buf->size = src->size;
-    buf->rsize = src->rsize;
-    buf->wsize = src->wsize;
-    memcpy(buf->data, src->data, src->size);
+        buf->size = src->size;
+        buf->rsize = src->rsize;
+        buf->wsize = src->wsize;
+        memcpy(buf->data, src->data, src->size);
+    }
+    else
+    {
+        buf = good_buffer_alloc(NULL);
+    }
 
     return buf;
 }

@@ -254,7 +254,7 @@ void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char
  * @see good_tree_sibling()
  * @see good_tree_swap()
 */
-void good_tree_sort(const good_tree_t *father,good_tree_order_t *order);
+void good_tree_sort(good_tree_t *father,good_tree_order_t *order);
 
 
 #endif //GOOD_UTIL_TREE_H

@@ -84,7 +84,18 @@ void test2()
     good_buffer_freep(&a);
 }
 
+void test3()
+{
+    good_buffer_t *a = good_buffer_alloc(NULL);
 
+    good_buffer_t *b = good_buffer_copy(a);
+
+    good_buffer_t *c = good_buffer_clone(b);
+
+    good_buffer_freep(&a);
+    good_buffer_freep(&b);
+    good_buffer_freep(&c);
+}
 
 int main(int argc, char **argv)
 {
@@ -92,5 +103,8 @@ int main(int argc, char **argv)
    test1();
 
    test2();
+
+    test3();
+
    return 0;
 }

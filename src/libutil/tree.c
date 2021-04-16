@@ -440,7 +440,7 @@ void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char
     good_heap_freep((void**)&stack);
 }
 
-void good_tree_sort(const good_tree_t *father,good_tree_order_t *order)
+void good_tree_sort(good_tree_t *father,good_tree_order_t *order)
 {
     good_tree_t *t1 = NULL;
     good_tree_t *t2 = NULL;

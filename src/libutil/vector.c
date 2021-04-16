@@ -102,13 +102,15 @@ good_vector_t *good_vector_copy(good_vector_t *src)
     good_allocator_t *alloc = NULL;
 
     assert(src);
-    assert(src->data != NULL && src->type > 0);
+    assert(src->type > 0);
 
     /*
      * 可能是空的。 
     */
     if (src->count > 0)
     {
+        assert(src->data != NULL);
+
         /*
         * 如果不支持引用，则执行克隆。
         */
@@ -137,13 +139,14 @@ good_vector_t *good_vector_clone(good_vector_t *src)
     good_vector_t *vec = NULL;
 
     assert(src);
-    assert(src->data != NULL && src->type > 0);
+    assert(src->type > 0);
 
     /*
      * 可能是空的。 
     */
     if (src->count > 0)
     {
+        assert(src->data != NULL);
 
         vec = good_vector_alloc2(src->type, src->count);
         if (!vec)
