@@ -138,7 +138,7 @@ void good_vector_set(good_vector_t *vec,size_t index,const void *data);
 /**
  * 元素取值。
 */
-void good_vector_get(good_vector_t *vec,size_t index,const void *data);
+void good_vector_get(good_vector_t *vec,size_t index,void *data);
 
 /**
  * 向末尾添加元素。

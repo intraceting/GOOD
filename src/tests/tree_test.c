@@ -11,7 +11,7 @@
 #include "libutil/tree.h"
 #include "libutil/buffer.h"
 
-int dump(size_t deep, const good_tree_t *node, void *opaque)
+int dump(size_t deep, good_tree_t *node, void *opaque)
 {
     good_tree_fprintf(stderr,deep,node,"%lu\n",node->alloc->sizes[0]);
 
@@ -20,7 +20,7 @@ int dump(size_t deep, const good_tree_t *node, void *opaque)
     return 1;
 }
 
-void traversal(const good_tree_t *root)
+void traversal(good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
@@ -33,7 +33,7 @@ void traversal(const good_tree_t *root)
     printf("\n-------------------------------------\n");
 }
 
-int dump2(size_t deep, const good_tree_t *node, void *opaque)
+int dump2(size_t deep, good_tree_t *node, void *opaque)
 {
     good_tree_fprintf(stderr,deep,node,"%d\n",*GOOD_PTR2PTR(int,node->alloc->pptrs[0],0));
 
@@ -42,7 +42,7 @@ int dump2(size_t deep, const good_tree_t *node, void *opaque)
     return 1;
 }
 
-void traversal2(const good_tree_t *root)
+void traversal2(good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 

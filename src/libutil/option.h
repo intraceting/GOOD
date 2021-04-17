@@ -36,6 +36,6 @@ int good_option_init(good_option_t *opt);
 
 int good_option_set(good_option_t *opt, const char *key, const char *value);
 
-const char* good_option_get(const good_option_t *opt, const char *key,int index);
+const good_vector_t* good_option_get(const good_option_t *opt, const char *key);
 
 #endif //GOOD_UTIL_OPTION_H

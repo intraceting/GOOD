@@ -13,7 +13,7 @@
 #include "libutil/buffer.h"
 
 
-int dump_tree(size_t deep, const good_tree_t *node, void *opaque)
+int dump_tree(size_t deep, good_tree_t *node, void *opaque)
 {
     if(deep==0)
         good_tree_fprintf(stderr,deep,node,"%s\n","map");
@@ -28,7 +28,7 @@ int dump_tree(size_t deep, const good_tree_t *node, void *opaque)
     return 1;
 }
 
-int dump_cb(const good_allocator_t *alloc, void *opaque)
+int dump_cb(good_allocator_t *alloc, void *opaque)
 {
     fprintf(stderr, "%d:%s\n",
                           *GOOD_PTR2PTR(int, alloc->pptrs[GOOD_MAP_KEY], 0),
@@ -37,7 +37,7 @@ int dump_cb(const good_allocator_t *alloc, void *opaque)
     return 1;
 }
 
-int dump2_tree(size_t deep, const good_tree_t *node, void *opaque)
+int dump2_tree(size_t deep, good_tree_t *node, void *opaque)
 {
     if(deep==0)
         good_tree_fprintf(stderr,deep,node,"%s\n","map");
@@ -52,7 +52,7 @@ int dump2_tree(size_t deep, const good_tree_t *node, void *opaque)
     return 1;
 }
 
-int dump2_cb(const good_allocator_t *alloc, void *opaque)
+int dump2_cb(good_allocator_t *alloc, void *opaque)
 {
 fprintf(stderr,"%s:%s\n",
                           GOOD_PTR2PTR(char, alloc->pptrs[GOOD_MAP_KEY], 0),
@@ -61,7 +61,7 @@ fprintf(stderr,"%s:%s\n",
     return 1;
 }
 
-void traversal_tree(const good_tree_t *root)
+void traversal_tree(good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
@@ -72,7 +72,7 @@ void traversal_tree(const good_tree_t *root)
     printf("\n-------------------------------------\n");
 }
 
-void traversal2_tree(const good_tree_t *root)
+void traversal2_tree(good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 

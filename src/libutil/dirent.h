@@ -25,6 +25,6 @@
  * @see good_tree_vfprintf()
  * 
 */
-void good_dirscan(good_tree_t *tree, const char *path, size_t depth, int onefs);
+void good_dirscan(good_tree_t *father,size_t depth, int onefs);
 
 #endif //GOOD_UTIL_DIRENT_H

@@ -66,14 +66,14 @@ int compare_cb(const good_tree_t *node1, const good_tree_t *node2, void *opaque)
     return good_strcmp(src,dst,1);
 }
 
-void test_sort(const good_tree_t *t,int by)
+void test_sort(good_tree_t *t,int by)
 {
     good_tree_order_t o = {by,compare_cb,NULL};
 
     good_tree_sort(t,&o);
 }
 
-int dump2(size_t deep, const good_tree_t *node, void *opaque)
+int dump2(size_t deep, good_tree_t *node, void *opaque)
 {
 
     test_sort(node,0);
@@ -95,7 +95,7 @@ int dump2(size_t deep, const good_tree_t *node, void *opaque)
     return 1;
 }
 
-void traversal(const good_tree_t *root)
+void traversal(good_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
@@ -110,19 +110,19 @@ void test_dirscan()
     good_tree_t * t = good_tree_alloc3(PATH_MAX);
 
  //   strcpy(t->alloc->pptrs[0],"/tmp/");
- //   good_dirscan(t,t->alloc->pptrs[0],100,0);
+ //   good_dirscan(t,100,0);
 
 //    strcpy(t->alloc->pptrs[0],"/proc/");
- //   good_dirscan(t,t->alloc->pptrs[0],5,0);
+ //   good_dirscan(t,5,0);
 
     strcpy(t->alloc->pptrs[0],"/usr");
-    good_dirscan(t,t->alloc->pptrs[0],100,0);
+    good_dirscan(t,100,0);
 
  //   strcpy(t->alloc->pptrs[0],"/mnt");
- //   good_dirscan(t,t->alloc->pptrs[0],100,1);
+ //   good_dirscan(t,100,1);
 
   //  strcpy(t->alloc->pptrs[0],"/tmp");
-  //  good_dirscan(t,t->alloc->pptrs[0],1,0);
+  //  good_dirscan(t,1,0);
 
     traversal(t);
 

@@ -315,7 +315,7 @@ good_tree_t *good_tree_alloc3(size_t size)
     return good_tree_alloc2(&size,1);
 }
 
-void good_tree_scan(const good_tree_t *root,good_tree_iterator_t* it)
+void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it)
 {
     good_tree_t *node = NULL;
     good_tree_t *child = NULL;

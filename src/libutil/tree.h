@@ -87,7 +87,7 @@ typedef struct _good_tree_iterator
      * 
      * @return -1 终止，0 忽略孩子，1 继续。
     */
-    int (*dump_cb)(size_t depth, const good_tree_t *node, void *opaque);
+    int (*dump_cb)(size_t depth, good_tree_t *node, void *opaque);
 
     /**
      * 环境指针。
@@ -219,7 +219,7 @@ good_tree_t *good_tree_alloc3(size_t size);
  * 深度优先遍历节点。
  * 
 */
-void good_tree_scan(const good_tree_t *root,good_tree_iterator_t* it);
+void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it);
 
 /**
  * 格式化输出。

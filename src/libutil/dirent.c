@@ -7,7 +7,7 @@
 #include "dirent.h"
 
 
-void good_dirscan(good_tree_t *tree, const char *path, size_t depth,int onefs)
+void good_dirscan(good_tree_t *father,size_t depth,int onefs)
 {
     DIR *f_dir = NULL;
     struct dirent *c_dir = NULL;
@@ -15,15 +15,16 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t depth,int onefs)
     struct stat c_attr;
     good_tree_t *node = NULL;
 
-    assert(tree && path);
+    assert(father);
+    assert(father->alloc->pptrs[0][0] != '\0');
 
-    if (lstat(path, &f_attr) == -1)
+    if (lstat(father->alloc->pptrs[0], &f_attr) == -1)
         return;
 
     if (!S_ISDIR(f_attr.st_mode))
         GOOD_ERRNO_AND_RETURN0(ENOTDIR);
 
-    f_dir = opendir(path);
+    f_dir = opendir(father->alloc->pptrs[0]);
     if (!f_dir)
         return;
 
@@ -36,13 +37,13 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t depth,int onefs)
         if (!node)
             break;
 
-        good_dirdir(node->alloc->pptrs[0], path);
+        good_dirdir(node->alloc->pptrs[0], father->alloc->pptrs[0]);
         good_dirdir(node->alloc->pptrs[0], c_dir->d_name);
       
         /*
          * 加入到树节点。
         */
-        good_tree_insert2(tree, node, 0);
+        good_tree_insert2(father, node, 0);
 
         /*
          * node->d_type 有些文件系统有BUG未设置有效值，因此不能直接使用，这里用替待方案。
@@ -52,7 +53,7 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t depth,int onefs)
             good_tree_free(&node);
             break;
         }
-
+        
         /*
          * 如果不是目录，下面的代码不需要执行。
         */
@@ -74,7 +75,7 @@ void good_dirscan(good_tree_t *tree, const char *path, size_t depth,int onefs)
         /*
          * 递归
         */
-        good_dirscan(node, node->alloc->pptrs[0], depth - 1, onefs);
+        good_dirscan(node, depth - 1, onefs);
     }
 
     if (f_dir)

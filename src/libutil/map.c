@@ -172,7 +172,7 @@ void good_map_erase(good_map_t *map, const void *key, size_t ksize)
     }
 }
 
-static int _good_map_scan_cb(size_t depth, const good_tree_t *node, void *opaque)
+static int _good_map_scan_cb(size_t depth, good_tree_t *node, void *opaque)
 {
     good_map_t *map = (good_map_t *)opaque;
 

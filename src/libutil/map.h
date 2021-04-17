@@ -57,7 +57,7 @@ typedef struct _good_map
      * 
      * @return -1 终止，1 继续。
     */
-    int (*dump_cb)(const good_allocator_t *alloc, void *opaque);
+    int (*dump_cb)(good_allocator_t *alloc, void *opaque);
 
     /**
     * 环境指针。
@@ -67,7 +67,7 @@ typedef struct _good_map
 }good_map_t;
 
 /**
- * MAP索引
+ * MAP的索引。
 */
 enum _good_map_index
 {

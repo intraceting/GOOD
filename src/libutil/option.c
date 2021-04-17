@@ -91,7 +91,7 @@ int good_option_set(good_option_t *opt, const char *key, const char *value)
     return chk;
 }
 
-const char* good_option_get(const good_option_t *opt, const char *key,int index)
+const good_vector_t* good_option_get(const good_option_t *opt, const char *key)
 {
     good_allocator_t *alloc = NULL;
     good_vector_t **val = NULL;
@@ -105,7 +105,7 @@ const char* good_option_get(const good_option_t *opt, const char *key,int index)
 
     val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
 
-    if((*val)->count<=)
+  //  if((*val)->count<=)
 
     return *val;
 }

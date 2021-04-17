@@ -245,7 +245,7 @@ void good_vector_set(good_vector_t *vec,size_t index,const void *data)
     memcpy(p,data,vec->type);
 }
 
-void good_vector_get(good_vector_t *vec,size_t index,const void *data)
+void good_vector_get(good_vector_t *vec,size_t index,void *data)
 {
     void *p = good_vector_at(vec,index);
 
