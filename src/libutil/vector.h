@@ -131,6 +131,16 @@ int good_vector_resize(good_vector_t *vec,size_t count);
 void* good_vector_at(good_vector_t *vec,size_t index);
 
 /**
+ * 元素赋值。
+*/
+void good_vector_set(good_vector_t *vec,size_t index,const void *data);
+
+/**
+ * 元素取值。
+*/
+void good_vector_get(good_vector_t *vec,size_t index,const void *data);
+
+/**
  * 向末尾添加元素。
  *
  * @return 0 成功，-1 失败。

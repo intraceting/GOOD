@@ -45,11 +45,12 @@ good_buffer_t *good_buffer_alloc2(size_t size)
     good_buffer_t *buf = NULL;
     good_allocator_t *alloc = NULL;
 
-    assert(size > 0);
-
-    alloc = good_allocator_alloc2(size);
-    if (!alloc)
-        return NULL;
+    if(size > 0)
+    {
+        alloc = good_allocator_alloc2(size);
+        if (!alloc)
+            goto final_error;
+    }
 
     buf = good_buffer_alloc(alloc);
     if (!buf)

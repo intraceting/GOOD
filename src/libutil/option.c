@@ -73,15 +73,15 @@ int good_option_set(good_option_t *opt, const char *key, const char *value)
     assert(opt != NULL && key != NULL && value != NULL);
     assert(key[0] != '\0' && value[0] != '\0');
     
-    value_cp = good_heap_clone(value,strlen(value)+1);
-    if(!value_cp)
-        return -1;
-
     /*
      * 新的KEY在构造函数初始化，析构函数反初始化。
     */
     alloc = good_map_find(&opt->table, key, strlen(key), sizeof(good_vector_t *));
     if (!alloc)
+        return -1;
+
+    value_cp = good_heap_clone(value,strlen(value)+1);
+    if(!value_cp)
         return -1;
 
     val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
@@ -91,7 +91,7 @@ int good_option_set(good_option_t *opt, const char *key, const char *value)
     return chk;
 }
 
-const good_vector_t* good_option_get(const good_option_t *opt, const char *key)
+const char* good_option_get(const good_option_t *opt, const char *key,int index)
 {
     good_allocator_t *alloc = NULL;
     good_vector_t **val = NULL;
@@ -104,6 +104,8 @@ const good_vector_t* good_option_get(const good_option_t *opt, const char *key)
         GOOD_ERRNO_AND_RETURN1(EAGAIN,NULL);
 
     val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
+
+    if((*val)->count<=)
 
     return *val;
 }
