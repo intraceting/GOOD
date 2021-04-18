@@ -223,7 +223,7 @@ int good_accept(int fd, good_sockaddr_t *addr)
     /*
      * 添加个非必要标志，忽略可能的出错信息。
     */
-    good_fflag_add(sub_fd, SOCK_CLOEXEC);
+    good_fflag_add(sub_fd, O_CLOEXEC);
 
     return sub_fd;
 }

@@ -6,7 +6,7 @@
  */
 #include "vector.h"
 
-good_vector_t* good_vector_alloc(size_t type,good_allocator_t *alloc)
+good_vector_t *good_vector_alloc(size_t type, good_allocator_t *alloc)
 {
     good_vector_t *vec = NULL;
 
@@ -46,7 +46,7 @@ good_vector_t* good_vector_alloc(size_t type,good_allocator_t *alloc)
     return vec;
 }
 
-good_vector_t *good_vector_alloc2(size_t type,size_t count)
+good_vector_t *good_vector_alloc2(size_t type, size_t count)
 {
     good_vector_t *vec = NULL;
     good_allocator_t *alloc = NULL;
@@ -67,7 +67,7 @@ good_vector_t *good_vector_alloc2(size_t type,size_t count)
         alloc = NULL;
     }
 
-    vec = good_vector_alloc(type,alloc);
+    vec = good_vector_alloc(type, alloc);
     if (!vec)
         goto final_error;
 
@@ -129,7 +129,6 @@ good_vector_t *good_vector_copy(good_vector_t *src)
     {
         vec = good_vector_alloc(src->type, 0);
     }
-
 
     return vec;
 }
@@ -205,7 +204,7 @@ int good_vector_resize(good_vector_t *vec, size_t count)
     /*
      * 复制数据。
     */
-    memcpy(alloc_new->pptrs[0], vec->data, GOOD_MIN(vec->count,count) * vec->type);
+    memcpy(alloc_new->pptrs[0], vec->data, GOOD_MIN(vec->count, count) * vec->type);
 
     /*
      * 解除旧的内存块。
@@ -236,22 +235,22 @@ void *good_vector_at(good_vector_t *vec, size_t index)
     return GOOD_PTR2PTR(void, vec->data, index * vec->type);
 }
 
-void good_vector_set(good_vector_t *vec,size_t index,const void *data)
+void good_vector_set(good_vector_t *vec, size_t index, const void *data)
 {
-    void *p = good_vector_at(vec,index);
+    void *p = good_vector_at(vec, index);
 
     assert(p != NULL);
 
-    memcpy(p,data,vec->type);
+    memcpy(p, data, vec->type);
 }
 
-void good_vector_get(good_vector_t *vec,size_t index,void *data)
+void good_vector_get(good_vector_t *vec, size_t index, void *data)
 {
-    void *p = good_vector_at(vec,index);
+    void *p = good_vector_at(vec, index);
 
     assert(p != NULL);
 
-    memcpy(data,p,vec->type);
+    memcpy(data, p, vec->type);
 }
 
 int good_vector_push_back(good_vector_t *vec, const void *data)

@@ -26,7 +26,7 @@ typedef struct _good_vector
     /**
      * 内存指针。
     */
-    void* data;
+    void *data;
 
     /**
      * 元素类型。
@@ -38,7 +38,6 @@ typedef struct _good_vector
      * 元素数量。
     */
     size_t count;
-
 
 } good_vector_t;
 
@@ -54,7 +53,7 @@ typedef struct _good_vector
  * @see good_heap_freep()
  * 
 */
-good_vector_t* good_vector_alloc(size_t type,good_allocator_t *alloc);
+good_vector_t *good_vector_alloc(size_t type, good_allocator_t *alloc);
 
 /**
  * 创建。
@@ -68,7 +67,7 @@ good_vector_t* good_vector_alloc(size_t type,good_allocator_t *alloc);
  * @see good_allocator_alloc2()
  * @see good_allocator_unref()
 */
-good_vector_t* good_vector_alloc2(size_t type,size_t count);
+good_vector_t *good_vector_alloc2(size_t type, size_t count);
 
 /**
  * 释放。
@@ -119,7 +118,7 @@ int good_vector_privatize(good_vector_t *dst);
  * 
  * @see  memcpy()
 */
-int good_vector_resize(good_vector_t *vec,size_t count);
+int good_vector_resize(good_vector_t *vec, size_t count);
 
 /**
  * 定位元素。
@@ -128,17 +127,17 @@ int good_vector_resize(good_vector_t *vec,size_t count);
  * 
  * @return !NULL(0) 元素的指针，NULL(0) 失败。
 */
-void* good_vector_at(good_vector_t *vec,size_t index);
+void *good_vector_at(good_vector_t *vec, size_t index);
 
 /**
  * 元素赋值。
 */
-void good_vector_set(good_vector_t *vec,size_t index,const void *data);
+void good_vector_set(good_vector_t *vec, size_t index, const void *data);
 
 /**
  * 元素取值。
 */
-void good_vector_get(good_vector_t *vec,size_t index,void *data);
+void good_vector_get(good_vector_t *vec, size_t index, void *data);
 
 /**
  * 向末尾添加元素。
@@ -149,13 +148,12 @@ void good_vector_get(good_vector_t *vec,size_t index,void *data);
  * @see good_vector_at()
  * @see memcpy()
 */
-int good_vector_push_back(good_vector_t *vec,const void *data);
+int good_vector_push_back(good_vector_t *vec, const void *data);
 
 /**
  * 弹出末尾的元素。
  * 
 */
 void good_vector_pop_back(good_vector_t *vec);
-
 
 #endif //GOOD_UTIL_VECTOR_H

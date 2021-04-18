@@ -83,7 +83,7 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
             *GOOD_PTR2PTR(uint64_t, it->alloc->pptrs[GOOD_MAP_BUCKET], 0) = bucket;
 
             /*
-             * 桶加和入到表格中。
+             * 桶加入到表格中。
             */
             good_tree_insert2(map->table, it, 0);
             map->table->alloc->pptrs[bucket] = (uint8_t *)it;
