@@ -10,27 +10,76 @@
 #include <string.h>
 #include "libutil/option.h"
 
+
+int dump2(size_t deep, good_tree_t *node, void *opaque)
+{
+    if(deep==0)
+        good_tree_fprintf(stderr,deep,node,"OPT\n");
+    if(deep==1)
+        good_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[GOOD_OPTION_KEY]);
+    if(deep==2)
+        good_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[GOOD_OPTION_VALUE]);
+
+    return 1;
+}
+
+void traversal(good_tree_t *root)
+{
+    printf("\n-------------------------------------\n");
+
+    good_tree_iterator_t it = {0,dump2,NULL};
+    good_tree_scan(root,&it);
+
+    printf("\n-------------------------------------\n");
+}
+
 int main(int argc, char **argv)
 {
-    good_option_t t = {0};
+    good_tree_t *t = good_tree_alloc(NULL);
 
-    good_option_init(&t);
 
-    good_option_set(&t,"aaa","bbb");
+    good_option_set(t,"-","bbb");
+    good_option_set(t,"-","ccc");
+    good_option_set(t,"-","fff");
+    good_option_set(t,"-","eee");
+    good_option_set(t,"-","www");
 
-    good_option_set(&t,"aaa","ccc");
-    good_option_set(&t,"aaa","ccc");
-    good_option_set(&t,"aaa","ccc");
-    good_option_set(&t,"aaa","ccc");
+    assert(good_option_count(t,"-")==5);
 
-    good_option_set(&t,"bbb","ccc");
-    good_option_set(&t,"bbb","ccc");
-    good_option_set(&t,"bbb","ccc");
-    good_option_set(&t,"bbb","ccc");
-    good_option_set(&t,"bbb","ccc");
+    good_option_set(t,"-bbb","123");
+    good_option_set(t,"-bbb","456");
+    good_option_set(t,"-bbb","789");
+    good_option_set(t,"-bbb","543");
+    good_option_set(t,"-bbb","854");
+
+    assert(good_option_count(t,"-bbb")==5);
+
+    good_option_set(t,"-ddd",NULL);
+
+    assert(good_option_count(t,"-ddd")==0);
+
+    assert(good_option_count(t,"-ccc")==-1);
+
+    traversal(t);
+
+    const char* p = good_option_get(t,"-",0,NULL);
+
+    printf("p=%s\n",p);
+
+    const char* p1 = good_option_get(t,"-bbb",1,NULL);
+
+    printf("p1=%s\n",p1);
+
+    const char* p2 = good_option_get(t,"-ccc",1,NULL);
+
+    assert(p2==NULL);
+
+    p2 = good_option_get(t,"-ccc",1,"f");
+
+    assert(p2[0]=='f');
  
 
-    good_option_destroy(&t);
+    good_tree_free(&t);
 
     return 0;
 }

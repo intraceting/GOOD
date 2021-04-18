@@ -11,47 +11,49 @@
 #include "tree.h"
 
 /**
- * 选项。
- * 
- * 支持一对多键值组合。
+ * 选项的字段。
 */
-typedef struct _good_option
+enum _good_option_field
 {
     /**
-     * 表格。
-     * 
-     * @note 尽量不要直接修改。
-     * 
-     * @see good_tree_scan()
-     * @see good_tree_fprintf()
-     * @see good_tree_vfprintf()
+     * Key 字段索引。
     */
-    good_tree_t *table;
+   GOOD_OPTION_KEY = 0,
+#define GOOD_OPTION_KEY     GOOD_OPTION_KEY
 
     /**
-     * KEY比较函数。
-     * 
-     * @see good_map_compare()
+     * Value 字段索引。
     */
-    int (*compare_cb)(const void *key1, const void *key2,void *opaque);
+   GOOD_OPTION_VALUE = 0
+#define GOOD_OPTION_VALUE   GOOD_OPTION_VALUE
 
-} good_option_t;
+};
 
 /**
- * 比较函数。
+ * 配置一个选项。
  * 
- * @return > 0 is data1 > data2，0 is data1 == data2，< 0 is data1 < data2。
+ * @param value 值的指针，可以为NULL0)。
  * 
- * @see memcmp()
+ * 支持一对多键值组合，相同键的值次序由添加顺序决定。
 */
-int good_option_compare(const void *data1, const void *data2,void *opaque);
+int good_option_set(good_tree_t *opt, const char *key, const char *value);
 
-void good_option_destroy(good_option_t *opt);
+/**
+ * 获取一个选项的值。
+ * 
+ * @param defval 默认值，可以为NULL(0)。
+ * 
+ * @return !NULL(0) 成功(值的指针)， NULL(0) 失败(键不存在)。
+*/
+const char* good_option_get(good_tree_t *opt, const char *key,size_t index,const char* defval);
 
-int good_option_init(good_option_t *opt);
-
-int good_option_set(good_option_t *opt, const char *key, const char *value);
-
-const char* good_option_get(const good_option_t *opt, const char *key,size_t index,const char* defval);
+/**
+ * 统计选项值的数量。
+ * 
+ * @param defval 默认值，可以为NULL(0)。
+ * 
+ * @return >=0 成功(值的数量)，< 0 失败(键不存在)。
+*/
+ssize_t good_option_count(good_tree_t *opt, const char *key);
 
 #endif //GOOD_UTIL_OPTION_H

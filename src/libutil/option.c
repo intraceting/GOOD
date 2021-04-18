@@ -6,90 +6,135 @@
  */
 #include "option.h"
 
-static void _good_option_construct_cb(good_allocator_t *alloc, void *opaque)
+static good_tree_t *_good_option_find_key(good_tree_t *opt, const char *key,int create)
 {
-    good_vector_t **val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
-    good_option_t *opt = (good_option_t *)opaque;
-
-    *val = good_vector_alloc2(sizeof(char*),0);
-}
-
-static void _good_option_destructor_cb(good_allocator_t *alloc, void *opaque)
-{
-    good_vector_t **val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
-    char **text;
-
-    if(*val == NULL)
-        return ;
-
-    for (size_t i = 0; i < (*val)->count; i++)
-    {
-        text = (char**)good_vector_at(*val, i);
-        if (text == NULL)
-            continue;
-
-        good_heap_freep((void**)text);
-    }
-
-    good_vector_freep(val);
-}   
-
-int good_option_compare(const void *data1, const void *data2,void *opaque)
-{
-    return good_strcmp(data1,data2,1);
-}
-
-void good_option_destroy(good_option_t* opt)
-{
-    assert(opt != NULL);
-
-    good_tree_free(&opt->table);
-
-    /*
-     * fill zero.
-    */
-    memset(opt,0,sizeof(*opt));
-}
-
-int good_option_init(good_option_t *opt)
-{
-    assert(opt);
-
-    /*
-     * 创建树节点，用于表格。
-    */
-    opt->table = good_tree_alloc(NULL);
-
-    if (!opt->table)
-        GOOD_ERRNO_AND_RETURN1(ENOMEM, -1);
-
-    /*
-     * 如果未指定，则启用默认函数。
-    */
-    if (!opt->compare_cb)
-        opt->compare_cb = good_option_compare;
-
-    return 0;
-}
-
-static good_tree_t * _good_option_find(good_option_t *opt, const char *key)
-{
-
-}
-
-int good_option_set(good_option_t *opt, const char *key, const char *value)
-{
-    good_allocator_t *alloc = NULL;
+    good_tree_t *it = NULL;
     int chk;
 
-    assert(opt != NULL && key != NULL && value != NULL);
-    assert(key[0] != '\0' && value[0] != '\0');
-    
+    assert(opt != NULL && key != NULL);
+
+    it = good_tree_child(opt,1);
+    while(it)
+    {
+        chk = good_strcmp(it->alloc->pptrs[GOOD_OPTION_KEY], key, 1);
+        if (chk == 0)
+            break;
+
+        it = good_tree_sibling(it,0);
+    }
+
+    if(it == NULL && create !=0 )
+    {
+        it = good_tree_alloc3(strlen(key)+1);
+
+        if(it)
+        {
+            strcpy(it->alloc->pptrs[GOOD_OPTION_KEY],key);
+            good_tree_insert2(opt,it,0);
+        }
+    }
+
+    return it;
+}
+
+static good_tree_t *_good_option_find_value(good_tree_t *key,size_t index)
+{
+    good_tree_t *it = NULL;
+    size_t chk;
+
+    assert(key != NULL);
+
+    it = good_tree_child(key,1);
+    while(it)
+    {
+        if (chk++ == index)
+            break;
+
+        it = good_tree_sibling(it,0);
+    }
+
+    return it;
+}
+
+static size_t _good_option_count_value(good_tree_t *key)
+{
+    good_tree_t *it = NULL;
+    size_t chk = 0;
+
+    assert(key != NULL);
+
+    it = good_tree_child(key,1);
+    while(it)
+    {
+        chk +=1;
+
+        it = good_tree_sibling(it,0);
+    }
 
     return chk;
 }
 
-const char* good_option_get(const good_option_t *opt, const char *key,size_t index,const char* defval)
+int good_option_set(good_tree_t *opt, const char *key, const char *value)
 {
+    good_tree_t *it_key = NULL;
+    good_tree_t *it_val = NULL;
+
+    assert(opt != NULL && key != NULL);
+
+    assert(key[0] != '\0');
+
+    it_key = _good_option_find_key(opt,key,1);
+    if(!it_key)
+        GOOD_ERRNO_AND_RETURN1(ENOMEM,-1);
+
+    /*
+     * 允许没有值。
+    */
+    if (value == NULL || value[0] == '\0')
+        return 0;
     
+    it_val = good_tree_alloc3(strlen(value) + 1);
+    if (!it_val)
+        GOOD_ERRNO_AND_RETURN1(ENOMEM, -1);
+
+    strcpy(it_val->alloc->pptrs[GOOD_OPTION_VALUE], value);
+    good_tree_insert2(it_key, it_val, 0);
+    
+
+    return 0;
+}
+
+const char* good_option_get(good_tree_t *opt, const char *key,size_t index,const char* defval)
+{
+    good_tree_t *it_key = NULL;
+    good_tree_t *it_val = NULL;
+
+    assert(opt != NULL && key != NULL);
+
+    assert(key[0] != '\0');
+
+    it_key = _good_option_find_key(opt,key,0);
+    if(!it_key)
+        GOOD_ERRNO_AND_RETURN1(EAGAIN,defval);
+
+    it_val = _good_option_find_value(it_key,index);
+    if(!it_val)
+        GOOD_ERRNO_AND_RETURN1(EAGAIN,defval);
+
+    return it_val->alloc->pptrs[GOOD_OPTION_VALUE];
+}
+
+ssize_t good_option_count(good_tree_t *opt, const char *key)
+{
+    good_tree_t *it_key = NULL;
+
+    assert(opt != NULL && key != NULL);
+
+    assert(key[0] != '\0');
+
+    it_key = _good_option_find_key(opt,key,0);
+    if(!it_key)
+        GOOD_ERRNO_AND_RETURN1(EAGAIN,-1);
+
+    return _good_option_count_value(it_key);
 }

@@ -16,13 +16,13 @@
 enum _good_dirent_field
 {
     /**
-     * 名字(包括路径)。
+     * 名字(包括路径) 字段索引。
     */
    GOOD_DIRENT_NAME = 0,
 #define GOOD_DIRENT_NAME    GOOD_DIRENT_NAME
 
     /**
-     * 状态。
+     * 状态 字段索引。
     */
    GOOD_DIRENT_STAT = 1
 #define GOOD_DIRENT_STAT    GOOD_DIRENT_STAT

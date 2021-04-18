@@ -72,19 +72,19 @@ typedef struct _good_map
 enum _good_map_field
 {
     /**
-     * Bucket 索引
+     * Bucket 字段索引。
     */
    GOOD_MAP_BUCKET = 0,
 #define GOOD_MAP_BUCKET     GOOD_MAP_BUCKET
 
     /**
-     * Key 索引
+     * Key 字段索引。
     */
    GOOD_MAP_KEY = 0,
 #define GOOD_MAP_KEY        GOOD_MAP_KEY
 
     /**
-     * Value 索引
+     * Value 字段索引。
     */
    GOOD_MAP_VALUE = 1
 #define GOOD_MAP_VALUE      GOOD_MAP_VALUE
