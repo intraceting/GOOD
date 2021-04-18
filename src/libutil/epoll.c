@@ -51,30 +51,30 @@ int good_epoll_drop(int efd, int fd)
     return epoll_ctl(efd,EPOLL_CTL_DEL,fd, NULL);
 }
 
-int good_epoll_wait(int efd,struct epoll_event * event,int max,int timeout)
+int good_epoll_wait(int efd,struct epoll_event * events,int max,int timeout)
 {
     int chk;
     uint32_t tmp;
-    assert(efd >= 0 && event != NULL && max > 0);
+    assert(efd >= 0 && events != NULL && max > 0);
 
-    chk = epoll_wait(efd,event,max,timeout);
+    chk = epoll_wait(efd,events,max,timeout);
 
     /*
      * 转换事件。
     */
     for (int i = 0; i < chk; i++)
     {
-        tmp = event[i].events;
-        event[i].events = 0;
+        tmp = events[i].events;
+        events[i].events = 0;
 
         if(tmp & EPOLLIN)
-            event[i].events |= GOOD_EPOLL_INPUT;
+            events[i].events |= GOOD_EPOLL_INPUT;
         if(tmp & EPOLLPRI)
-            event[i].events |= GOOD_EPOLL_INOOB;
+            events[i].events |= GOOD_EPOLL_INOOB;
         if(tmp & EPOLLOUT)
-            event[i].events |= GOOD_EPOLL_OUTPUT;
+            events[i].events |= GOOD_EPOLL_OUTPUT;
         if(tmp & (EPOLLERR | EPOLLHUP | EPOLLRDHUP))
-            event[i].events |= GOOD_EPOLL_ERROR;
+            events[i].events |= GOOD_EPOLL_ERROR;
     }
 
     return chk;
