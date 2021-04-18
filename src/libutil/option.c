@@ -34,11 +34,16 @@ static void _good_option_destructor_cb(good_allocator_t *alloc, void *opaque)
     good_vector_freep(val);
 }   
 
+int good_option_compare(const void *data1, const void *data2,void *opaque)
+{
+    return good_strcmp(data1,data2,1);
+}
+
 void good_option_destroy(good_option_t* opt)
 {
     assert(opt != NULL);
 
-    good_map_destroy(&opt->table);
+    good_tree_free(&opt->table);
 
     /*
      * fill zero.
@@ -48,64 +53,43 @@ void good_option_destroy(good_option_t* opt)
 
 int good_option_init(good_option_t *opt)
 {
-    assert(opt != NULL);
-
-    if(good_map_init(&opt->table,100) != 0)
-        return -1;
+    assert(opt);
 
     /*
-     * 注册析构函数。
+     * 创建树节点，用于表格。
     */
-    opt->table.construct_cb = _good_option_construct_cb;
-    opt->table.destructor_cb = _good_option_destructor_cb;
-    opt->table.opaque = opt;
+    opt->table = good_tree_alloc(NULL);
+
+    if (!opt->table)
+        GOOD_ERRNO_AND_RETURN1(ENOMEM, -1);
+
+    /*
+     * 如果未指定，则启用默认函数。
+    */
+    if (!opt->compare_cb)
+        opt->compare_cb = good_option_compare;
 
     return 0;
+}
+
+static good_tree_t * _good_option_find(good_option_t *opt, const char *key)
+{
+
 }
 
 int good_option_set(good_option_t *opt, const char *key, const char *value)
 {
     good_allocator_t *alloc = NULL;
-    good_vector_t **val = NULL;
-    char *value_cp = NULL;
     int chk;
 
     assert(opt != NULL && key != NULL && value != NULL);
     assert(key[0] != '\0' && value[0] != '\0');
     
-    /*
-     * 新的KEY在构造函数初始化，析构函数反初始化。
-    */
-    alloc = good_map_find(&opt->table, key, strlen(key), sizeof(good_vector_t *));
-    if (!alloc)
-        return -1;
-
-    value_cp = good_heap_clone(value,strlen(value)+1);
-    if(!value_cp)
-        return -1;
-
-    val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
-    
-    chk = good_vector_push_back(*val,&value_cp);
 
     return chk;
 }
 
-const good_vector_t* good_option_get(const good_option_t *opt, const char *key)
+const char* good_option_get(const good_option_t *opt, const char *key,size_t index,const char* defval)
 {
-    good_allocator_t *alloc = NULL;
-    good_vector_t **val = NULL;
-
-    assert(opt != NULL && key != NULL);
-    assert(key[0] != '\0');
-
-    alloc = good_map_find((good_map_t*)&opt->table, key, strlen(key), 0);
-    if (!alloc)
-        GOOD_ERRNO_AND_RETURN1(EAGAIN,NULL);
-
-    val = (good_vector_t **)alloc->pptrs[GOOD_MAP_VALUE];
-
-  //  if((*val)->count<=)
-
-    return *val;
+    
 }
