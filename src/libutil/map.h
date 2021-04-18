@@ -67,9 +67,9 @@ typedef struct _good_map
 }good_map_t;
 
 /**
- * MAP的索引。
+ * MAP的字段。
 */
-enum _good_map_index
+enum _good_map_field
 {
     /**
      * Bucket 索引

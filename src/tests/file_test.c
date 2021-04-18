@@ -60,8 +60,8 @@ void test_dir()
 
 int compare_cb(const good_tree_t *node1, const good_tree_t *node2, void *opaque)
 {
-    char* src = GOOD_PTR2PTR(char, node1->alloc->pptrs[0], 0);
-    char* dst = GOOD_PTR2PTR(char, node2->alloc->pptrs[0], 0);
+    char* src = GOOD_PTR2PTR(char, node1->alloc->pptrs[GOOD_DIRENT_NAME], 0);
+    char* dst = GOOD_PTR2PTR(char, node2->alloc->pptrs[GOOD_DIRENT_NAME], 0);
 
     return good_strcmp(src,dst,1);
 }
@@ -78,20 +78,18 @@ int dump2(size_t deep, good_tree_t *node, void *opaque)
 
     test_sort(node,0);
 
+    char *path = (char*)(node->alloc->pptrs[GOOD_DIRENT_NAME]);
+    struct stat *stat = (struct stat *)(node->alloc->pptrs[GOOD_DIRENT_STAT]);
+
+
+    char name[NAME_MAX] ={0};
+    good_basename(name,path);
+
 #if 1
-    if(deep==0)
-        good_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[0]);
-    else 
-    {
-        char name[NAME_MAX] ={0};
-        good_basename(name,node->alloc->pptrs[0]);
-        good_tree_fprintf(stderr,deep,node,"%s\n",name);
-    }
+    good_tree_fprintf(stderr,deep,node,"%s%s\n",name,(S_ISDIR(stat->st_mode)?"/":""));
 #else 
-    fprintf(stderr,"%s\n",node->alloc->pptrs[0]);
-#endif 
-
-
+    good_tree_fprintf(stderr,deep,node,"%s(%s)\n",name,path);
+#endif
     return 1;
 }
 
@@ -107,21 +105,22 @@ void traversal(good_tree_t *root)
 
 void test_dirscan()
 {
-    good_tree_t * t = good_tree_alloc3(PATH_MAX);
+    size_t sizes[2] = {PATH_MAX,sizeof(struct stat)};
+    good_tree_t * t = good_tree_alloc2(sizes,2);
 
- //   strcpy(t->alloc->pptrs[0],"/tmp/");
- //   good_dirscan(t,100,0);
+   strcpy(t->alloc->pptrs[GOOD_DIRENT_NAME],"/tmp/");
+   good_dirscan(t,100,0);
 
-//    strcpy(t->alloc->pptrs[0],"/proc/");
+//    strcpy(t->alloc->pptrs[GOOD_DIRENT_NAME],"/proc/");
  //   good_dirscan(t,5,0);
 
-    strcpy(t->alloc->pptrs[0],"/usr");
-    good_dirscan(t,100,0);
+ //   strcpy(t->alloc->pptrs[GOOD_DIRENT_NAME],"/usr");
+ //   good_dirscan(t,100,0);
 
- //   strcpy(t->alloc->pptrs[0],"/mnt");
+ //   strcpy(t->alloc->pptrs[GOOD_DIRENT_NAME],"/mnt");
  //   good_dirscan(t,100,1);
 
-  //  strcpy(t->alloc->pptrs[0],"/tmp");
+ //   strcpy(t->alloc->pptrs[GOOD_DIRENT_NAME],"/tmp");
   //  good_dirscan(t,1,0);
 
     traversal(t);
