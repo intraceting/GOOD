@@ -83,6 +83,11 @@ int main(int argc, char **argv)
     char buf[100] = {0};
 
     good_option_snprintf(buf,100,t);
+
+
+    good_option_parse(t,argc,argv,"--");
+
+    good_option_fprintf(stderr,t);
  
 
     good_tree_free(&t);

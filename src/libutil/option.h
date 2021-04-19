@@ -70,4 +70,10 @@ ssize_t good_option_fprintf(FILE *fp,good_tree_t *opt);
 */
 ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt);
 
+/**
+ * 解析参数选项。
+*/
+void good_option_parse(good_tree_t *opt,int argc, char* argv[],const char *prefix);
+
+
 #endif //GOOD_UTIL_OPTION_H

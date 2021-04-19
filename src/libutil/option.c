@@ -192,3 +192,28 @@ ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt)
     
     return wsize;
 }
+
+void good_option_parse(good_tree_t *opt,int argc, char* argv[],const char *prefix)
+{
+    int prefix_len = 0;
+    char *it_key = NULL;
+
+    assert(opt != NULL && argc > 0 && argv != NULL && prefix != NULL);
+
+    assert(argv[0] != NULL && argv[0][0] != '\0' && prefix[0] != '\0');
+
+    prefix_len = strlen(prefix);
+    it_key = prefix;
+
+    for (int i = 0; i < argc;)
+    {
+        if (good_strncmp(argv[i], prefix, prefix_len, 1) != 0)
+        {
+            good_option_set(opt,it_key, argv[i++]);
+        }
+        else
+        {
+            good_option_set(opt,it_key = argv[i++],NULL);
+        }
+    }
+}
