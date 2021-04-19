@@ -56,4 +56,9 @@ const char* good_option_get(good_tree_t *opt, const char *key,size_t index,const
 */
 ssize_t good_option_count(good_tree_t *opt, const char *key);
 
+/**
+ *
+*/
+void good_option_dump(good_tree_t *opt,FILE *fp);
+
 #endif //GOOD_UTIL_OPTION_H

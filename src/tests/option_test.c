@@ -77,6 +77,8 @@ int main(int argc, char **argv)
     p2 = good_option_get(t,"-ccc",1,"f");
 
     assert(p2[0]=='f');
+
+    good_option_dump(t,stderr);
  
 
     good_tree_free(&t);

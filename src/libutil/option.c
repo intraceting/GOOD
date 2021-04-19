@@ -138,3 +138,29 @@ ssize_t good_option_count(good_tree_t *opt, const char *key)
 
     return _good_option_count_value(it_key);
 }
+
+void good_option_dump(good_tree_t *opt,FILE *fp)
+{
+    good_tree_t *it_key = NULL;
+    good_tree_t *it_val = NULL;
+
+    assert(opt != NULL && fp != NULL);
+
+        
+
+    it_key = good_tree_child(opt,1);
+    while(it_key)
+    {
+        fprintf(fp,"\n%s\n",it_key->alloc->pptrs[GOOD_OPTION_KEY]);
+
+        it_val = good_tree_child(it_key,1);
+        while(it_val)
+        {
+            fprintf(fp,"%s\n",it_val->alloc->pptrs[GOOD_OPTION_VALUE]);
+
+            it_val = good_tree_sibling(it_val,0);  
+        }
+
+        it_key = good_tree_sibling(it_key,0);
+    }
+}
