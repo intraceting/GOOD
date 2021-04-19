@@ -56,9 +56,9 @@ int main(int argc, char **argv)
 
     good_option_set(t,"-ddd",NULL);
 
-    assert(good_option_count(t,"-ddd")==0);
+    assert(good_option_exist(t,"-ddd"));
 
-    assert(good_option_count(t,"-ccc")==-1);
+    assert(!good_option_exist(t,"-ccc"));
 
     traversal(t);
 
@@ -86,6 +86,13 @@ int main(int argc, char **argv)
 
 
     good_option_parse(t,argc,argv,"--");
+
+    printf("\n--------------------------------------\n");
+    good_option_fprintf(stderr,t);
+    printf("\n--------------------------------------\n");
+    
+    good_option_import(t,good_option_get(t,"--test-import",0,NULL),'#',"test-import","--");
+
 
     printf("\n--------------------------------------\n");
     good_option_fprintf(stderr,t);

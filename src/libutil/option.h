@@ -57,6 +57,13 @@ const char* good_option_get(good_tree_t *opt, const char *key,size_t index,const
 ssize_t good_option_count(good_tree_t *opt, const char *key);
 
 /**
+ * 检测键是否存在。
+ * 
+ * @return !0 存在， 0 不存在。
+*/
+#define good_option_exist(opt, key) (good_option_count((opt), (key)) >= 0 ? 1 : 0)
+
+/**
  * 删除一个选项和值。
  * 
  * @return 0 成功，-1 失败(键不存在)。
@@ -80,11 +87,44 @@ ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt);
 /**
  * 解析参数选项。
  * 
- * 通常用于命令行参数解析。
+ * @warning 未关联键的值，使用前缀做为键。
  * 
  * @param prefix 键的前缀字符串。
 */
 void good_option_parse(good_tree_t *opt,int argc, char* argv[],const char *prefix);
+
+/**
+ * 导入参数选项。
+ * 
+ * @warning 注释行将被忽略。
+ * 
+ * @param note 注释字符，可以为'\0'。
+ * @param argv0 命令字符串，可以为NULL(0)。
+ * @param prefix 键的前缀字符串。
+*/
+void good_option_fimport(good_tree_t *opt,FILE *fp,char note,const char *argv0,const char *prefix);
+
+/**
+ * 导入参数选项。
+ * 
+ * @warning 注释行将被忽略。
+ * 
+ * @param note 注释字符，可以为'\0'。
+ * @param argv0 命令字符串，可以为NULL(0)。
+ * @param prefix 键的前缀字符串。
+*/
+void good_option_import(good_tree_t *opt,const char *name,char note,const char *argv0,const char *prefix);
+
+/**
+ * 导入参数选项。
+ * 
+ * @warning 注释行将被忽略。
+ * 
+ * @param note 注释字符，可以为'\0'。
+ * @param argv0 命令字符串，可以为NULL(0)。
+ * @param prefix 键的前缀字符串。
+*/
+void good_option_memimport(good_tree_t *opt,const char *text,size_t len,char note,const char *argv0,const char *prefix);
 
 
 #endif //GOOD_UTIL_OPTION_H
