@@ -222,26 +222,59 @@ good_tree_t *good_tree_alloc3(size_t size);
 void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it);
 
 /**
- * 格式化输出。
+ * 格式化打印。
  * 
  * 输出有层次感的树形图。
  * 
  * @warning 不会在末尾添加'\n'(换行)字符。
  * 
+ * @return >=0 输出的长度，< 0 失败。
+ * 
+ * @see good_tree_vfprintf()
  * @see fprintf()
 */
-void good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...);
+ssize_t good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...);
 
 /**
- * 格式化输出。
+ * 格式化打印。
  * 
  * 输出有层次感的树形图。
  * 
  * @warning 不会在末尾添加'\n'(换行)字符。
+ * 
+ * @return >=0 输出的长度，< 0 失败。
  * 
  * @see vfprintf()
 */
-void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args);
+ssize_t good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args);
+
+/**
+ * 格式化打印。
+ * 
+ * 输出有层次感的树形图。
+ * 
+ * @warning 不会在末尾添加'\n'(换行)字符。
+ * 
+ * @return >=0 输出的长度，< 0 失败。
+ * 
+ * @see good_tree_vfprintf()
+ * @see snprintf()
+*/
+ssize_t good_tree_snprintf(char *buf, size_t max, size_t depth, const good_tree_t *node, const char *fmt, ...);
+
+/**
+ * 格式化打印。
+ * 
+ * 输出有层次感的树形图。
+ * 
+ * @warning 不会在末尾添加'\n'(换行)字符。
+ * 
+ * @return >=0 输出的长度，< 0 失败。
+ * 
+ * @see good_tree_vfprintf()
+ * @see vsnprintf()
+*/
+ssize_t good_tree_vsnprintf(char *buf, size_t max, size_t depth, const good_tree_t *node,const char* fmt,va_list args);
 
 /** 
  * 排序。

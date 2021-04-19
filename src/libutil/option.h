@@ -57,8 +57,17 @@ const char* good_option_get(good_tree_t *opt, const char *key,size_t index,const
 ssize_t good_option_count(good_tree_t *opt, const char *key);
 
 /**
- *
+ * 格式化打印。
+ * 
+ * @return >=0 输出的长度，< 0 失败。
 */
-void good_option_dump(good_tree_t *opt,FILE *fp);
+ssize_t good_option_fprintf(FILE *fp,good_tree_t *opt);
+
+/**
+ * 格式化打印。
+ * 
+ * @return >=0 输出的长度，< 0 失败。
+*/
+ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt);
 
 #endif //GOOD_UTIL_OPTION_H

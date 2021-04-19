@@ -78,7 +78,11 @@ int main(int argc, char **argv)
 
     assert(p2[0]=='f');
 
-    good_option_dump(t,stderr);
+    int s = good_option_fprintf(stderr,t);
+
+    char buf[100] = {0};
+
+    good_option_snprintf(buf,100,t);
  
 
     good_tree_free(&t);

@@ -386,26 +386,36 @@ final:
 
 }
 
-void good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...)
+ssize_t good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...)
 {
+    ssize_t wsize = 0;
+
     va_list vaptr;
     va_start(vaptr, fmt);
 
-    good_tree_vfprintf(fp,depth,node,fmt,vaptr);
+    wsize = good_tree_vfprintf(fp,depth,node,fmt,vaptr);
 
     va_end(vaptr);
+
+    return wsize;
 }
 
-void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args)
+ssize_t good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args)
 {
     good_tree_t *tmp = NULL;
     good_tree_t **stack = NULL;
+    ssize_t wsize = 0;
+    ssize_t wsize2 = 0;
 
     assert(fp && node && fmt);
 
     if (depth <= 0)
     {
-        vfprintf(fp,fmt,args);
+        wsize2 = vfprintf(fp,fmt,args);
+        if (wsize2 <= 0)
+            goto final;
+
+        wsize += wsize2;
     }
     else
     {
@@ -414,7 +424,7 @@ void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char
         */
         stack = good_heap_alloc(depth * sizeof(good_tree_t *));
         if(!stack)
-            GOOD_ERRNO_AND_RETURN0(ENOMEM);
+            GOOD_ERRNO_AND_RETURN1(ENOMEM,-1);
 
         tmp = (good_tree_t *)node;
 
@@ -424,20 +434,73 @@ void good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char
         for (size_t i = 1; i < depth; i++)
         {
             if (good_tree_sibling((good_tree_t *)stack[i], 0))
-                fprintf(fp, "│   ");
+                wsize2 = fprintf(fp, "│   ");
             else
-                fprintf(fp, "    ");
+                wsize2 = fprintf(fp, "    ");
+
+            if (wsize2 <= 0)
+                goto final;
+
+            wsize += wsize2;
         }
 
         if(good_tree_sibling(node,0))
-            fprintf(fp,"├── ");
+            wsize2 = fprintf(fp,"├── ");
         else 
-            fprintf(fp,"└── ");
+            wsize2 = fprintf(fp,"└── ");
 
-        vfprintf(fp,fmt,args);
+        if (wsize2 <= 0)
+            goto final;
+
+        wsize += wsize2;
+
+        wsize2 = vfprintf(fp,fmt,args);
+
+        if (wsize2 <= 0)
+            goto final;
+
+        wsize += wsize2;
     }
 
+final:
+
     good_heap_freep((void**)&stack);
+
+    return wsize;
+}
+
+ssize_t good_tree_snprintf(char *buf, size_t max, size_t depth, const good_tree_t *node, const char *fmt, ...)
+{
+    ssize_t wsize = 0;
+
+    assert(buf != NULL && max >0 && node != NULL && fmt != NULL);
+
+    va_list vaptr;
+    va_start(vaptr, fmt);
+
+    wsize = good_tree_vsnprintf(buf,max,depth,node,fmt,vaptr);
+
+    va_end(vaptr);
+    
+    return wsize;
+}
+
+ssize_t good_tree_vsnprintf(char *buf, size_t max, size_t depth, const good_tree_t *node,const char* fmt,va_list args)
+{
+    FILE* fp = NULL;
+    ssize_t wsize = 0;
+
+    assert(buf != NULL && max >0 && node != NULL && fmt != NULL);
+
+    fp = fmemopen(buf,max,"w");
+    if(!fp)
+        return -1;
+
+    wsize = good_tree_vfprintf(fp,depth,node,fmt,args);
+
+    fclose(fp);
+    
+    return wsize;
 }
 
 void good_tree_sort(good_tree_t *father,good_tree_order_t *order)
