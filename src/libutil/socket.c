@@ -316,7 +316,7 @@ int good_connect(int fd, good_sockaddr_t *addr, time_t timeout)
     /*
      * 获取SOCKET句柄的出错码。
     */
-    chk = good_sockopt_option_int(fd, SOL_SOCKET, SO_ERROR, &eno,2);
+    chk = good_sockopt_option_int(fd, SOL_SOCKET, SO_ERROR, &eno, 1);
     chk = (eno == 0 ? 0 : -1);
 
 final:
