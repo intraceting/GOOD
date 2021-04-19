@@ -127,18 +127,49 @@ int good_socket_ioctl(uint32_t cmd, void *args);
 char *good_mac_fetch(const char *ifname, char addr[12]);
 
 /**
- * 获取SOCKET句柄标志。
+ * 获取或设置SOCKET选项。
+ * 
+ * @param direction 方向。 1 读，2 写。
  * 
  * @return 0 成功，-1 失败。
 */
-int good_getsockopt_int(int fd,int level, int name,int *flag);
+int good_socket_option(int fd, int level, int name, void *data, int *len, int direction);
 
 /**
- * 设置SOCKET句柄标志。
+ * 获取或设置SOCKET选项(integer)。
+ * 
+ * @param direction 方向。 1 读，2 写。
  * 
  * @return 0 成功，-1 失败。
 */
-int good_setsockopt_int(int fd,int level, int name,int flag);
+int good_sockopt_option_int(int fd, int level, int name, int *flag, int direction);
+
+/**
+ * 获取或设置SOCKET选项(timeout)。
+ * 
+ * @param direction 方向。 1 读，2 写。
+ * 
+ * @return 0 成功，-1 失败。
+*/
+int good_sockopt_option_timeout(int fd, int name, struct timeval *tv, int direction);
+
+/**
+ * 获取或设置SOCKET选项(linger)。
+ * 
+ * @param direction 方向。 1 读，2 写。
+ * 
+ * @return 0 成功，-1 失败。
+*/
+int good_socket_option_linger(int fd, struct linger *lg, int direction);
+
+/**
+ * 获取或设置SOCKET选项(multicast)。
+ * 
+ * @param direction 方向。 1 读，2 写。
+ * 
+ * @return 0 成功，-1 失败。
+*/
+int good_socket_option_multicast(int fd, int name, good_sockaddr_t *multiaddr, const char *ifaddr, int direction);
 
 /**
  * 创建一个SOCKET句柄。

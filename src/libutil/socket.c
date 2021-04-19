@@ -169,22 +169,71 @@ char *good_mac_fetch(const char *ifname, char addr[12])
     return addr;
 }
 
-int good_getsockopt_int(int fd,int level, int name,int *flag)
+int good_socket_option(int fd,int level, int name,void *data,int *len,int direction)
 {
-    socklen_t flen = sizeof(int);
+    assert(fd >= 0 && level != 0 && name != 0 && data != NULL && len != NULL && (direction == 1 || direction == 2));
 
-    assert(fd >= 0 && flag != NULL);
-
-    return getsockopt(fd,level,name,flag,&flen);
+    if(direction == 1)
+        return getsockopt(fd,level,name,data,len);
+    
+    return setsockopt(fd,level,name,data,*len);
 }
 
-int good_setsockopt_int(int fd,int level, int name,int flag)
+int good_sockopt_option_int(int fd,int level, int name,int *flag,int direction)
 {
-    socklen_t flen = sizeof(int);
+    socklen_t len = sizeof(int);
 
-    assert(fd >= 0);
+    assert(fd >= 0 && level != 0 && name != 0 && flag != NULL && (direction == 1 || direction == 2));
 
-    return setsockopt(fd,level,name,&flag,flen);
+    return good_socket_option(fd,level,name,flag,&len,direction);
+}
+
+int good_sockopt_option_timeout(int fd,int name, struct timeval *tv,int direction)
+{
+    socklen_t len = sizeof(struct timeval);
+
+    assert(fd >= 0 && name != 0 && tv != NULL && (direction == 1 || direction == 2));
+
+    return good_socket_option(fd,SOL_SOCKET,name,tv,&len,direction);
+}
+
+int good_socket_option_linger(int fd,struct linger *lg,int direction)
+{
+    socklen_t len = sizeof(struct linger);
+
+    assert(fd >= 0 && lg != NULL && (direction == 1 || direction == 2));
+
+    return good_socket_option(fd,SOL_SOCKET,SO_LINGER,lg,&len,direction);  
+}
+
+int good_socket_option_multicast(int fd,int name,good_sockaddr_t *multiaddr,const char* ifaddr,int direction)
+{
+    socklen_t len = sizeof(struct ip_mreq);
+    socklen_t len6 = sizeof(struct ipv6_mreq);
+    struct ip_mreq st_mreq = {0};
+    struct ipv6_mreq st_mreq6 = {0};
+    int chk;
+
+    assert(fd >= 0 && name != 0 && multiaddr != NULL && (direction == 1 || direction == 2));
+
+    assert(multiaddr->family == GOOD_IPV4 || multiaddr->family == GOOD_IPV6);
+
+    if(multiaddr->family == GOOD_IPV4)
+    {
+        st_mreq.imr_multiaddr = multiaddr->addr4.sin_addr;
+        st_mreq.imr_interface.s_addr = (ifaddr ? inet_addr(ifaddr) : INADDR_ANY);
+
+        chk = good_socket_option(fd,IPPROTO_IP,name,&st_mreq,&len,direction);  
+    }
+    else if(multiaddr->family == GOOD_IPV6)
+    {
+        st_mreq6.ipv6mr_multiaddr = multiaddr->addr6.sin6_addr;
+        st_mreq6.ipv6mr_interface = (ifaddr ? if_nametoindex(ifaddr) : 0);
+
+        chk = good_socket_option(fd,IPPROTO_IP,name,&st_mreq,&len,direction); 
+    }
+
+    return chk;
 }
 
 int good_socket(sa_family_t family, int udp)
@@ -267,7 +316,7 @@ int good_connect(int fd, good_sockaddr_t *addr, time_t timeout)
     /*
      * 获取SOCKET句柄的出错码。
     */
-    chk = good_getsockopt_int(fd, SOL_SOCKET, SO_ERROR, &eno);
+    chk = good_sockopt_option_int(fd, SOL_SOCKET, SO_ERROR, &eno,2);
     chk = (eno == 0 ? 0 : -1);
 
 final:
