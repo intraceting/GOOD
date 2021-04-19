@@ -16,9 +16,6 @@
  * 
  * @param ident NULL(0) 进程名做为标识，!NULL(0) 自定义标识。
  * @param copy2stderr 0 仅记录，!0 复制到stderr。
- * 
- * @see openlog()
- * @see setlogmask()
  */
 void good_log_init(const char *ident, int copy2stderr);
 
@@ -36,8 +33,6 @@ void good_log_redirect(void (*agent_cb)(void *opaque,int level,const char* fmt,v
  * @param mask 新的掩码。
  * 
  * @return 旧的掩码。
- * 
- * @see setlogmask()
  */
 int good_log_mask(int mask);
 
@@ -47,10 +42,6 @@ int good_log_mask(int mask);
  * 被掩码覆盖的级别才会被记录。
  * 
  * @param level LOG_* in syslog.h
- * @param fmt 
- * @param ... 
- * 
- * @see good_log_vprintf()
  */
 void good_log_printf(int level,const char* fmt,...);
 
@@ -60,10 +51,6 @@ void good_log_printf(int level,const char* fmt,...);
  * 被掩码覆盖的级别才会被记录。
  * 
  * @param level LOG_* in syslog.h
- * @param fmt 
- * @param args 
- * 
- * @see vsyslog()
  */
 void good_log_vprintf(int level,const char* fmt,va_list args);
 

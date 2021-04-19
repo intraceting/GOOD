@@ -14,12 +14,6 @@
  * 映射已经打开文件句柄到内存页面。
  *
  * @return NULL(0) 失败，!NULL(0) 成功。
- * 
- * @see fstat()
- * @see mmap()
- * @see munmap()
- * @see good_allocator_alloc()
- * @see good_allocator_atfree()
  *
 */
 good_allocator_t* good_mmap(int fd,int rw,int shared);
@@ -28,10 +22,6 @@ good_allocator_t* good_mmap(int fd,int rw,int shared);
  * 映射文件到内存页面。
  * 
  * @return NULL(0) 失败，!NULL(0) 成功。
- *  
- * @see good_open()
- * @see good_mmap()
- * @see good_closep()
  *  
 */
 good_allocator_t* good_mmap2(const char* name,int rw,int shared);
@@ -53,8 +43,6 @@ int good_msync(good_allocator_t* alloc,int async);
  * 当前是最后一个引用者才会释放。
  * 
  * @param alloc 指针的指针。当接口返回时，被赋值NULL(0)。
- * 
- * @see good_allocator_unref()
  * 
 */
 void good_munmap(good_allocator_t** alloc);

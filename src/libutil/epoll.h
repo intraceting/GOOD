@@ -33,8 +33,6 @@
  * 创建EPOLL句柄
  * 
  * @return >=0 成功(EPOLL句柄)，-1 失败。
- * 
- * @see epoll_create()
 */
 int good_epoll_create();
 
@@ -44,8 +42,6 @@ int good_epoll_create();
  * @param first 是否首次注册。0 否，!0 是。
  * 
  * @return 0 成功，-1 失败。
- * 
- * @see epoll_ctl()
 */
 int good_epoll_mark(int efd, int fd,const struct epoll_event * event, int first);
 
@@ -53,8 +49,6 @@ int good_epoll_mark(int efd, int fd,const struct epoll_event * event, int first)
  * 删除句柄(文件或SOCKET)和事件。
  * 
  * @return 0 成功，-1 失败。
- * 
- * @see epoll_ctl()
 */
 int good_epoll_drop(int efd, int fd);
 

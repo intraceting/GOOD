@@ -80,11 +80,6 @@ typedef struct _good_thread_t
 
 /**
  * 销毁互斥量及属性。
- * 
- * @see pthread_condattr_destroy()
- * @see pthread_cond_destroy()
- * @see pthread_mutexattr_destroy()
- * @see pthread_mutex_destroy()
 */
 void good_mutex_destroy(good_mutex_t *ctx);
 
@@ -92,9 +87,6 @@ void good_mutex_destroy(good_mutex_t *ctx);
  * 初始化互斥量。
  * 
  * 在调用此函数前需先初始化属性。
- * 
- * @see pthread_cond_init()
- * @see pthread_mutex_init()
 */
 void good_mutex_init(good_mutex_t *ctx);
 
@@ -104,16 +96,6 @@ void good_mutex_init(good_mutex_t *ctx);
  * 当互斥量拥用共享属性时，在多进程间有效。
  * 
  * @param shared 0 私有，!0 共享。
- * 
- * @see pthread_condattr_init()
- * @see pthread_condattr_setclock()
- * @see pthread_condattr_setpshared()
- * @see pthread_cond_init()
- * @see pthread_mutexattr_init()
- * @see pthread_mutexattr_setpshared()
- * @see pthread_mutexattr_setrobust()
- * @see pthread_mutex_init()
- * @see good_mutex_init()
 */
 void good_mutex_init2(good_mutex_t *ctx, int shared);
 
@@ -124,10 +106,6 @@ void good_mutex_init2(good_mutex_t *ctx, int shared);
  * 
  * @return 0 成功，!0 出错。
  * 
- * @see pthread_mutex_lock()
- * @see pthread_mutex_trylock()
- * @see pthread_mutex_consistent()
- * @see pthread_mutex_unlock()
 */
 int good_mutex_lock(good_mutex_t *ctx, int try);
 
@@ -135,8 +113,6 @@ int good_mutex_lock(good_mutex_t *ctx, int try);
  * 互斥量解锁。
  * 
  * @return 0 成功；!0 出错。
- * 
- * @see pthread_mutex_unlock()
 */
 int good_mutex_unlock(good_mutex_t *ctx);
 
@@ -146,9 +122,6 @@ int good_mutex_unlock(good_mutex_t *ctx);
  * @param timeout 超时(毫秒)。>= 0 有事件或时间过期，< 0 直到有事件或出错。
  * 
  * @return 0 成功；!0 出错。
- * 
- * @see pthread_cond_timedwait()
- * @see pthread_cond_wait()
 */
 int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
 
@@ -158,9 +131,6 @@ int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
  * @param broadcast 是否广播事件通知。0 否，!0 是。
  * 
  * @return 0 成功；!0 出错。
- * 
- * @see pthread_cond_broadcast()
- * @see pthread_cond_signal()
 */
 int good_mutex_notice(good_mutex_t *ctx, int broadcast);
 
@@ -173,11 +143,6 @@ int good_mutex_notice(good_mutex_t *ctx, int broadcast);
  * 
  * @return 0 成功；!0 出错。
  * 
- * @see pthread_attr_init()
- * @see pthread_attr_setdetachstate()
- * @see pthread_attr_destroy()
- * @see pthread_create()
- * 
 */
 int good_thread_create(good_thread_t *ctx,int joinable);
 
@@ -187,9 +152,6 @@ int good_thread_create(good_thread_t *ctx,int joinable);
  * 当线程被已经分离或已经分离模式创建的，直接返回。
  * 
  * @return 0 成功；!0 出错。
- * 
- * @see pthread_attr_getdetachstate()
- * @see pthread_join()
 */
 int good_thread_join(good_thread_t* ctx);
 
@@ -202,8 +164,6 @@ int good_thread_join(good_thread_t* ctx);
  * 
  * @return 0 成功；!0 出错。
  * 
- * @see pthread_setname_np()
- * 
 */
 int good_thread_setname(const char* fmt,...);
 
@@ -211,8 +171,6 @@ int good_thread_setname(const char* fmt,...);
  * 获取当前线程名字。
  * 
  * @return 0 成功；!0 出错。
- * 
- * @see pthread_getname_np()
  * 
 */
 int good_thread_getname(char name[16]);

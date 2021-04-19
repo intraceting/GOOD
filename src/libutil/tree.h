@@ -182,9 +182,6 @@ void good_tree_swap(good_tree_t *src,good_tree_t *dst);
  * 包括自己，自己的孩子，以孩子的孩子都会被删除。
  * 
  * @param root 节点指针的指针。当接口返回时，被赋值NULL(0)。
-
- * @see good_heap_free()
- * @see good_allocator_unref()
 */
 void good_tree_free(good_tree_t **root);
 
@@ -193,23 +190,16 @@ void good_tree_free(good_tree_t **root);
  * 
  * @param alloc 内存块指针，可以为NULL(0)。仅复制指针，不是指针对像引用。
  * 
- * @see good_heap_alloc()
- * 
 */
 good_tree_t *good_tree_alloc(good_allocator_t *alloc);
 
 /**
  * 创建节点，同时申请数据内存块。
- * 
- * @see good_tree_alloc()
- * @see good_allocator_alloc()
 */
 good_tree_t *good_tree_alloc2(size_t *sizes,size_t numbers);
 
 /**
  * 创建节点，同时申请数据内存块。
- * 
- * @see good_tree_alloc2()
 */
 good_tree_t *good_tree_alloc3(size_t size);
 
@@ -217,7 +207,6 @@ good_tree_t *good_tree_alloc3(size_t size);
  * 扫描树节点。
  * 
  * 深度优先遍历节点。
- * 
 */
 void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it);
 
@@ -229,9 +218,6 @@ void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it);
  * @warning 不会在末尾添加'\n'(换行)字符。
  * 
  * @return >=0 输出的长度，< 0 失败。
- * 
- * @see good_tree_vfprintf()
- * @see fprintf()
 */
 ssize_t good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...);
 
@@ -243,8 +229,6 @@ ssize_t good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const ch
  * @warning 不会在末尾添加'\n'(换行)字符。
  * 
  * @return >=0 输出的长度，< 0 失败。
- * 
- * @see vfprintf()
 */
 ssize_t good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args);
 
@@ -256,9 +240,6 @@ ssize_t good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const c
  * @warning 不会在末尾添加'\n'(换行)字符。
  * 
  * @return >=0 输出的长度，< 0 失败。
- * 
- * @see good_tree_vfprintf()
- * @see snprintf()
 */
 ssize_t good_tree_snprintf(char *buf, size_t max, size_t depth, const good_tree_t *node, const char *fmt, ...);
 
@@ -270,9 +251,6 @@ ssize_t good_tree_snprintf(char *buf, size_t max, size_t depth, const good_tree_
  * @warning 不会在末尾添加'\n'(换行)字符。
  * 
  * @return >=0 输出的长度，< 0 失败。
- * 
- * @see good_tree_vfprintf()
- * @see vsnprintf()
 */
 ssize_t good_tree_vsnprintf(char *buf, size_t max, size_t depth, const good_tree_t *node,const char* fmt,va_list args);
 
@@ -282,10 +260,6 @@ ssize_t good_tree_vsnprintf(char *buf, size_t max, size_t depth, const good_tree
  * 选择法排序。
  * 
  * 只排序子节点，如需要对整颗树排序，需要接合迭代器。
- * 
- * @see good_tree_child()
- * @see good_tree_sibling()
- * @see good_tree_swap()
 */
 void good_tree_sort(good_tree_t *father,good_tree_order_t *order);
 

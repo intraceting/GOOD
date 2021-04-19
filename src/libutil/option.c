@@ -139,6 +139,24 @@ ssize_t good_option_count(good_tree_t *opt, const char *key)
     return _good_option_count_value(it_key);
 }
 
+int good_option_remove(good_tree_t *opt, const char *key)
+{
+    good_tree_t *it_key = NULL;
+
+    assert(opt != NULL && key != NULL);
+
+    assert(key[0] != '\0');
+
+    it_key = _good_option_find_key(opt,key,0);
+    if(!it_key)
+        GOOD_ERRNO_AND_RETURN1(EAGAIN,-1);
+
+    good_tree_unlink(it_key);
+    good_tree_free(&it_key);
+
+    return 0;
+}
+
 ssize_t good_option_fprintf(FILE *fp,good_tree_t *opt)
 {
     good_tree_t *it_key = NULL;
@@ -196,7 +214,7 @@ ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt)
 void good_option_parse(good_tree_t *opt,int argc, char* argv[],const char *prefix)
 {
     int prefix_len = 0;
-    char *it_key = NULL;
+    const char *it_key = NULL;
 
     assert(opt != NULL && argc > 0 && argv != NULL && prefix != NULL);
 

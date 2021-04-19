@@ -107,8 +107,6 @@ size_t good_align(size_t size,size_t align);
  * @param routine 执行函数。0 成功，!0 失败。
  * 
  * @return 0 第一次，1 第N次，-1 失败。
- * 
- * @see pthread_once()
 */
 int good_once(atomic_int* status,int (*routine)(void *opaque),void *opaque);
 
@@ -116,26 +114,18 @@ int good_once(atomic_int* status,int (*routine)(void *opaque),void *opaque);
 
 /**
  * 内存申请。
- * 
- * @see calloc()
- * 
  */
 void* good_heap_alloc(size_t size);
 
 /**
  * 内存重新申请。
- * 
- * @see realloc()
- * 
  */
 void* good_heap_realloc(void *buf,size_t size);
 
 /**
  * 内存释放。
  * 
- * @param data 
- * 
- * @see free()
+ * @param data 内存的指针。
  */
 void good_heap_free(void *data);
 
@@ -143,16 +133,11 @@ void good_heap_free(void *data);
  * 内存释放。
  * 
  * @param data 指针的指针。返回时赋值NULL(0)。
- * 
- * @see good_heap_free()
  */
 void good_heap_freep(void **data);
 
 /**
  * 内存克隆。
- * 
- * @see good_heap_alloc()
- * @see memcpy()
 */
 void* good_heap_clone(const void* data,size_t size);
 
@@ -172,9 +157,6 @@ uint64_t good_time_clock2kind(struct timespec* ts,uint8_t precision);
  * 获取时间戳并整形化
  * 
  * @param id CLOCK_* in time.h
- * 
- * @see clock_gettime()
- * @see good_time_clock2kind()
 */
 uint64_t good_time_clock2kind_with(clockid_t id ,uint8_t precision);
 
@@ -200,9 +182,6 @@ struct tm* good_time_get(struct tm* tm,int utc);
  * @param caseAb 0 不区分大小写，!0 区分大小写。
  * 
  * @return NULL(0) 未找到，!NULL(0) 匹配到的首地址。
- * 
- * @see strstr()
- * @see strcasestr()
 */
 const char* good_strstr(const char *str, const char *sub,int caseAb);
 
@@ -210,9 +189,6 @@ const char* good_strstr(const char *str, const char *sub,int caseAb);
  * 字符串比较。
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
- * 
- * @see strcmp()
- * @see strcasecmp()
 */
 int good_strcmp(const char *s1, const char *s2,int caseAb);
 
@@ -220,16 +196,13 @@ int good_strcmp(const char *s1, const char *s2,int caseAb);
  * 字符串比较。
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
- * 
- * @see strncmp()
- * @see strncasecmp()
 */
 int good_strncmp(const char *s1, const char *s2,size_t len,int caseAb);
 
 /**
  * 字符串修剪。
  * 
- * @param isctype_cb 字符比较函数。返回 !0 是，0 否。
+ * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。
  * @param where 0 右端，1 左端，2 两端。
  * 
  * @see is*() functions. in ctype.h
@@ -244,8 +217,6 @@ char* good_strtrim(char* str,int (*isctype_cb)(int c),int where);
  * @param saveptr 临时指针。不可支持访问。
  * 
  * @return NULL(0) 结束，!NULL(0) 分割后的字符串首地址。
- * 
- * @see good_strstr()
 */
 char *good_strtok(char *str, const char *delim, char **saveptr);
 
@@ -253,15 +224,13 @@ char *good_strtok(char *str, const char *delim, char **saveptr);
  * 字符串匹配。
  * 
  * @return 0 成功，!0 失败。
- * 
- * @see fnmatch()
 */
 int good_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
 
 /**
  * 检测字符串中的字符类型。
  * 
- * @param isctype_cb 字符比较函数。返回 !0 是，0 否。
+ * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。
  * 
  * @return !0 通过，0 未通过。
  * 
@@ -309,17 +278,17 @@ uint8_t* good_endian_swap(uint8_t* dst,int len);
 uint8_t* good_endian_ntoh(uint8_t* dst,int len);
 
 /**
- * @see good_endian_ntoh()
+ * 16位整型数值，网络字节序转本地字节序。
 */
 uint16_t good_endian_ntoh16(uint16_t num);
 
 /**
- * @see good_endian_ntoh()
+ * 32位整型数值，网络字节序转本地字节序。
 */
 uint32_t good_endian_ntoh32(uint32_t num);
 
 /**
- * @see good_endian_ntoh()
+ * 64位整型数值，网络字节序转本地字节序。
 */
 uint64_t good_endian_ntoh64(uint64_t num);
 
@@ -331,17 +300,17 @@ uint64_t good_endian_ntoh64(uint64_t num);
 uint8_t* good_endian_hton(uint8_t* dst,int len);
 
 /**
- * @see good_endian_hton()
+ * 16位整型数值，本地字节序转网络字节序。
 */
 uint16_t good_endian_hton16(uint16_t num);
 
 /**
- * @see good_endian_hton()
+ * 32位整型数值，本地字节序转网络字节序。
 */
 uint32_t good_endian_hton32(uint32_t num);
 
 /**
- * @see good_endian_hton()
+ * 64位整型数值，本地字节序转网络字节序。
 */
 uint64_t good_endian_hton64(uint64_t num);
 
@@ -400,8 +369,6 @@ void good_mkdir(const char *path,mode_t mode);
  * 截取目录。
  * 
  * 最后一级的名称会被裁剪，并且无论目录结构是否真存在都会截取。 
- *
- * @see dirname()
 */
 char *good_dirname(char *dst, const char *src);
 
@@ -409,8 +376,6 @@ char *good_dirname(char *dst, const char *src);
  * 截取目录或文件名称。
  * 
  * 最后一级的名称'/'(包括)之前的会被裁剪，并且无论目录结构是否真存在都会截取。 
- * 
- * @see basename()
 */
 char *good_basename(char *dst, const char *src);
 
@@ -428,10 +393,6 @@ char *good_dirnice(char *dst, const char *src);
 
 /**
  * 获取当前程序的完整路径和文件名。
- *
- * /proc/self/exe
- * 
- * @see readlink()
 */
 char* good_proc_pathfile(char* buf);
 
@@ -440,16 +401,11 @@ char* good_proc_pathfile(char* buf);
  * 
  * @param append 拼接目录或文件名。NULL(0) 忽略。
  * 
- * @see good_app_pathfile()
- * @see good_dirname()
 */
 char* good_proc_dirname(char* buf,const char* append);
 
 /**
  * 获取当前程序的文件名。
- * 
- * @see good_app_pathfile()
- * @see good_basename()
 */
 char* good_proc_basename(char* buf);
 
@@ -463,9 +419,6 @@ char* good_proc_basename(char* buf);
  * @param pid 当接口返回时，被赋值正在运行的进程ID。NULL(0) 忽略。
  * 
  * @return >= 0 文件句柄(当前进程是唯一进程)，-1 已有实例正在运行。
- * 
- * @see flock()
- * @see getpid()
 */
 int good_proc_singleton(const char* lockfile,int* pid);
 
@@ -479,8 +432,6 @@ int good_proc_singleton(const char* lockfile,int* pid);
  * /var/run/user/$UID/
  * 
  * @param append 拼接目录或文件名。NULL(0) 忽略。
- * 
- * @see snprintf()
 */
 char* good_user_dirname(char* buf,const char* append);
 
@@ -500,8 +451,6 @@ int good_poll(int fd, int event,time_t timeout);
  * 写数据。
  * 
  * @return > 0 写入完成的大小，<= 0 写入失败或空间不足。
- * 
- * @see write()
 */
 ssize_t good_write(int fd, const void *data, size_t size);
 
@@ -509,15 +458,11 @@ ssize_t good_write(int fd, const void *data, size_t size);
  * 读数据。
  * 
  * @return > 0 读取完成的大小，<= 0 读取失败或已到末尾。
- * 
- * @see read()
 */
 ssize_t good_read(int fd, void *data, size_t size);
 
 /**
  * 关闭文件句柄。
- * 
- * @see close()
 */
 void good_closep(int *fd);
 
@@ -525,8 +470,6 @@ void good_closep(int *fd);
  * 打开文件。
  * 
  * @return >= 0 句柄，-1 失败。
- * 
- * @see open()
  * 
 */
 int good_open(const char *file, int rw, int nonblock, int create);
@@ -540,9 +483,6 @@ int good_open(const char *file, int rw, int nonblock, int create);
  * 
  * @return fd2 成功，-1 失败。
  * 
- * @see open()
- * @see dup2()
- * 
 */
 int good_open2(int fd2,const char *file, int rw, int nonblock, int create);
 
@@ -550,8 +490,6 @@ int good_open2(int fd2,const char *file, int rw, int nonblock, int create);
  * 获取标志。
  * 
  * @return !- 成功(标志)，-1 失败。
- * 
- * @see fcntl()
 */
 int good_fflag_get(int fd);
 
@@ -559,8 +497,6 @@ int good_fflag_get(int fd);
  * 添加标志。
  * 
  * @return 0 成功，-1 失败。
- * 
- * @see fcntl()
 */
 int good_fflag_add(int fd,int flag);
 
@@ -568,8 +504,6 @@ int good_fflag_add(int fd,int flag);
  * 删除标志。
  * 
  * @return 0 成功，-1 失败。
- * 
- * @see fcntl()
 */
 int good_fflag_del(int fd,int flag);
 
@@ -597,8 +531,6 @@ pid_t good_popen(const char* cmd,char * const envp[],int* stdin_fd, int* stdout_
  * 通常是在'/dev/shm/'目录内创建。
  * 
  * @return >= 0 句柄，-1 失败。
- * 
- * @see shm_open()
 */
 int good_shm_open(const char* name,int rw, int create);
 
@@ -606,8 +538,6 @@ int good_shm_open(const char* name,int rw, int create);
  * 删除共享内存文件。
  * 
  * @return 0 成功，-1 失败。
- * 
- * @see shm_unlink()
 */
 int good_shm_unlink(const char* name);
 

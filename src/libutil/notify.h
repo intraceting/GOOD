@@ -41,8 +41,6 @@ typedef struct _good_notify_event
  * @param nonblock 0 阻塞模式，!0 非阻塞模式。
  * 
  * @return >= 0 句柄，< 0 错误。
- * 
- * @see inotify_init1()
 */
 int good_notify_init(int nonblock);
 
@@ -50,8 +48,6 @@ int good_notify_init(int nonblock);
  * 添加一个监视对象(文件或目录)。
  * 
  * @return >= 0 成功(WD)，< 0 错误。
- * 
- * @see inotify_add_watch()
 */
 int good_notify_add(int fd,const char* name,uint32_t masks);
 
@@ -59,8 +55,6 @@ int good_notify_add(int fd,const char* name,uint32_t masks);
  * 删除一个监视对象。
  * 
  * @return 0 成功，!0 失败。
- * 
- * @see inotify_rm_watch()
 */
 int good_notify_remove(int fd,int wd);
 
@@ -72,9 +66,6 @@ int good_notify_remove(int fd,int wd);
  * @param timeout 超时(毫秒)。>= 0 有事件或时间过期，< 0 直到事件或出错。
  * 
  * @return 0 成功，!0 超时或失败。
- * 
- * @see good_poll()
- * @see good_read()
 */
 int good_notify_watch(int fd,good_notify_event_t *event,time_t timeout);
 

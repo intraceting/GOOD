@@ -87,7 +87,17 @@ int main(int argc, char **argv)
 
     good_option_parse(t,argc,argv,"--");
 
+    printf("\n--------------------------------------\n");
     good_option_fprintf(stderr,t);
+    printf("\n--------------------------------------\n");
+
+    good_option_remove(t,"-bbb");
+
+
+    printf("\n--------------------------------------\n");
+    good_option_fprintf(stderr,t);
+    printf("\n--------------------------------------\n");
+
  
 
     good_tree_free(&t);

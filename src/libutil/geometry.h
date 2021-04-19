@@ -49,8 +49,6 @@ double good_geom_p2p_distance(const good_point_t *p1, const good_point_t *p2);
  * 
  * @param axis 仅支持X轴或者Y轴。
  * 
- * @see atan2()
- * 
 */
 double good_geom_halfline_radian(const good_point_t *p1, const good_point_t *p2, int axis);
 
@@ -63,11 +61,6 @@ double good_geom_halfline_radian(const good_point_t *p1, const good_point_t *p2,
  * @param radian 弧度
  * @param dist 距离
  * @param p2 
- * 
- * @see good_geom_p2p_distance()
- * @see good_geom_halfline_radian()
- * @see cos()
- * @see sin()
  */
 void good_geom_point_move(const good_point_t *p1,double radian,double dist,good_point_t *p2);
 

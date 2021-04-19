@@ -37,8 +37,6 @@ typedef struct _good_signal
  * 等待信号。
  * 
  * @param timeout 超时(毫秒)。 >= 0 有信号或时间过期，< 0 直到有信号或出错。
- * 
- * 
 */
 void good_sigwaitinfo(good_signal_t *sig, time_t timeout);
 

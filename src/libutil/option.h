@@ -57,6 +57,13 @@ const char* good_option_get(good_tree_t *opt, const char *key,size_t index,const
 ssize_t good_option_count(good_tree_t *opt, const char *key);
 
 /**
+ * 删除一个选项和值。
+ * 
+ * @return 0 成功，-1 失败(键不存在)。
+*/
+int good_option_remove(good_tree_t *opt, const char *key);
+
+/**
  * 格式化打印。
  * 
  * @return >=0 输出的长度，< 0 失败。
@@ -72,6 +79,10 @@ ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt);
 
 /**
  * 解析参数选项。
+ * 
+ * 通常用于命令行参数解析。
+ * 
+ * @param prefix 键的前缀字符串。
 */
 void good_option_parse(good_tree_t *opt,int argc, char* argv[],const char *prefix);
 

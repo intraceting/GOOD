@@ -56,8 +56,6 @@ void good_allocator_atfree(good_allocator_t *alloc,
  * 
  * @param sizes 指定每个内存块的容量。NULL(0) 容量为0。
  * @param numbers 数量。> 0 的整数。
- * 
- * @see good_heap_alloc()
 */
 good_allocator_t *good_allocator_alloc(size_t *sizes,size_t numbers);
 
@@ -65,8 +63,6 @@ good_allocator_t *good_allocator_alloc(size_t *sizes,size_t numbers);
  * 申请一个内存块。
  * 
  * @param size 容量。>= 0 的整数。
- * 
- * @see good_allocator_alloc()
 */
 good_allocator_t *good_allocator_alloc2(size_t size);
 
@@ -76,7 +72,6 @@ good_allocator_t *good_allocator_alloc2(size_t size);
  * 复制内存块指针。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
- * 
 */
 good_allocator_t *good_allocator_refer(good_allocator_t *src);
 
@@ -86,8 +81,6 @@ good_allocator_t *good_allocator_refer(good_allocator_t *src);
  * 当前是最后一个引用者才会释放。
  * 
  * @param buf 指针的指针。函数返回前设置为NULL(0)。
- * 
- * @see good_heap_free()
 */
 void good_allocator_unref(good_allocator_t **dst);
 
@@ -95,9 +88,6 @@ void good_allocator_unref(good_allocator_t **dst);
  * 内存块克隆。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
- * 
- * @see good_allocator_alloc()
- * @see memcpy()
 */
 good_allocator_t *good_allocator_clone(good_allocator_t *src);
 
@@ -110,9 +100,6 @@ good_allocator_t *good_allocator_clone(good_allocator_t *src);
  * @param src 内存块指针的指针。私有化成功后，指针不可再被访问；如果私有化失败，指针依然有效。
  * 
  * @return !NULL(0) 成功，NULL(0) 失败。
- * 
- * @see good_allocator_clone()
- * @see good_allocator_unref()
 */
 good_allocator_t * good_allocator_privatize(good_allocator_t **dst);
 
