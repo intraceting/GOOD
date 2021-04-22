@@ -41,11 +41,15 @@
 #include <sys/file.h>
 #include <sys/wait.h>
 #include <sys/ioctl.h>
+#include <sys/epoll.h>
+#include <sys/mtio.h>
+#include <scsi/scsi.h>
+#include <scsi/scsi_ioctl.h>
+#include <scsi/sg.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <net/if.h>
-#include <sys/epoll.h>
 
 /*------------------------------------------------------------------------------------------------*/
 

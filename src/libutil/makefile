@@ -62,7 +62,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/notify.o \
 	${OBJ_PATH}/iconv.o \
 	${OBJ_PATH}/socket.o \
-	${OBJ_PATH}/epoll.o
+	${OBJ_PATH}/epoll.o \
+	${OBJ_PATH}/scsi.o
 
 
 #

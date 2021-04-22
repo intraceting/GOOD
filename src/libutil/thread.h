@@ -62,15 +62,11 @@ typedef struct _good_thread_t
 
     /**
      * 线程函数。
-     * 
-     * @see pthared_create() 
-     */
+    */
     void *(*routine)(void *opaque);
 
     /**
      * 环境指针。
-     * 
-     * @see pthared_create() 
      */
     void *opaque;
 

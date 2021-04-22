@@ -62,7 +62,8 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/process_test.exe \
 	$(BUILD_PATH)/popen_test.exe \
 	$(BUILD_PATH)/socket_test.exe \
-	$(BUILD_PATH)/option_test.exe
+	$(BUILD_PATH)/option_test.exe \
+	$(BUILD_PATH)/scsi_test.exe
 
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
 	mkdir -p $(BUILD_PATH)
@@ -90,5 +91,6 @@ clean:
 	rm -f $(BUILD_PATH)/popen_test.exe
 	rm -f $(BUILD_PATH)/socket_test.exe
 	rm -f $(BUILD_PATH)/option_test.exe
+	rm -f $(BUILD_PATH)/scsi_test.exe
 
 
