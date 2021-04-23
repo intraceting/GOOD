@@ -359,7 +359,7 @@ uint32_t good_tar_hdr_get_checksum(good_tar_hdr* hdr)
 
 int64_t good_tar_hdr_get_size(good_tar_hdr* hdr)
 {
-    uint32_t size = 0;
+    uint64_t size = 0;
     char buf[64] = {0};
 
     assert(hdr != NULL);
@@ -397,4 +397,128 @@ uint32_t good_tar_hdr_get_mode(good_tar_hdr *hdr)
     sscanf(buf, "%o", &mode);
 
     return mode;
+}
+
+void good_tar_hdr_fill(good_tar_hdr *hdr,
+                       char typeflag, const char name[100],
+                       int64_t size, time_t time, uint32_t mode)
+{
+    assert(hdr != NULL && name != NULL);
+    assert(size >= 0);
+    assert(name[0] != '\0');
+
+    /**/
+    hdr->typeflag = typeflag;
+
+    /*for 99 byte*/
+    strncpy(hdr->name, name, sizeof (hdr->name) - 1);
+
+    strncpy(hdr->magic, TMAGIC, TMAGLEN);
+    strncpy(hdr->version, TVERSION, TVERSLEN);
+
+    snprintf(hdr->mode, 8, "%07o", (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
+
+    snprintf(hdr->mtime, 12, "%011lo", time);
+
+    /*max 8GB*/
+    if (size < 1024 * 1024 * 1024 * 8LL)
+        snprintf(hdr->size, 12, "%011lo", size); //must be 11
+    else
+        EncodeUint8(size, hdr->size, 11); //must be 11
+    
+    /**/
+    snprintf(hdr->chksum, 8, "%07ou", good_tar_hdr_calc_checksum(hdr));
+}
+
+int good_tar_hdr_verify(good_tar_hdr *hdr)
+{
+    uint32_t old_sum = 0;
+    uint32_t now_sum = 0;
+
+    assert(hdr != NULL);
+
+    if(good_strncmp(hdr->magic, TMAGIC, strlen(TMAGIC),1) != 0)
+        return 0;
+
+    old_sum = good_tar_hdr_get_checksum(hdr);
+    now_sum = good_tar_hdr_calc_checksum(hdr);
+
+    if(old_sum != now_sum)
+        return 0;
+
+    return 1;
+}
+
+int good_tar_write_hdr(int fd,const char* name,const struct stat *attr,good_buffer_t *buf)
+{
+    int namelen;
+    good_tar_hdr *hdr;
+    char *longname;
+    int longname_space;
+    int chk;
+
+    assert(fd >= 0 && name != NULL && attr != NULL);
+
+    assert(name[0] != '\0');
+    assert(S_ISREG(attr->st_mode) ||S_ISDIR(attr->st_mode));
+
+    hdr = (good_tar_hdr *)good_heap_alloc(GOOD_TAR_BLOCK_SIZE);
+    if (hdr == NULL)
+        goto final_error;
+
+    /*计算文件名的长度。*/
+    namelen = strlen(name);
+
+    /*文件名(包括路径)的长度大于或等于100时，需要特别处理。*/
+    if (namelen >= 100)
+    {   
+        /*计算长文件名占用的空间。*/
+        longname_space = good_align(namelen,GOOD_TAR_BLOCK_SIZE);
+        longname = (char*)good_heap_alloc(longname_space);
+        if (longname == NULL)
+            goto final_error;
+
+        /*复制长文件名。*/
+        strncpy(longname,name,namelen);
+
+        /*填充长文件名的头部信息。*/
+        good_tar_hdr_fill(hdr, GOOD_USTAR_LONGNAME_TYPE, GOOD_USTAR_LONGNAME_MAGIC,namelen, 0, 0);
+
+        /*长文件名的头部写入到文件。*/
+        chk = ((good_tar_write(fd, hdr, GOOD_TAR_BLOCK_SIZE, buf) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
+        if (chk != 0)
+            goto final_error;
+
+        /*长文件名写入到文件。*/
+        chk = ((good_tar_write(fd, longname, longname_space, buf) == longname_space) ? 0 : -1);
+        if (chk != 0)
+            goto final_error;
+
+        /*清空头部准备复用。*/
+        memset(hdr,0,GOOD_TAR_BLOCK_SIZE);
+    }
+
+    /*填充头部信息。*/
+    if (S_ISREG(attr->st_mode))
+        good_tar_hdr_fill(hdr, REGTYPE, name, attr->st_size, attr->st_mtim.tv_sec, attr->st_mode);
+    else if (S_ISDIR(attr->st_mode))
+        good_tar_hdr_fill(hdr, DIRTYPE, name, 0, attr->st_mtim.tv_sec, attr->st_mode);
+
+    /*写入到文件。*/
+    chk = ((good_tar_write(fd, hdr, GOOD_TAR_BLOCK_SIZE, buf) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
+    if (chk == 0)
+        goto final;
+
+
+final_error:
+
+    /*出错了。*/
+    chk = -1;
+
+final:
+
+    good_heap_freep((void**)&hdr);
+    good_heap_freep((void**)&longname);
+
+    return chk;
 }

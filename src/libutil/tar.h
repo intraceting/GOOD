@@ -10,8 +10,14 @@
 #include "general.h"
 #include "buffer.h"
 
+
 /**
- * This is the tar header.
+ * TAR的块长度(512Bytes)。
+*/
+#define GOOD_TAR_BLOCK_SIZE     512
+
+/**
+ * TAR头部信息.
  * 
  * 512 Bytes.
  */
@@ -48,6 +54,7 @@ typedef struct _good_tar_hdr
     } other;
 
 } good_tar_hdr;
+
 
 /*
  * gnu tar extensions:
@@ -92,12 +99,12 @@ ssize_t good_tar_write(int fd, const void *data, size_t size, good_buffer_t *buf
 int good_tar_write_trailer(int fd, uint8_t stuffing, good_buffer_t *buf);
 
 /**
- * 计算TAR头部校验和。
+ * 计算TAR头部较验和。
 */
 uint32_t good_tar_hdr_calc_checksum(good_tar_hdr *hdr);
 
 /** 
- * 提取TAR头部中的校验和字段。
+ * 提取TAR头部中的较验和字段。
 */
 uint32_t good_tar_hdr_get_checksum(good_tar_hdr *hdr);
 
@@ -115,5 +122,28 @@ time_t good_tar_hdr_get_mtime(good_tar_hdr *hdr);
  * 提取TAR头部中的状态字段。
 */
 uint32_t good_tar_hdr_get_mode(good_tar_hdr *hdr);
+
+/** 
+ * 填充TAR头部的字段。
+ * 
+ * @param name 文件名(包括路径)。including NULL byte。
+*/
+void good_tar_hdr_fill(good_tar_hdr *hdr,
+                       char typeflag, const char name[100],
+                       int64_t size, time_t time, uint32_t mode);
+
+/**
+ * 较验TAR头部的较验和是否一致。
+ * 
+ * @return !0 一致，0 不一致。
+*/
+int good_tar_hdr_verify(good_tar_hdr *hdr);
+
+/**
+ * 向文件写入TAR头部。
+ * 
+ * @param name 文件名(包括路径)。
+*/
+int good_tar_write_hdr(int fd,const char* name,const struct stat *attr,good_buffer_t *buf);
 
 #endif //GOOD_UTIL_TAR_H

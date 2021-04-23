@@ -282,6 +282,25 @@ void test_iconv()
     iconv_close(cd);
 }
 
+void test_tar(const char* name)
+{
+    int fd =good_open(name,0,0,0);
+
+    good_buffer_t *buf = good_buffer_alloc2(512 * 1024);
+
+
+    good_tar_hdr h;
+
+    good_tar_read(fd,&h,512,buf);
+
+    assert(good_tar_hdr_verify(&h));
+
+
+    good_buffer_freep(&buf);
+
+    good_closep(&fd);
+}
+
 int main(int argc, char **argv)
 {
     
@@ -289,14 +308,17 @@ int main(int argc, char **argv)
 
    //  test_dirscan();
 
-     if(argc>=3)
-         test_file(argv[1],argv[2]);
+  //   if(argc>=3)
+   //      test_file(argv[1],argv[2]);
 
     // test_mman();
 
     //test_notify();
 
    // test_iconv();
+
+   if(argc>=2)
+        test_tar(argv[1]);
 
     return 0;
 }
