@@ -18,9 +18,7 @@ good_buffer_t *good_buffer_alloc(good_allocator_t *alloc)
     {
         assert(alloc->numbers > 0 && alloc->pptrs[0] != NULL && alloc->sizes[0] > 0);
 
-        /*
-        * 绑定内存块。
-        */
+        /*绑定内存块。*/
         buf->alloc = alloc;
 
         buf->data = buf->alloc->pptrs[0];
@@ -30,9 +28,7 @@ good_buffer_t *good_buffer_alloc(good_allocator_t *alloc)
     }
     else
     {
-        /*
-         * 允许空的。
-        */
+        /*允许空的。*/
         buf->alloc = buf->data = NULL;
         buf->size = buf->rsize = buf->wsize = 0;
     }
@@ -87,9 +83,7 @@ good_buffer_t *good_buffer_copy(good_buffer_t *src)
     
     if(src->data != NULL && src->size > 0)
     {
-        /*
-        * 如果不支持引用，则执行克隆。
-        */
+        /*如果不支持引用，则执行克隆。*/
         if (!src->alloc)
             return buf = good_buffer_clone(src);
 
@@ -145,9 +139,7 @@ int good_buffer_privatize(good_buffer_t *dst)
         if (!new_p)
             GOOD_ERRNO_AND_RETURN1(ENOMEM, -1);
 
-        /*
-         * 旧的指针换成新的指针。
-        */
+        /*旧的指针换成新的指针。*/
         dst->alloc = new_p;
 
         dst->data = new_p->pptrs[0];
@@ -170,19 +162,13 @@ int good_buffer_resize(good_buffer_t *buf, size_t size)
     if (!alloc_new)
         return -1;
 
-    /*
-     * 复制数据。
-    */
+    /*复制数据。*/
     memcpy(alloc_new->pptrs[0], buf->data, buf->size);
 
-    /*
-     * 解除旧的内存块。
-     */
+    /*解除旧的内存块*/
     good_allocator_unref(&buf->alloc);
 
-    /*
-     * 绑定新的内存块。
-    */
+    /*绑定新的内存块。*/
     buf->alloc = alloc_new;
 
     buf->data = alloc_new->pptrs[0];

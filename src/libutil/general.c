@@ -10,9 +10,7 @@
 
 size_t good_align(size_t size, size_t align)
 {
-    /*
-     * 大于1时，对齐才有意义。
-    */
+    /*大于1时，对齐才有意义。*/
     if (size && align > 1)
     {
         size_t padding = size % align;
@@ -369,9 +367,7 @@ uint8_t *good_endian_swap(uint8_t *dst, int len)
     }
     else if( len > 1 )
     {
-        /*
-        * 5,6,7,other,...
-        */
+        /* 5,6,7,other,... */
         for (int i = 0; i < len; i++)
             GOOD_INTEGER_SWAP(dst[len - i - 1], dst[i]);
     }
@@ -496,9 +492,7 @@ char *good_dirdir(char *path, const char *suffix)
         }
     }
 
-    /*
-     * 要有足够的可用空间，不然会溢出。
-    */
+    /* 要有足够的可用空间，不然会溢出。 */
     strcat(path + len, suffix);
 
     return path;
@@ -520,9 +514,7 @@ void good_mkdir(const char *path, mode_t mode)
     if (!tmp)
         GOOD_ERRNO_AND_RETURN0(ENOMEM);
 
-    /*
-     * 必须允许当前用户具有读、写、访问权限。
-    */
+    /* 必须允许当前用户具有读、写、访问权限。 */
     mode |= S_IRWXU;
 
     for (size_t i = 1; i < len; i++)
@@ -607,9 +599,7 @@ char *good_dirnice(char *dst, const char *src)
     if (s == NULL || *s == '\0')
         goto final;
 
-    /*
-     * 拆分目录，根据目录层级关系压入堆栈。
-    */
+    /*拆分目录，根据目录层级关系压入堆栈。*/
     while (1)
     {
         t = good_strtok(s, "/", &saveptr);
@@ -635,9 +625,7 @@ char *good_dirnice(char *dst, const char *src)
         }
     }
 
-    /*
-     * 拼接目录
-    */
+    /* 拼接目录 */
     if (*src == '/')
         good_dirdir(dst, "/");
 
@@ -688,9 +676,7 @@ char *good_proc_dirname(char *buf, const char *append)
     }
     else
     {
-        /*
-         * 这里的覆盖不会影响调用者。
-        */
+        /* 这里的覆盖不会影响调用者。*/
         buf = NULL;
     }
 
@@ -715,9 +701,7 @@ char *good_proc_basename(char *buf)
     }
     else
     {
-        /*
-         * 这里的覆盖不会影响调用者。
-        */
+        /*这里的覆盖不会影响调用者。*/
         buf = NULL;
     }
 
@@ -737,42 +721,28 @@ int good_proc_singleton(const char *lockfile,int* pid)
     if (fd < 0)
         return -1;
 
-    /*
-     * 通过尝试加独占锁来确定是否程序已经运行。
-    */
+    /* 通过尝试加独占锁来确定是否程序已经运行。*/
     if (flock(fd, LOCK_EX | LOCK_NB) == 0)
     {
-        /*
-         * PID可视化，便于阅读。
-        */
+        /* PID可视化，便于阅读。*/
         snprintf(strpid,15,"%d",getpid());
 
-        /*
-         * 清空。
-        */
+        /* 清空。*/
         ftruncate(fd, 0);
 
-        /*
-         * 写入文件。
-        */
+        /*写入文件。*/
         good_write(fd,strpid,strlen(strpid));
         fsync(fd);
 
-        /*
-         *进程ID就是自己。
-        */
+        /*进程ID就是自己。*/
         if(pid)
            *pid = getpid();
 
-        /*
-         * 走到这里返回锁定文件的句柄。
-        */
+        /* 走到这里返回锁定文件的句柄。*/
         return fd;
     }
 
-    /*
-     * 程序已经运行，进程ID需要从锁定文件中读取。
-    */
+    /* 程序已经运行，进程ID需要从锁定文件中读取。 */
     if(pid)
     {
         good_read(fd,strpid,12);
@@ -783,9 +753,7 @@ int good_proc_singleton(const char *lockfile,int* pid)
             *pid = -1;
     }
 
-    /*
-     * 独占失败，关闭句柄，返回-1。
-    */
+    /* 独占失败，关闭句柄，返回-1。*/
     good_closep(&fd);
     GOOD_ERRNO_AND_RETURN1(EPERM,-1);
 }
@@ -838,9 +806,7 @@ ssize_t good_write(int fd, const void *data, size_t size)
     {
         if (wsize < size)
         {
-            /*
-             * 有的系统超过2GB，需要分段落盘。
-            */
+            /*有的系统超过2GB，需要分段落盘。*/
             wsize2 = good_write(fd, GOOD_PTR2PTR(void, data, wsize), size - wsize);
             if (wsize2 > 0)
                 wsize += wsize2;
@@ -862,9 +828,7 @@ ssize_t good_read(int fd, void *data, size_t size)
     {
         if (rsize < size)
         {
-            /*
-            * 有的系统超过2GB，需要分段读取。
-            */
+            /*有的系统超过2GB，需要分段读取。*/
             rsize2 = good_read(fd, GOOD_PTR2PTR(char, data, rsize), size - rsize);
             if (rsize2 > 0)
                 rsize += rsize2;
@@ -918,9 +882,7 @@ int good_open2(int fd2, const char *file, int rw, int nonblock, int create)
 
     fd3 = dup2(fd, fd2);
 
-    /*
-     * 必须要关闭，不然句柄就会丢失，造成资源泄露。
-    */
+    /*必须要关闭，不然句柄就会丢失，造成资源泄露。*/
     good_closep(&fd);
 
     return fd3;
@@ -1017,9 +979,7 @@ pid_t good_popen(const char *cmd,char * const envp[], int *stdin_fd, int *stdout
         good_closep(&in2err_fd[0]);
         good_closep(&in2err_fd[1]);
 
-        /*
-         * 这个基本都支持。
-        */
+        /* 这个基本都支持。*/
         execle("/bin/sh", "sh", "-c", cmd,NULL,envp);
 
         /*Maybe it will never be here.*/

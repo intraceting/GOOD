@@ -28,9 +28,7 @@ typedef struct _good_log
     void *opaque;
 } good_log_t;
 
-/*
- * 全局的日志环境
-*/
+/* 全局的日志环境*/
 static good_log_t *__good_log_ctx = NULL;
 
 void good_log_init(const char *ident, int copy2stderr)
@@ -42,9 +40,7 @@ void good_log_init(const char *ident, int copy2stderr)
     openlog(ident, LOG_CONS | LOG_PID | (copy2stderr ? LOG_PERROR : 0), LOG_USER);
     setlogmask(log.mask);
 
-    /*
-     * 绑定到全局日志环境。
-    */
+    /* 绑定到全局日志环境。*/
     __good_log_ctx = &log;
 }
 

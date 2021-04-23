@@ -20,9 +20,7 @@ void good_map_destroy(good_map_t *map)
 {
     assert(map);
 
-    /*
-     * 全部释放。
-    */
+    /* 全部释放。*/
     good_tree_free(&map->table);
 
     memset(map, 0, sizeof(*map));
@@ -32,9 +30,7 @@ int good_map_init(good_map_t *map, size_t size)
 {
     assert(map && size > 0);
 
-    /*
-     * 创建树节点，用于表格。
-    */
+    /* 创建树节点，用于表格。 */
     map->table = good_tree_alloc2(NULL, size);
 
     if (!map->table)

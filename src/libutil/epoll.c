@@ -12,9 +12,7 @@ int good_epoll_create()
     if (fd < 0)
         return -1;
 
-    /*
-     * 添加个非必要标志，忽略可能的出错信息。
-    */
+    /* 添加个非必要标志，忽略可能的出错信息。 */
     good_fflag_add(fd, SOCK_CLOEXEC);
 
     return fd;
@@ -31,9 +29,7 @@ int good_epoll_mark(int efd, int fd, const struct epoll_event *event, int first)
     mark.data = event->data;
     mark.events |= (EPOLLERR | EPOLLHUP | EPOLLRDHUP | EPOLLET);
 
-    /*
-     * 转换事件。
-    */
+    /*转换事件。*/
     if (event->events & GOOD_EPOLL_INPUT)
         mark.events |= EPOLLIN;
     if (event->events & GOOD_EPOLL_OUTPUT)
@@ -59,9 +55,7 @@ int good_epoll_wait(int efd,struct epoll_event * events,int max,int timeout)
 
     chk = epoll_wait(efd,events,max,timeout);
 
-    /*
-     * 转换事件。
-    */
+    /*转换事件。 */
     for (int i = 0; i < chk; i++)
     {
         tmp = events[i].events;

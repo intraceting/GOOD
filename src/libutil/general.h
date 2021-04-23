@@ -33,6 +33,7 @@
 #include <iconv.h>
 #include <ifaddrs.h>
 #include <netdb.h>
+#include <tar.h>
 #include <sys/socket.h>
 #include <sys/inotify.h>
 #include <sys/stat.h>

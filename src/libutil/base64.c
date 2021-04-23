@@ -49,14 +49,10 @@ ssize_t good_base64_encode(const uint8_t *src, size_t slen, char *dst, size_t dm
 
     assert(GOOD_BASE64_ENCODE_LEN(slen) >= dmaxlen);
 
-    /*
-    * 原文长度除以3的余数。
-    */
+    /*原文长度除以3的余数*/
     remain = slen % 3;
 
-    /*
-    * 原文长度减去除以3的余数。
-    */
+    /*原文长度减去除以3的余数。*/
     formal = slen - remain;
 
     mark = 0;
@@ -161,9 +157,7 @@ ssize_t good_base64_decode(const char *src, size_t slen, uint8_t *dst, size_t dm
 
     assert(GOOD_BASE64_DECODE_LEN(slen, src[slen - 2], src[slen - 1]) >= dmaxlen);
 
-    /*
-     * 原文长度减去4。
-    */
+    /*原文长度减去4。*/
     formal = slen - 4;
 
     mark = 0;

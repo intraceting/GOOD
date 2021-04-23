@@ -25,9 +25,7 @@ ssize_t good_iconv(iconv_t cd, const char *src, size_t slen, char *dst, size_t d
     if(chk == -1)
         return -1;
 
-    /*
-     * 调用者可能关注未转换成功的。
-    */    
+    /* 调用者可能关注未转换成功的。*/    
     if(remain != NULL)
         *remain = chk;
     

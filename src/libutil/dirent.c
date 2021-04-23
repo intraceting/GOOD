@@ -27,9 +27,7 @@ void good_dirscan(good_tree_t *father,size_t depth,int onefs)
     assert( f_path != NULL && *f_path != '\0');
     assert( f_stat != NULL);
 
-    /*
-     * 递归进来的，查询一次即可。
-    */
+    /* 递归进来的，查询一次即可。*/
     if(f_stat->st_nlink <= 0)
     {
         if (lstat(f_path, f_stat) == -1)
@@ -58,41 +56,29 @@ void good_dirscan(good_tree_t *father,size_t depth,int onefs)
         good_dirdir(c_path, f_path);
         good_dirdir(c_path, c_dir->d_name);
       
-        /*
-         * 加入到树节点。
-        */
+        /*加入到树节点。*/
         good_tree_insert2(father, node, 0);
 
-        /*
-         * node->d_type 有些文件系统有BUG未设置有效值，因此不能直接使用，这里用替待方案。
-         */
+        /*node->d_type 有些文件系统有BUG未设置有效值，因此不能直接使用，这里用替待方案。 */
         if (lstat(c_path, c_stat) == -1)
         {
             good_tree_free(&node);
             break;
         }
         
-        /*
-         * 如果不是目录，下面的代码不需要执行。
-        */
+        /* 如果不是目录，下面的代码不需要执行。*/
         if (!S_ISDIR(c_stat->st_mode))
             continue;
 
-        /*
-         * 递归深度。
-        */
+        /* 递归深度。*/
         if (depth <= 0)
             continue;
 
-        /*
-         * 同一个文件系统。
-        */
+        /* 同一个文件系统。*/
         if(onefs && f_stat->st_dev != c_stat->st_dev)
             continue;
 
-        /*
-         * 递归。
-        */
+        /* 递归。 */
         good_dirscan(node, depth - 1, onefs);
     }
 

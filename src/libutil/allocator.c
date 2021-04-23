@@ -193,9 +193,7 @@ void good_allocator_unref(good_allocator_t **dst)
         in_p->out.sizes = NULL;
         in_p->out.pptrs = NULL;
 
-        /*
-         * 只要释放一次即可全部释放，因为内存是一次性申请的。
-        */
+        /* 只要释放一次即可全部释放，因为内存是一次性申请的。*/
         good_heap_freep((void **)&in_p);
     }
 
@@ -231,9 +229,7 @@ good_allocator_t *good_allocator_privatize(good_allocator_t **dst)
 
     if (atomic_load(dst_p->refcount) > 1)
     {
-        /*
-         * 当前不是唯一引用，克隆一份。
-        */
+        /* 当前不是唯一引用，克隆一份。*/
         new_p = good_allocator_clone(dst_p);
         if(new_p)
             good_allocator_unref(dst);
