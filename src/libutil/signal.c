@@ -38,9 +38,7 @@ void good_sigwaitinfo(good_signal_t *sig, time_t timeout)
         if(sig->signal_cb)
             chk = sig->signal_cb(&info,sig->opaque);
 
-        /*
-         * -1 终止。
-        */
+        /* -1 终止。 */
         if(chk == -1)
             break;
     }

@@ -99,14 +99,10 @@ int good_scsi_inquiry_sn(int fd,
     if(*status != GOOD)
         return -1;
 
-    /*
-     * Just copy SN。
-    */
+    /* Just copy SN。  */
     memcpy(buf, tmp + 4, GOOD_MIN(tmp[3], 32));
 
-    /*
-     * 去掉两端的空格。
-    */
+    /* 去掉两端的空格。 */
     good_strtrim(buf,isspace,2);
 
     return 0;
@@ -133,9 +129,7 @@ int good_scsi_inquiry_baseinfo(int fd,
     if(*status != GOOD)
         return -1;
 
-    /*
-     * Copy TYPE，VENDOR，PRODUCT。
-    */
+    /* Copy TYPE，VENDOR，PRODUCT。*/
     if(type)
         *type = tmp[0] & 0x1f;
     if(vendor)
@@ -143,9 +137,7 @@ int good_scsi_inquiry_baseinfo(int fd,
     if(product)
         memcpy(product, tmp + 16, 16);
 
-    /*
-     * 去掉两端的空格。
-    */
+    /* 去掉两端的空格。 */
     if(vendor)
         good_strtrim(vendor,isspace,2);
     if(product)

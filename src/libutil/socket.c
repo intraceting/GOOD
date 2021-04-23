@@ -46,9 +46,7 @@ int good_inet_pton(const char *name, sa_family_t family, good_sockaddr_t *addr)
 {
     assert(name != NULL && (family == GOOD_IPV4 || family == GOOD_IPV6) && addr != NULL);
 
-    /*
-     * bind family
-    */
+    /*bind family*/
     addr->family = family;
 
     if (addr->family == GOOD_IPV4)
@@ -118,9 +116,7 @@ int good_ifname_fetch(good_ifaddrs_t *addrs, int max, int ex_loopback)
             memcpy(&p->addr, it->ifa_addr, sizeof(struct sockaddr_in6));
             memcpy(&p->mark, it->ifa_netmask, sizeof(struct sockaddr_in6));
 
-            /*
-             * IPv6 not support.
-            */
+            /*IPv6 not support. */
             p->broa.family = PF_UNSPEC;
         }
     }
@@ -269,9 +265,7 @@ int good_accept(int fd, good_sockaddr_t *addr)
     if (sub_fd < 0)
         return -1;
 
-    /*
-     * 添加个非必要标志，忽略可能的出错信息。
-    */
+    /* 添加个非必要标志，忽略可能的出错信息。 */
     good_fflag_add(sub_fd, O_CLOEXEC);
 
     return sub_fd;
@@ -289,9 +283,7 @@ int good_connect(int fd, good_sockaddr_t *addr, time_t timeout)
     if (flags == -1)
         return -1;
 
-    /*
-     * 添加非阻塞标志，用于异步连接。
-    */
+    /* 添加非阻塞标志，用于异步连接。*/
     chk = 0;
     if (!(flags & O_NONBLOCK))
         chk = good_fflag_add(fd, O_NONBLOCK);
@@ -306,24 +298,18 @@ int good_connect(int fd, good_sockaddr_t *addr, time_t timeout)
     if (errno != EINPROGRESS && errno != EWOULDBLOCK && errno != EAGAIN)
         goto final;
 
-    /*
-     * 等待写事件(允许)。
-    */
+    /* 等待写事件(允许)。 */
     chk = (good_poll(fd, 0x02, timeout) > 0 ? 0 : -1);
     if(chk != 0)
         goto final;
 
-    /*
-     * 获取SOCKET句柄的出错码。
-    */
+    /* 获取SOCKET句柄的出错码。 */
     chk = good_sockopt_option_int(fd, SOL_SOCKET, SO_ERROR, &eno, 1);
     chk = (eno == 0 ? 0 : -1);
 
 final:
     
-    /*
-     * 恢复原有的标志，忽略可能的出错信息。
-    */
+    /* 恢复原有的标志，忽略可能的出错信息。*/
     if (!(flags & O_NONBLOCK))
         good_fflag_del(fd, O_NONBLOCK);
 

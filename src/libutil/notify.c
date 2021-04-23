@@ -37,45 +37,31 @@ int good_notify_watch(int fd,good_notify_event_t *event,time_t timeout)
     assert(fd >= 0 && event != NULL);
     assert(event->buf != NULL && event->buf->data != NULL && event->buf->size > 0);
 
-    /*
-    * 清除已经读取的。
-    */
+    /* 清除已经读取的。*/
     good_buffer_drain(event->buf);
 
-    /*
-     * 缓存无数据，先等待。
-    */
+    /*缓存无数据，先等待。*/
     if (event->buf->wsize <= 0)
     {
-        /*
-        * 等待事件到来。
-        */
+        /* 等待事件到来。 */
         if (good_poll(fd, 0x01, timeout) <= 0)
             return -1;
 
-        /*
-         * 导入缓存。
-        */
+        /* 导入缓存。 */
         if( good_buffer_import_atmost(event->buf,fd,INT64_MAX)<=0)
             return -1;
     }
 
-    /*
-     * 读事件，必须符合事件结构大小，不能多，也不能少。
-    */
+    /*读事件，必须符合事件结构大小，不能多，也不能少。*/
     rlen = good_buffer_read(event->buf, &event->event, sizeof(struct inotify_event));
     if (rlen <= 0 || rlen != sizeof(struct inotify_event))
         return -1;
 
-    /*
-    * 事件后没有附带名字，直接返回。
-    */
+    /* 事件后没有附带名字，直接返回。*/
     if(event->event.len<=0)
         return 0;
 
-    /*
-    * 事件后跟着固定长度的名字，读取的名字长度符合事件描述的大小，不能多，也不能少。
-    */
+    /* 事件后跟着固定长度的名字，读取的名字长度符合事件描述的大小，不能多，也不能少。*/
     rlen = good_buffer_read(event->buf,event->name,event->event.len);
     if (rlen <= 0 || rlen != event->event.len)
         return -1;

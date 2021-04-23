@@ -41,9 +41,7 @@ void good_tree_unlink(good_tree_t *self)
 
     assert(self);
 
-    /*
-     * 获取父节点
-     */
+    /* 获取父节点*/
     root = self->chain[GOOD_TREE_CHAIN_FATHER];
 
     if (!root)
@@ -59,9 +57,7 @@ void good_tree_unlink(good_tree_t *self)
     if (self->chain[GOOD_TREE_CHAIN_SIBLING_PREV])
         self->chain[GOOD_TREE_CHAIN_SIBLING_PREV]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT];
 
-    /*
-     * NODE 是首?
-    */
+    /* NODE 是首?*/
     if (self == root->chain[GOOD_TREE_CHAIN_CHILD_FIRST])
     {
         root->chain[GOOD_TREE_CHAIN_CHILD_FIRST] = self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT];
@@ -69,9 +65,7 @@ void good_tree_unlink(good_tree_t *self)
             root->chain[GOOD_TREE_CHAIN_CHILD_FIRST]->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = NULL;
     }
 
-    /*
-     * NODE 是尾?
-    */
+    /* NODE 是尾? */
     if (self == root->chain[GOOD_TREE_CHAIN_CHILD_LEAST])
     {
         root->chain[GOOD_TREE_CHAIN_CHILD_LEAST] = self->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
@@ -79,9 +73,7 @@ void good_tree_unlink(good_tree_t *self)
             root->chain[GOOD_TREE_CHAIN_CHILD_LEAST]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = NULL;
     }
 
-    /*
-     * 打断与父节点的关系链，但同时保留子节点关系链。
-    */
+    /* 打断与父节点的关系链，但同时保留子节点关系链。*/
     self->chain[GOOD_TREE_CHAIN_FATHER] = NULL;
     self->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = NULL;
     self->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = NULL;
@@ -91,16 +83,12 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
 {
     assert(father && child);
 
-    /* 
-     * 必须是根节点，或独立节点。
-    */
+    /*必须是根节点，或独立节点。 */
     assert(NULL == child->chain[GOOD_TREE_CHAIN_FATHER]);
     assert(NULL == child->chain[GOOD_TREE_CHAIN_SIBLING_PREV]);
     assert(NULL == child->chain[GOOD_TREE_CHAIN_SIBLING_NEXT]);
 
-    /* 
-     * 绑定新父节点。
-    */
+    /* 绑定新父节点。*/
     child->chain[GOOD_TREE_CHAIN_FATHER] = father;
 
     if (where)
@@ -109,22 +97,16 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
 
         if (where == father->chain[GOOD_TREE_CHAIN_CHILD_FIRST])
         {
-            /*
-             * 添加到头节点之前。
-            */
+            /*添加到头节点之前。*/
             where->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = child;
             child->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = where;
 
-            /* 
-             * 新的头节点。
-            */
+            /* 新的头节点。*/
             father->chain[GOOD_TREE_CHAIN_CHILD_FIRST] = child;
         }
         else
         {
-            /*
-             * 添加到节点之前
-            */
+            /*添加到节点之前*/
             where->chain[GOOD_TREE_CHAIN_SIBLING_PREV]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = child;
             child->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = where->chain[GOOD_TREE_CHAIN_SIBLING_PREV];
             child->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = where;
@@ -135,22 +117,16 @@ void good_tree_insert(good_tree_t *father, good_tree_t *child, good_tree_t *wher
     {
         if (father->chain[GOOD_TREE_CHAIN_CHILD_LEAST])
         {
-            /*
-             * 添加到尾节点之后。
-            */
+            /* 添加到尾节点之后。*/
             father->chain[GOOD_TREE_CHAIN_CHILD_LEAST]->chain[GOOD_TREE_CHAIN_SIBLING_NEXT] = child;
             child->chain[GOOD_TREE_CHAIN_SIBLING_PREV] = father->chain[GOOD_TREE_CHAIN_CHILD_LEAST];
 
-            /* 
-             * 新的尾节点。
-            */
+            /* 新的尾节点。*/
             father->chain[GOOD_TREE_CHAIN_CHILD_LEAST] = child;
         }
         else
         {
-            /*
-             * 空链表，添加第一个节点。
-            */
+            /* 空链表，添加第一个节点。*/
             father->chain[GOOD_TREE_CHAIN_CHILD_LEAST] = father->chain[GOOD_TREE_CHAIN_CHILD_FIRST] = child;
         }
     }
@@ -183,9 +159,7 @@ void good_tree_swap(good_tree_t *src,good_tree_t *dst)
     src_next = good_tree_sibling(src,0);
     dst_next = good_tree_sibling(dst,0);
 
-    /*
-     * 两个兄弟紧挨着。
-    */
+    /* 两个兄弟紧挨着。*/
     if(src_next == dst)
     {
         good_tree_unlink(dst);
@@ -198,9 +172,7 @@ void good_tree_swap(good_tree_t *src,good_tree_t *dst)
     }
     else
     {
-        /*
-         * 有其它兄弟姐妺夹在中间。
-        */
+        /* 有其它兄弟姐妺夹在中间。 */
         good_tree_unlink(dst);
         good_tree_unlink(src);
 
@@ -226,14 +198,10 @@ void good_tree_free(good_tree_t **root)
     if(!root || !*root)
         GOOD_ERRNO_AND_RETURN0(EINVAL);
 
-    /*
-     * 复制一下
-    */
+    /* 复制一下 */
     root_p = *root;
 
-    /*
-     * 以防清理到父和兄弟节点。 
-    */
+    /* 以防清理到父和兄弟节点。 */
     assert(NULL == root_p->chain[GOOD_TREE_CHAIN_FATHER]);
     assert(NULL == root_p->chain[GOOD_TREE_CHAIN_SIBLING_PREV]);
     assert(NULL == root_p->chain[GOOD_TREE_CHAIN_SIBLING_NEXT]);
@@ -246,9 +214,7 @@ void good_tree_free(good_tree_t **root)
         {
             child = good_tree_child(node,0);
 
-            /*
-             * 检测是否有子节点，如果有先清理子节点。
-            */
+            /* 检测是否有子节点，如果有先清理子节点。  */
             if (child)
             {
                 root_p = node;
@@ -263,9 +229,7 @@ void good_tree_free(good_tree_t **root)
         }
         else
         {
-            /*
-             * 没有子节点，返回到父节点。
-            */
+            /* 没有子节点，返回到父节点。*/
             root_p = good_tree_father(root_p);
         }
     }
@@ -301,9 +265,7 @@ good_tree_t *good_tree_alloc2(size_t *sizes, size_t numbers)
 
 final_error:
 
-    /*
-     * 走到这里出错了。
-    */
+    /* 走到这里出错了。 */
     good_tree_free(&node);
     good_allocator_unref(&alloc);
     
@@ -327,9 +289,7 @@ void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it)
     assert(root != NULL && it != NULL);
     assert(it->dump_cb!= NULL);
         
-    /*
-     * 如果调用者不确定，则在内部自动确定。
-    */
+    /* 如果调用者不确定，则在内部自动确定。  */
     if (it->depth_max > stack_size)
         stack_size = it->depth_max;
 
@@ -337,16 +297,12 @@ void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it)
     if (!stack)
         goto final;
 
-    /*
-     * 根
-    */
+    /* 根  */
     chk = it->dump_cb(0,root,it->opaque);
     if(chk == 0)
         goto final;
 
-    /*
-     * 从第一个孩子开始遍历。
-    */
+    /* 从第一个孩子开始遍历。 */
     node = good_tree_child(root,1);
 
     while(node)
@@ -419,9 +375,7 @@ ssize_t good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const c
     }
     else
     {
-        /*
-         * 准备堆栈。
-        */
+        /*准备堆栈。 */
         stack = good_heap_alloc(depth * sizeof(good_tree_t *));
         if(!stack)
             GOOD_ERRNO_AND_RETURN1(ENOMEM,-1);
@@ -535,9 +489,7 @@ void good_tree_sort(good_tree_t *father,good_tree_order_t *order)
             t3 = good_tree_sibling(t3, 0);
         }
 
-        /*
-         * 需要交换时，再进行交换。
-        */
+        /*需要交换时，再进行交换。*/
         if (t1 != t2)
             good_tree_swap(t1, t2);
 

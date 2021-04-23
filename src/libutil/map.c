@@ -36,9 +36,7 @@ int good_map_init(good_map_t *map, size_t size)
     if (!map->table)
         GOOD_ERRNO_AND_RETURN1(ENOMEM, -1);
 
-    /*
-     * 如果未指定，则启用默认函数。
-    */
+    /* 如果未指定，则启用默认函数。 */
     if (!map->hash_cb)
         map->hash_cb = good_map_hash;
     if (!map->compare_cb)
@@ -64,23 +62,17 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
     hash = map->hash_cb(key, ksize, map->opaque);
     bucket = hash % map->table->alloc->numbers;
 
-    /*
-     * 查找桶，不存在则创建。
-    */
+    /* 查找桶，不存在则创建。*/
     it = (good_tree_t *)map->table->alloc->pptrs[bucket];
     if (!it)
     {
         it = good_tree_alloc3(sizeof(bucket));
         if (it)
         {
-            /*
-             * 存放桶的索引值。
-            */
+            /*存放桶的索引值。*/
             *GOOD_PTR2PTR(uint64_t, it->alloc->pptrs[GOOD_MAP_BUCKET], 0) = bucket;
 
-            /*
-             * 桶加入到表格中。
-            */
+            /* 桶加入到表格中。*/
             good_tree_insert2(map->table, it, 0);
             map->table->alloc->pptrs[bucket] = (uint8_t *)it;
         }
@@ -89,9 +81,7 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
     if (!it)
         GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
 
-    /*
-     * 链表存储的节点，依次比较查找。
-    */
+    /* 链表存储的节点，依次比较查找。*/
     node = good_tree_child(it, 1);
     while (node)
     {
@@ -105,9 +95,7 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
         node = good_tree_sibling(node, 0);
     }
 
-    /*
-     * 如果节点不存在并且需要创建，则添加到链表头。
-    */
+    /*如果节点不存在并且需要创建，则添加到链表头。 */
     if (!node && vsize > 0)
     {
         size_t sizes[2] = {ksize, vsize};
@@ -116,26 +104,18 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
         if (!node)
             GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
 
-        /*
-         * 注册数据节点的析构函数。
-        */
+        /* 注册数据节点的析构函数。*/
         if (map->destructor_cb)
             good_allocator_atfree(node->alloc, map->destructor_cb, map->opaque);
 
-        /*
-         * 复制KEY。
-        */
+        /*复制KEY。*/
         memcpy(node->alloc->pptrs[GOOD_MAP_KEY], key, ksize);
 
-        /*
-         * 也许有构造函数要处理一下。
-        */
+        /*也许有构造函数要处理一下。*/
         if(map->construct_cb)
             map->construct_cb(node->alloc,map->opaque);
 
-        /*
-         * 加入到链表头。
-        */
+        /* 加入到链表头。 */
         good_tree_insert2(it, node, 1);
     }
 
@@ -172,9 +152,7 @@ static int _good_map_scan_cb(size_t depth, good_tree_t *node, void *opaque)
 {
     good_map_t *map = (good_map_t *)opaque;
 
-    /*
-     * 跳过组织结构。
-    */
+    /*跳过组织结构。*/
     if (depth <= 1)
         return 1;
 

@@ -277,9 +277,7 @@ void good_option_fimport(good_tree_t *opt,FILE *fp,char note,const char *argv0,c
 
     while (_good_option_getline(fp,&line, &len, &rows,note) != -1)
     {
-        /*
-         * 去掉字符串两端所有控制字符。
-        */
+        /* 去掉字符串两端所有控制字符。 */
         good_strtrim(line,iscntrl,2);
 
         if (good_strncmp(line, prefix, prefix_len, 1) != 0)
@@ -299,9 +297,7 @@ void good_option_fimport(good_tree_t *opt,FILE *fp,char note,const char *argv0,c
         }
     }
 
-    /*
-     * 不要忘记释放这两块内存，不然可能会有内存泄漏的风险。
-    */
+    /*不要忘记释放这两块内存，不然可能会有内存泄漏的风险。 */
     if(line)
         free(line);
     if(it_key != prefix)

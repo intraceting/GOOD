@@ -44,15 +44,11 @@ good_allocator_t* good_mmap(int fd,int rw,int shared)
     alloc = good_allocator_alloc(NULL,1);
     if (alloc)
     {
-        /*
-         * 绑定内存和特定的释放函数，用于支持引用计数器。
-        */
+        /*绑定内存和特定的释放函数，用于支持引用计数器。*/
         alloc->pptrs[0] = mmptr;
         alloc->sizes[0] = attr.st_size;
 
-        /*
-         * 注册特定的析构函数。
-        */
+        /* 注册特定的析构函数。 */
         good_allocator_atfree(alloc,_good_munmap_cb,NULL);
     }
 
