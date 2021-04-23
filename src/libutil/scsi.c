@@ -6,7 +6,7 @@
  */
 #include "scsi.h"
 
-int good_scsi_ioctl(int fd,struct sg_io_hdr *hdr)
+int good_scsi_sgioctl(int fd,struct sg_io_hdr *hdr)
 {
     assert(fd >= 0 && hdr != NULL);
 
@@ -20,13 +20,13 @@ int good_scsi_ioctl(int fd,struct sg_io_hdr *hdr)
     return ioctl(fd,SG_IO,hdr);
 }
 
-int good_scsi_ioctl2(int fd,
-                     int direction,
-                     uint8_t *cdb, uint8_t cdblen,
-                     uint8_t *transfer, unsigned int transferlen,
-                     uint8_t *sense, uint8_t senselen,
-                     uint8_t *status,
-                     unsigned int timeout)
+int good_scsi_sgioctl2(int fd,
+                       int direction,
+                       uint8_t *cdb, uint8_t cdblen,
+                       uint8_t *transfer, unsigned int transferlen,
+                       uint8_t *sense, uint8_t senselen,
+                       uint8_t *status,
+                       unsigned int timeout)
 {
     struct sg_io_hdr hdr = {0};
     int chk;
@@ -45,7 +45,7 @@ int good_scsi_ioctl2(int fd,
     hdr.mx_sb_len = senselen;
     hdr.timeout = timeout;
 
-    chk = good_scsi_ioctl(fd,&hdr);
+    chk = good_scsi_sgioctl(fd,&hdr);
     if(chk != 0)
         return -1;
 
@@ -61,7 +61,7 @@ int good_scsi_test(int fd,uint8_t *sense, uint8_t senselen,uint8_t *status,unsig
     
     cdb[0] = 0x00; /*00H is TEST UNIT READY*/
 
-    return good_scsi_ioctl2(fd,SG_DXFER_NONE,cdb,6,NULL,0,sense,senselen,status,timeout);
+    return good_scsi_sgioctl2(fd,SG_DXFER_NONE,cdb,6,NULL,0,sense,senselen,status,timeout);
 }
 
 int good_scsi_inquiry(int fd,
@@ -78,7 +78,7 @@ int good_scsi_inquiry(int fd,
     cdb[2] = (vpd ? vid : 0x00); /* Return PAGE CODE */
     cdb[4] = transferlen;
 
-    return good_scsi_ioctl2(fd,SG_DXFER_FROM_DEV,cdb,6,transfer,transferlen,sense,senselen,status,timeout);
+    return good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,6,transfer,transferlen,sense,senselen,status,timeout);
 }
 
 int good_scsi_inquiry_sn(int fd,
