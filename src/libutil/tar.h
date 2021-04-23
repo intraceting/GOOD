@@ -38,7 +38,7 @@ typedef struct _good_ustar_hdr
 
 /*
  * gnu tar extensions:
- */
+*/
 
 /** long link magic.*/
 #define GOOD_USTAR_LONGNAME_MAGIC "././@LongLink"
@@ -51,17 +51,25 @@ typedef struct _good_ustar_hdr
 
 /**
  * TAR读。
+ * 
+ * @return > 0 读取的长度，<= 0 读取失败或已到末尾。
 */
 ssize_t good_tar_read(int fd, void *data, size_t size, good_buffer_t *buf);
 
 /**
  * TAR写。
+ * 
+ * @return > 0 写入的长度，<= 0 写入失败或空间不足。
 */
 ssize_t good_tar_write(int fd, const void *data, size_t size, good_buffer_t *buf);
 
 /**
  * TAR写末尾。
+ * 
+ * @param stuffing 填充物。
+ * 
+ * @return > 0 缓存数据全部写入到文件，= 0 缓存无数据或无缓存，< 0 写入失败或空间不足(剩余数据在缓存中)。
 */
-ssize_t good_tar_write_trailer(int fd, const void *data, size_t size, good_buffer_t *buf);
+int good_tar_write_trailer(int fd,uint8_t stuffing, good_buffer_t *buf);
 
 #endif //GOOD_UTIL_TAR_H

@@ -13,6 +13,7 @@
 #include "libutil/mman.h"
 #include "libutil/notify.h"
 #include "libutil/iconv.h"
+#include "libutil/tar.h"
 
 void test_dir()
 {
@@ -131,37 +132,35 @@ void test_dirscan()
 
 void test_file(const char *f1, const char *f2)
 {
-    // good_mkdir(f2, 0);
+    good_mkdir(f2, 0);
 
-    // int fd1 = good_open(f1, 0, 1, 0);
-    // int fd2 = good_open(f2, 1, 1, 1);
+    int fd1 = good_open(f1, 0, 1, 0);
+    int fd2 = good_open(f2, 1, 1, 1);
 
-    // assert(fd1 >= 0 && fd2 >= 0);
+    assert(fd1 >= 0 && fd2 >= 0);
 
-    // good_buffer_t *rbuf = good_buffer_alloc3(512 * 1024);
-    // good_buffer_t *wbuf = good_buffer_alloc3(256);
+    good_buffer_t *rbuf = good_buffer_alloc2(512 * 1024);
+    good_buffer_t *wbuf = good_buffer_alloc2(256);
 
-    // while (1)
-    // {
-    //     char buf[1023];
-    //     ssize_t rsize = good_read(fd1, buf, 1023, rbuf);
-    //     if (rsize <= 0)
-    //         break;
+    while (1)
+    {
+        char buf[1023];
+        ssize_t rsize = good_tar_read(fd1, buf, 1023, rbuf);
+        if (rsize <= 0)
+            break;
 
-    //     ssize_t wsize = good_write(fd2, buf, rsize, wbuf);
+        ssize_t wsize = good_tar_write(fd2, buf, rsize, wbuf);
 
-    //     assert(wsize == rsize);
-    // }
+        assert(wsize == rsize);
+    }
 
-    // assert(good_write_trailer(fd2, 1, 0, wbuf) == 0);
+    assert(good_tar_write_trailer(fd2,0, wbuf) == 0);
 
-    // //  assert(good_write_trailer(fd2,0,0,wbuf)==0);
+    good_buffer_freep(&rbuf);
+    good_buffer_freep(&wbuf);
 
-    // good_buffer_unref(&rbuf);
-    // good_buffer_unref(&wbuf);
-
-    // good_closep(&fd1);
-    // good_closep(&fd2);
+    good_closep(&fd1);
+    good_closep(&fd2);
 }
 
 void test_mman()
@@ -288,10 +287,10 @@ int main(int argc, char **argv)
     
     // test_dir();
 
-     test_dirscan();
+   //  test_dirscan();
 
-    // if(argc>=3)
-    //     test_file(argv[1],argv[2]);
+     if(argc>=3)
+         test_file(argv[1],argv[2]);
 
     // test_mman();
 

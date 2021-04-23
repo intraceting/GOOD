@@ -455,14 +455,14 @@ int good_poll(int fd, int event,time_t timeout);
 /**
  * 写数据。
  * 
- * @return > 0 写入完成的大小，<= 0 写入失败或空间不足。
+ * @return > 0 写入的长度，<= 0 写入失败或空间不足。
 */
 ssize_t good_write(int fd, const void *data, size_t size);
 
 /**
  * 读数据。
  * 
- * @return > 0 读取完成的大小，<= 0 读取失败或已到末尾。
+ * @return > 0 读取的长度，<= 0 读取失败或已到末尾。
 */
 ssize_t good_read(int fd, void *data, size_t size);
 
