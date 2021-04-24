@@ -6,6 +6,63 @@
  */
 #include "tar.h"
 
+/**
+ * TAR的块长度(512Bytes)。
+*/
+#define GOOD_TAR_BLOCK_SIZE     512
+
+/**
+ * TAR头部信息.
+ * 
+ * 512 Bytes.
+ */
+typedef struct _good_tar_hdr
+{
+    char name[100];         /*   0 Dateiname*/
+    char mode[8];           /* 100 Zugriffsrechte*/
+    char uid[8];            /* 108 Benutzernummer*/
+    char gid[8];            /* 116 Benutzergruppe*/
+    char size[12];          /* 124 Dateigroesze*/
+    char mtime[12];         /* 136 Zeit d. letzten Aenderung*/
+    char chksum[8];         /* 148 Checksumme*/
+    char typeflag;          /* 156 Typ der Datei*/
+    char linkname[100];     /* 157 Zielname des Links*/
+    char magic[TMAGLEN];    /* 257 "ustar"*/
+    char version[TVERSLEN]; /* 263 Version v. star*/
+    char uname[32];         /* 265 Benutzername	*/
+    char gname[32];         /* 297 Gruppenname*/
+    char devmajor[8];       /* 329 Major bei Geraeten*/
+    char devminor[8];       /* 337 Minor bei Geraeten*/
+    char prefix[155];       /* 345 Prefix fuer t_name*/
+
+    /*Other*/
+    union
+    {
+        /**
+         * This is the ustar (Posix 1003.1) header.
+        */
+        struct
+        {
+            char mfill[12]; /* 500 Filler bis 512*/
+        } ustar;
+
+    } other;
+
+} good_tar_hdr;
+
+/*
+ * gnu tar extensions:
+*/
+
+/** long link magic.*/
+#define GOOD_USTAR_LONGNAME_MAGIC "././@LongLink"
+/** including NULL byte. */
+#define GOOD_USTAR_LONGNAME_MAGIC_LEN 14
+/** Identifies the NEXT file on the tape  as having a long linkname.*/
+#define GOOD_USTAR_LONGLINK_TYPE 'K'
+/** Identifies the NEXT file on the tape  as having a long name.*/
+#define GOOD_USTAR_LONGNAME_TYPE 'L'
+
 /*
  * 以下几个方法的来源：http://www.ncbi.nlm.nih.gov/IEB/ToolBox/CPP_DOC/lxr/source/src/util/compress/api/tar.cpp 
 */
@@ -154,173 +211,7 @@ static int DecodeUint8(uint64_t* val, const char* ptr, size_t len)
  * 以上几个方法的来源：http://www.ncbi.nlm.nih.gov/IEB/ToolBox/CPP_DOC/lxr/source/src/util/compress/api/tar.cpp 
 */
 
-ssize_t good_tar_read(int fd, void *data, size_t size, good_buffer_t *buf)
-{
-    ssize_t rsize = 0;
-    size_t rsize2 = 0;
-
-    assert(fd >= 0 && data != NULL && size > 0);
-
-    if (buf)
-    {
-        assert(buf->data != NULL && buf->size > 0);
-
-        while (rsize < size)
-        {
-            if (buf->wsize > 0)
-            {
-                /*缓存有数据，先从缓存读取。*/
-                rsize2 = good_buffer_read(buf, GOOD_PTR2PTR(void, data, rsize), size - rsize);
-                if (rsize2 <= 0)
-                    break;
-
-                /*累加读取长度。*/
-                rsize += rsize2;
-
-                /*吸收已经读取的缓存数据。*/
-                good_buffer_drain(buf);
-            }
-            else if (buf->wsize == 0 || (size - rsize) < buf->size)
-            {
-                /*
-                 * 满足以下两个条件之一，则先读取到缓存空间。
-                 * 1：缓存无数据。
-                 * 2：待读数据小于缓存空间。
-                */
-                rsize2 = good_buffer_import_atmost(buf, fd, buf->size);
-                if (rsize2 <= 0)
-                    break;
-            }
-            else
-            {
-                assert((size - rsize) >= buf->size);
-
-                /*
-                 * 同时满足以下两个条件，把数据直接从文件中读取。
-                 * 1：缓存无数据。
-                 * 2：待读取数据大于缓存空间。
-                */
-                rsize2 = good_read(fd, GOOD_PTR2PTR(void, data, rsize), buf->size);
-                if (rsize2 <= 0)
-                    break;
-
-                /*累加读取长度。*/
-                rsize += rsize2;
-
-                /*带缓存的读取，每次必须读取相同的大小。*/
-                if (rsize2 != buf->size)
-                    break;
-            }
-        }
-    }
-    else
-    {
-        /*无缓存空间，直接从文件读取。*/
-        rsize = good_read(fd, data, size);
-    }
-
-    return rsize;
-}
-
-ssize_t good_tar_write(int fd, const void *data, size_t size, good_buffer_t *buf)
-{
-    ssize_t wsize = 0;
-    ssize_t wsize2 = 0;
-
-    assert(fd >= 0 && data != NULL && size > 0);
-
-    if (buf)
-    {
-        assert(buf->data != NULL && buf->size > 0);
-
-        while (wsize < size)
-        {
-            if (buf->wsize > 0 && buf->wsize == buf->size)
-            {
-                /*缓存空间已满，先把缓存数据导出到文件。*/
-                wsize2 = good_buffer_export_atmost(buf, fd, buf->size);
-                if (wsize2 <= 0)
-                    break;
-
-                /*吸收已经导出(已经写入到文件)的缓存数据。*/
-                good_buffer_drain(buf);
-            }
-            else if (buf->wsize > 0 || (size - wsize) < buf->size)
-            {
-                /* 
-                 * 满足以下两个条件之一，则先把数据写进缓存空间。
-                 * 1：缓存有数据，但未满。
-                 * 2：缓存无数据，但是待写入数据小于缓存空间。
-                 */
-                wsize2 = good_buffer_write(buf, GOOD_PTR2PTR(void, data, wsize), size - wsize);
-                if (wsize2 <= 0)
-                    break;
-
-                /*累加写入长度。*/
-                wsize += wsize2;
-            }
-            else
-            {
-                assert((size - wsize) >= buf->size);
-
-                /*
-                 * 同时满足以下两个条件，把数据直接写入到文件。
-                 * 1：缓存无数据。
-                 * 2：待写入数据大于缓存空间。
-                */
-                wsize2 = good_write(fd, GOOD_PTR2PTR(void, data, wsize), buf->size);
-                if (wsize2 <= 0)
-                    break;
-
-                /*累加写入长度。*/
-                wsize += wsize2;
-            }
-        }
-    }
-    else
-    {
-        /*无缓存空间，直接写入文件。*/
-        wsize = good_write(fd, data, size);
-    }
-
-    return wsize;
-}
-
-int good_tar_write_trailer(int fd, uint8_t stuffing, good_buffer_t *buf)
-{
-    ssize_t wsize2 = 0;
-
-    assert(fd >= 0);
-
-    /*无缓存。*/
-    if (!buf)
-        return 0;
-
-    assert(buf->data != NULL && buf->size > 0);
-
-    /*缓存无数据。*/
-    if (buf->wsize == 0)
-        return 0;
-
-    /*缓存有数据，先用填充物填满缓存空间。*/
-    good_buffer_fill(buf, stuffing);
-
-    /*把缓存数据导出到文件。*/
-    wsize2 = good_buffer_export_atmost(buf, fd, buf->size);
-    if (wsize2 <= 0)
-        return -1;
-
-    /*吸收已经导出(已经写入到文件)的缓存数据。*/
-    good_buffer_drain(buf);
-
-    /*检查是否有数据未导出。*/
-    if (buf->wsize == 0)
-        return 0;
-
-    return -1;
-}
-
-uint32_t good_tar_hdr_calc_checksum(good_tar_hdr *hdr)
+uint32_t _good_tar_hdr_calc_checksum(good_tar_hdr *hdr)
 {
     uint32_t sum = 0;
     int i = 0;
@@ -343,7 +234,7 @@ uint32_t good_tar_hdr_calc_checksum(good_tar_hdr *hdr)
     return sum;
 }
 
-uint32_t good_tar_hdr_get_checksum(good_tar_hdr* hdr)
+uint32_t _good_tar_hdr_get_checksum(good_tar_hdr* hdr)
 {
     uint32_t sum = 0;
     char buf[64] = {0};
@@ -357,7 +248,7 @@ uint32_t good_tar_hdr_get_checksum(good_tar_hdr* hdr)
     return sum;
 }
 
-int64_t good_tar_hdr_get_size(good_tar_hdr* hdr)
+int64_t _good_tar_hdr_get_size(good_tar_hdr* hdr)
 {
     uint64_t size = 0;
     char buf[64] = {0};
@@ -372,7 +263,7 @@ int64_t good_tar_hdr_get_size(good_tar_hdr* hdr)
     return size;
 }
 
-time_t good_tar_hdr_get_mtime(good_tar_hdr *hdr)
+time_t _good_tar_hdr_get_mtime(good_tar_hdr *hdr)
 {
     time_t mtime = 0;
     char buf[64] = {0};
@@ -386,7 +277,7 @@ time_t good_tar_hdr_get_mtime(good_tar_hdr *hdr)
     return mtime;
 }
 
-uint32_t good_tar_hdr_get_mode(good_tar_hdr *hdr)
+uint32_t _good_tar_hdr_get_mode(good_tar_hdr *hdr)
 {
     uint32_t mode = 0;
     char buf[64] = {0};
@@ -399,8 +290,8 @@ uint32_t good_tar_hdr_get_mode(good_tar_hdr *hdr)
     return mode;
 }
 
-void good_tar_hdr_fill(good_tar_hdr *hdr,
-                       char typeflag, const char name[100],
+void _good_tar_hdr_fill(good_tar_hdr *hdr,char typeflag,
+                       const char name[100],const char linkname[100],
                        int64_t size, time_t time, uint32_t mode)
 {
     assert(hdr != NULL && name != NULL);
@@ -410,8 +301,12 @@ void good_tar_hdr_fill(good_tar_hdr *hdr,
     /**/
     hdr->typeflag = typeflag;
 
-    /*for 99 byte*/
+    /*Max 99 bytes.*/
     strncpy(hdr->name, name, sizeof (hdr->name) - 1);
+
+    /*Max 99 bytes, may be NULL(0).*/
+    if(linkname)
+        strncpy(hdr->linkname, linkname, sizeof (hdr->linkname) - 1);
 
     strncpy(hdr->magic, TMAGIC, TMAGLEN);
     strncpy(hdr->version, TVERSION, TVERSLEN);
@@ -430,7 +325,7 @@ void good_tar_hdr_fill(good_tar_hdr *hdr,
     snprintf(hdr->chksum, 8, "%07ou", good_tar_hdr_calc_checksum(hdr));
 }
 
-int good_tar_hdr_verify(good_tar_hdr *hdr)
+int _good_tar_hdr_verify(good_tar_hdr *hdr)
 {
     uint32_t old_sum = 0;
     uint32_t now_sum = 0;
@@ -449,22 +344,217 @@ int good_tar_hdr_verify(good_tar_hdr *hdr)
     return 1;
 }
 
-int good_tar_write_hdr(int fd,const char* name,const struct stat *attr,good_buffer_t *buf)
+ssize_t good_tar_read(good_tar_t *tar, void *data, size_t size)
+{
+    ssize_t rsize = 0;
+    size_t rsize2 = 0;
+
+    assert(tar != NULL && data != NULL && size > 0);
+    assert(tar->fd >= 0);
+
+    if (tar->buf)
+    {
+        assert(tar->buf->data != NULL && tar->buf->size > 0);
+
+        while (rsize < size)
+        {
+            if (tar->buf->wsize > 0)
+            {
+                /*缓存有数据，先从缓存读取。*/
+                rsize2 = good_buffer_read(tar->buf, GOOD_PTR2PTR(void, data, rsize), size - rsize);
+                if (rsize2 <= 0)
+                    break;
+
+                /*累加读取长度。*/
+                rsize += rsize2;
+
+                /*吸收已经读取的缓存数据。*/
+                good_buffer_drain(tar->buf);
+            }
+            else if (tar->buf->wsize == 0 || (size - rsize) < tar->buf->size)
+            {
+                /*
+                 * 满足以下两个条件之一，则先读取到缓存空间。
+                 * 1：缓存无数据。
+                 * 2：待读数据小于缓存空间。
+                */
+                rsize2 = good_buffer_import_atmost(tar->buf, tar->fd, tar->buf->size);
+                if (rsize2 <= 0)
+                    break;
+            }
+            else
+            {
+                assert((size - rsize) >= tar->buf->size);
+
+                /*
+                 * 同时满足以下两个条件，把数据直接从文件中读取。
+                 * 1：缓存无数据。
+                 * 2：待读取数据大于缓存空间。
+                */
+                rsize2 = good_read(tar->fd, GOOD_PTR2PTR(void, data, rsize), tar->buf->size);
+                if (rsize2 <= 0)
+                    break;
+
+                /*累加读取长度。*/
+                rsize += rsize2;
+
+                /*带缓存的读取，每次必须读取相同的大小。*/
+                if (rsize2 != tar->buf->size)
+                    break;
+            }
+        }
+    }
+    else
+    {
+        /*无缓存空间，直接从文件读取。*/
+        rsize = good_read(tar->fd, data, size);
+    }
+
+    return rsize;
+}
+
+ssize_t good_tar_write(good_tar_t *tar, const void *data, size_t size)
+{
+    ssize_t wsize = 0;
+    ssize_t wsize2 = 0;
+
+    assert(tar != NULL && data != NULL && size > 0);
+    assert(tar->fd >= 0);
+
+    if (tar->buf)
+    {
+        assert(tar->buf->data != NULL && tar->buf->size > 0);
+
+        while (wsize < size)
+        {
+            if (tar->buf->wsize > 0 && tar->buf->wsize == tar->buf->size)
+            {
+                /*缓存空间已满，先把缓存数据导出到文件。*/
+                wsize2 = good_buffer_export_atmost(tar->buf, tar->fd, tar->buf->size);
+                if (wsize2 <= 0)
+                    break;
+
+                /*吸收已经导出(已经写入到文件)的缓存数据。*/
+                good_buffer_drain(tar->buf);
+            }
+            else if (tar->buf->wsize > 0 || (size - wsize) < tar->buf->size)
+            {
+                /* 
+                 * 满足以下两个条件之一，则先把数据写进缓存空间。
+                 * 1：缓存有数据，但未满。
+                 * 2：缓存无数据，但是待写入数据小于缓存空间。
+                 */
+                wsize2 = good_buffer_write(tar->buf, GOOD_PTR2PTR(void, data, wsize), size - wsize);
+                if (wsize2 <= 0)
+                    break;
+
+                /*累加写入长度。*/
+                wsize += wsize2;
+            }
+            else
+            {
+                assert((size - wsize) >= tar->buf->size);
+
+                /*
+                 * 同时满足以下两个条件，把数据直接写入到文件。
+                 * 1：缓存无数据。
+                 * 2：待写入数据大于缓存空间。
+                */
+                wsize2 = good_write(tar->fd, GOOD_PTR2PTR(void, data, wsize), tar->buf->size);
+                if (wsize2 <= 0)
+                    break;
+
+                /*累加写入长度。*/
+                wsize += wsize2;
+            }
+        }
+    }
+    else
+    {
+        /*无缓存空间，直接写入文件。*/
+        wsize = good_write(tar->fd, data, size);
+    }
+
+    return wsize;
+}
+
+int good_tar_write_trailer(good_tar_t *tar, uint8_t stuffing)
+{
+    ssize_t wsize2 = 0;
+
+    assert(tar != NULL);
+    assert(tar->fd >= 0);
+
+    /*无缓存。*/
+    if (!tar->buf)
+        return 0;
+
+    assert(tar->buf->data != NULL && tar->buf->size > 0);
+
+    /*缓存无数据。*/
+    if (tar->buf->wsize == 0)
+        return 0;
+
+    /*缓存有数据，先用填充物填满缓存空间。*/
+    good_buffer_fill(tar->buf, stuffing);
+
+    /*把缓存数据导出到文件。*/
+    wsize2 = good_buffer_export_atmost(tar->buf, tar->fd, tar->buf->size);
+    if (wsize2 <= 0)
+        return -1;
+
+    /*吸收已经导出(已经写入到文件)的缓存数据。*/
+    good_buffer_drain(tar->buf);
+
+    /*检查是否有数据未导出。*/
+    if (tar->buf->wsize == 0)
+        return 0;
+
+    return -1;
+}
+
+int good_tar_write_hdr(good_tar_t *tar, const char *name, const struct stat *attr, const char *linkname)
 {
     int namelen;
+    int linknamelen;
+    int longname_space;
+    int longlink_space;
     good_tar_hdr *hdr;
     char *longname;
-    int longname_space;
+    char *longlink;
+    void *tmp;
     int chk;
 
-    assert(fd >= 0 && name != NULL && attr != NULL);
+    assert(tar != NULL && name != NULL && attr != NULL);
 
+    assert(tar->fd >= 0);
     assert(name[0] != '\0');
-    assert(S_ISREG(attr->st_mode) ||S_ISDIR(attr->st_mode));
+    assert(S_ISREG(attr->st_mode) || S_ISDIR(attr->st_mode) || S_ISLNK(attr->st_mode));
 
     hdr = (good_tar_hdr *)good_heap_alloc(GOOD_TAR_BLOCK_SIZE);
     if (hdr == NULL)
         goto final_error;
+
+    /**/
+    if(linkname != NULL && linkname[0] != '\0')
+    {
+        /*计算链接名的长度。*/
+        linknamelen = strlen(linkname);
+
+        /*链接名的长度大于或等于100时，需要特别处理。*/
+        if (linknamelen >= 100)
+        {
+            /*计算长链接名占用的空间。*/
+            longlink_space = good_align(linknamelen, GOOD_TAR_BLOCK_SIZE);
+            longlink = (char *)good_heap_alloc(longlink_space);
+            if (longlink == NULL)
+                goto final_error;
+
+            
+        }
+
+
+    }
 
     /*计算文件名的长度。*/
     namelen = strlen(name);
@@ -485,12 +575,12 @@ int good_tar_write_hdr(int fd,const char* name,const struct stat *attr,good_buff
         good_tar_hdr_fill(hdr, GOOD_USTAR_LONGNAME_TYPE, GOOD_USTAR_LONGNAME_MAGIC,namelen, 0, 0);
 
         /*长文件名的头部写入到文件。*/
-        chk = ((good_tar_write(fd, hdr, GOOD_TAR_BLOCK_SIZE, buf) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
+        chk = ((good_tar_write(tar, hdr, GOOD_TAR_BLOCK_SIZE) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
         if (chk != 0)
             goto final_error;
 
         /*长文件名写入到文件。*/
-        chk = ((good_tar_write(fd, longname, longname_space, buf) == longname_space) ? 0 : -1);
+        chk = ((good_tar_write(tar, longname, longname_space) == longname_space) ? 0 : -1);
         if (chk != 0)
             goto final_error;
 
@@ -500,12 +590,12 @@ int good_tar_write_hdr(int fd,const char* name,const struct stat *attr,good_buff
 
     /*填充头部信息。*/
     if (S_ISREG(attr->st_mode))
-        good_tar_hdr_fill(hdr, REGTYPE, name, attr->st_size, attr->st_mtim.tv_sec, attr->st_mode);
+        good_tar_hdr_fill(hdr, REGTYPE, name, "", attr->st_size, attr->st_mtim.tv_sec, attr->st_mode);
     else if (S_ISDIR(attr->st_mode))
-        good_tar_hdr_fill(hdr, DIRTYPE, name, 0, attr->st_mtim.tv_sec, attr->st_mode);
+        good_tar_hdr_fill(hdr, DIRTYPE, name, "",0, attr->st_mtim.tv_sec, attr->st_mode);
 
     /*写入到文件。*/
-    chk = ((good_tar_write(fd, hdr, GOOD_TAR_BLOCK_SIZE, buf) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
+    chk = ((good_tar_write(tar, hdr, GOOD_TAR_BLOCK_SIZE) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
     if (chk == 0)
         goto final;
 
@@ -519,6 +609,9 @@ final:
 
     good_heap_freep((void**)&hdr);
     good_heap_freep((void**)&longname);
+    good_heap_freep((void**)&longlink);
 
     return chk;
 }
+
+/*------------------------------------------------------------------------------------------------*/
