@@ -64,6 +64,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/socket.o \
 	${OBJ_PATH}/epoll.o \
 	${OBJ_PATH}/scsi.o \
+	${OBJ_PATH}/blockio.o \
 	${OBJ_PATH}/tar.o
 
 

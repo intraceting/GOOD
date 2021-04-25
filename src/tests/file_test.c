@@ -139,22 +139,22 @@ void test_file(const char *f1, const char *f2)
 
     assert(fd1 >= 0 && fd2 >= 0);
 
-    good_buffer_t *rbuf = good_buffer_alloc2(512 * 1024);
+    good_buffer_t *rbuf = good_buffer_alloc2(512);
     good_buffer_t *wbuf = good_buffer_alloc2(256);
 
     while (1)
     {
         char buf[1023];
-        ssize_t rsize = good_tar_read(fd1, buf, 1023, rbuf);
+        ssize_t rsize = good_block_read(fd1, buf, 1023, rbuf);
         if (rsize <= 0)
             break;
 
-        ssize_t wsize = good_tar_write(fd2, buf, rsize, wbuf);
+        ssize_t wsize = good_block_write(fd2, buf, rsize, wbuf);
 
         assert(wsize == rsize);
     }
 
-    assert(good_tar_write_trailer(fd2,0, wbuf) == 0);
+    assert(good_block_write_trailer(fd2,0, wbuf) == 0);
 
     good_buffer_freep(&rbuf);
     good_buffer_freep(&wbuf);
@@ -284,21 +284,21 @@ void test_iconv()
 
 void test_tar(const char* name)
 {
-    int fd =good_open(name,0,0,0);
+    // int fd =good_open(name,0,0,0);
 
-    good_buffer_t *buf = good_buffer_alloc2(512 * 1024);
-
-
-    good_tar_hdr h;
-
-    good_tar_read(fd,&h,512,buf);
-
-    assert(good_tar_hdr_verify(&h));
+    // good_buffer_t *buf = good_buffer_alloc2(512 * 1024);
 
 
-    good_buffer_freep(&buf);
+    // good_tar_hdr h;
 
-    good_closep(&fd);
+    // good_tar_read(fd,&h,512,buf);
+
+    // assert(good_tar_hdr_verify(&h));
+
+
+    // good_buffer_freep(&buf);
+
+    // good_closep(&fd);
 }
 
 int main(int argc, char **argv)
@@ -308,8 +308,8 @@ int main(int argc, char **argv)
 
    //  test_dirscan();
 
-  //   if(argc>=3)
-   //      test_file(argv[1],argv[2]);
+     if(argc>=3)
+         test_file(argv[1],argv[2]);
 
     // test_mman();
 
@@ -317,8 +317,8 @@ int main(int argc, char **argv)
 
    // test_iconv();
 
-   if(argc>=2)
-        test_tar(argv[1]);
+ //  if(argc>=2)
+ //       test_tar(argv[1]);
 
     return 0;
 }
