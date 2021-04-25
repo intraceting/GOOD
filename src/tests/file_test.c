@@ -282,23 +282,46 @@ void test_iconv()
     iconv_close(cd);
 }
 
-void test_tar(const char* name)
+void test_tar(const char* tarfile)
 {
-    // int fd =good_open(name,0,0,0);
 
-    // good_buffer_t *buf = good_buffer_alloc2(512 * 1024);
+    good_tar_t t;
 
+    t.fd = good_open(tarfile,0,0,0);
+    t.buf = good_buffer_alloc2(512 * 1024);
 
-    // good_tar_hdr h;
+    while (1)
+    {
+        char name[PATH_MAX] = {0};
+        struct stat attr = {0};
+        char linkname[PATH_MAX] = {0};
+        char buf[100];
 
-    // good_tar_read(fd,&h,512,buf);
+        if (good_tar_read_hdr(&t, name, &attr, linkname) != 0)
+            break;
 
-    // assert(good_tar_hdr_verify(&h));
+        printf("%s->%s\n", name, linkname);
 
+        if(S_ISREG(attr.st_mode))
+        {
+            size_t size = 0;
 
-    // good_buffer_freep(&buf);
+            while (size<attr.st_size)
+            {
+                size_t rsize = good_tar_read(&t,buf,GOOD_MIN(attr.st_size-size,100));
+                assert(rsize>0);
+                size += rsize;
+            }
+            
+            if(attr.st_size>0)
+                assert(good_tar_read_align(&t,attr.st_size)==0);
+        }
 
-    // good_closep(&fd);
+        
+    }
+
+    good_buffer_freep(&t.buf);
+    good_closep(&t.fd);
 }
 
 int main(int argc, char **argv)
@@ -308,8 +331,8 @@ int main(int argc, char **argv)
 
    //  test_dirscan();
 
-     if(argc>=3)
-         test_file(argv[1],argv[2]);
+ //    if(argc>=3)
+  //       test_file(argv[1],argv[2]);
 
     // test_mman();
 
@@ -317,8 +340,8 @@ int main(int argc, char **argv)
 
    // test_iconv();
 
- //  if(argc>=2)
- //       test_tar(argv[1]);
+   if(argc>=2)
+        test_tar(argv[1]);
 
     return 0;
 }

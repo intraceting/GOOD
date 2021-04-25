@@ -110,7 +110,17 @@ time_t good_tar_hdr_get_mtime(good_tar_hdr *hdr);
 /** 
  * 提取TAR头部中的状态字段。
 */
-uint32_t good_tar_hdr_get_mode(good_tar_hdr *hdr);
+mode_t good_tar_hdr_get_mode(good_tar_hdr *hdr);
+
+/** 
+ * 提取TAR头部中的UID字段。
+*/
+uid_t good_tar_hdr_get_uid(good_tar_hdr *hdr);
+
+/** 
+ * 提取TAR头部中的GID字段。
+*/
+gid_t good_tar_hdr_get_gid(good_tar_hdr *hdr);
 
 /** 
  * 填充TAR头部的字段。
@@ -120,7 +130,7 @@ uint32_t good_tar_hdr_get_mode(good_tar_hdr *hdr);
 */
 void good_tar_hdr_fill(good_tar_hdr *hdr,char typeflag,
                        const char name[100],const char linkname[100],
-                       int64_t size, time_t time, uint32_t mode);
+                       int64_t size, time_t time, mode_t mode);
 
 /**
  * 较验TAR头部的较验和是否一致。
@@ -130,12 +140,62 @@ void good_tar_hdr_fill(good_tar_hdr *hdr,char typeflag,
 int good_tar_hdr_verify(good_tar_hdr *hdr);
 
 /**
- * 向文件写入TAR头部。
+ * 从TAR文件中读数据。
+ * 
+ * @return > 0 读取的长度，<= 0 读取失败或已到末尾。
+*/
+ssize_t good_tar_read(good_tar_t *tar,void *data, size_t size);
+
+/**
+ * 从TAR文件中读数据对齐差额长度的数据，并丢弃掉。
+ * 
+ * @return 0 成功，-1 失败(读取失败或已到末尾)。
+*/
+int good_tar_read_align(good_tar_t *tar,size_t size);
+
+/**
+ * 向TAR文件中写数据。
+ * 
+ * @return > 0 写入的长度，<= 0 写入失败或空间不足。
+*/
+ssize_t good_tar_write(good_tar_t *tar,const void *data, size_t size);
+
+/**
+ * 向TAR文件中写数据对齐差额长度的数据。
+ * 
+ * @return 0 成功，-1 失败(写入失败或空间不足)。
+*/
+int good_tar_write_align(good_tar_t *tar,size_t size);
+
+/**
+ * 向TAR文件中以块为单位写补齐数据。
+ * 
+ * @param stuffing 填充物。
+ * 
+ * @return > 0 缓存数据全部写完，= 0 缓存无数据或无缓存，< 0 写入失败或空间不足(剩余数据在缓存中)。
+*/
+int good_tar_write_trailer(good_tar_t *tar, uint8_t stuffing);
+
+/**
+ * 从TAR文件中读数据TAR头部。
+ * 
+ * @param name 文件名的指针。
+ * @param attr 属性的指针。
+ * @param linkname 链接名的指针。
+ * 
+ * @return 0 成功，-1 失败(不是TAR格式或较验和错误)。
+ * 
+*/
+int good_tar_read_hdr(good_tar_t *tar, char name[PATH_MAX], struct stat *attr, char linkname[PATH_MAX]);
+
+/**
+ * 向TAR文件写入TAR头部。
  * 
  * @param name 文件名的指针(包括路径)。
  * @param attr 属性的指针。
  * @param linkname 链接名的指针，可以为NULL(0)。
  * 
+ * @return 0 成功，-1 失败(写入失败或空间不足)。
 */
 int good_tar_write_hdr(good_tar_t *tar, const char *name, const struct stat *attr, const char *linkname);
 

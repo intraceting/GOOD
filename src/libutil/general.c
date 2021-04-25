@@ -10,8 +10,7 @@
 
 size_t good_align(size_t size, size_t align)
 {
-    /*大于1时，对齐才有意义。*/
-    if (size && align > 1)
+    if (size > 0 && align > 1)
     {
         size_t padding = size % align;
         return (size + ((padding > 0) ? align - padding : 0));

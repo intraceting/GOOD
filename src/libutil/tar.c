@@ -177,28 +177,28 @@ uint32_t good_tar_hdr_calc_checksum(good_tar_hdr *hdr)
     return sum;
 }
 
-uint32_t good_tar_hdr_get_checksum(good_tar_hdr* hdr)
+uint32_t good_tar_hdr_get_checksum(good_tar_hdr *hdr)
 {
     uint32_t sum = 0;
     char buf[64] = {0};
 
     assert(hdr != NULL);
 
-    memcpy(buf, hdr->chksum, sizeof (hdr->chksum));
+    memcpy(buf, hdr->chksum, sizeof(hdr->chksum));
 
     sscanf(buf, "%o", &sum);
 
     return sum;
 }
 
-int64_t good_tar_hdr_get_size(good_tar_hdr* hdr)
+int64_t good_tar_hdr_get_size(good_tar_hdr *hdr)
 {
     uint64_t size = 0;
     char buf[64] = {0};
 
     assert(hdr != NULL);
 
-    memcpy(buf, hdr->size, sizeof (hdr->size));
+    memcpy(buf, hdr->size, sizeof(hdr->size));
 
     if (DecodeUint8(&size, buf, sizeof(hdr->size)) == 0)
         size = -1;
@@ -213,29 +213,55 @@ time_t good_tar_hdr_get_mtime(good_tar_hdr *hdr)
 
     assert(hdr != NULL);
 
-    memcpy(buf, hdr->mtime, sizeof (hdr->mtime));
+    memcpy(buf, hdr->mtime, sizeof(hdr->mtime));
 
     sscanf(buf, "%lo", &mtime);
 
     return mtime;
 }
 
-uint32_t good_tar_hdr_get_mode(good_tar_hdr *hdr)
+mode_t good_tar_hdr_get_mode(good_tar_hdr *hdr)
 {
-    uint32_t mode = 0;
+    mode_t mode = 0;
     char buf[64] = {0};
 
     assert(hdr != NULL);
 
-    memcpy(buf, hdr->mode, sizeof (hdr->mode));
+    memcpy(buf, hdr->mode, sizeof(hdr->mode));
     sscanf(buf, "%o", &mode);
 
     return mode;
 }
 
-void good_tar_hdr_fill(good_tar_hdr *hdr,char typeflag,
-                       const char name[100],const char linkname[100],
-                       int64_t size, time_t time, uint32_t mode)
+uid_t good_tar_hdr_get_uid(good_tar_hdr *hdr)
+{
+    uid_t uid = 0;
+    char buf[64] = {0};
+
+    assert(hdr != NULL);
+
+    memcpy(buf, hdr->uid, sizeof(hdr->uid));
+    sscanf(buf, "%o", &uid);
+
+    return uid;
+}
+
+gid_t good_tar_hdr_get_gid(good_tar_hdr *hdr)
+{
+    gid_t gid = 0;
+    char buf[64] = {0};
+
+    assert(hdr != NULL);
+
+    memcpy(buf, hdr->gid, sizeof(hdr->gid));
+    sscanf(buf, "%o", &gid);
+
+    return gid;
+}
+
+void good_tar_hdr_fill(good_tar_hdr *hdr, char typeflag,
+                       const char name[100], const char linkname[100],
+                       int64_t size, time_t time, mode_t mode)
 {
     assert(hdr != NULL && name != NULL);
     assert(size >= 0);
@@ -245,11 +271,11 @@ void good_tar_hdr_fill(good_tar_hdr *hdr,char typeflag,
     hdr->typeflag = typeflag;
 
     /*Max 99 bytes.*/
-    strncpy(hdr->name, name, sizeof (hdr->name) - 1);
+    strncpy(hdr->name, name, sizeof(hdr->name) - 1);
 
     /*Max 99 bytes, may be NULL(0).*/
-    if(linkname)
-        strncpy(hdr->linkname, linkname, sizeof (hdr->linkname) - 1);
+    if (linkname)
+        strncpy(hdr->linkname, linkname, sizeof(hdr->linkname) - 1);
 
     strncpy(hdr->magic, TMAGIC, TMAGLEN);
     strncpy(hdr->version, TVERSION, TVERSLEN);
@@ -263,7 +289,7 @@ void good_tar_hdr_fill(good_tar_hdr *hdr,char typeflag,
         snprintf(hdr->size, 12, "%011lo", size); //must be 11
     else
         EncodeUint8(size, hdr->size, 11); //must be 11
-    
+
     /**/
     snprintf(hdr->chksum, 8, "%07ou", good_tar_hdr_calc_checksum(hdr));
 }
@@ -275,28 +301,176 @@ int good_tar_hdr_verify(good_tar_hdr *hdr)
 
     assert(hdr != NULL);
 
-    if(good_strncmp(hdr->magic, TMAGIC, strlen(TMAGIC),1) != 0)
+    if (good_strncmp(hdr->magic, TMAGIC, strlen(TMAGIC), 1) != 0)
         return 0;
 
     old_sum = good_tar_hdr_get_checksum(hdr);
     now_sum = good_tar_hdr_calc_checksum(hdr);
 
-    if(old_sum != now_sum)
+    if (old_sum != now_sum)
         return 0;
 
     return 1;
 }
 
+ssize_t good_tar_read(good_tar_t *tar, void *data, size_t size)
+{
+    assert(tar != NULL && data != NULL && size > 0);
+
+    return good_block_read(tar->fd, data, size, tar->buf);
+}
+
+int good_tar_read_align(good_tar_t *tar, size_t size)
+{
+    char tmp[GOOD_TAR_BLOCK_SIZE] = {0};
+    size_t fix_size;
+
+    assert(tar != NULL && size > 0);
+
+    /*计算需要读取对齐的差额长度。*/
+    fix_size = good_align(size, GOOD_TAR_BLOCK_SIZE) - size;
+
+    /*也许已经对齐。*/
+    if (fix_size <= 0)
+        return 0;
+
+    return ((good_tar_read(tar, tmp, fix_size) == fix_size) ? 0 : -1);
+}
+
+ssize_t good_tar_write(good_tar_t *tar, const void *data, size_t size)
+{
+    assert(tar != NULL && data != NULL && size > 0);
+
+    return good_block_write(tar->fd, data, size, tar->buf);
+}
+
+int good_tar_write_align(good_tar_t *tar, size_t size)
+{
+    char tmp[GOOD_TAR_BLOCK_SIZE] = {0};
+    size_t fix_size;
+
+    assert(tar != NULL && size > 0);
+
+    /*计算需要写入对齐的差额长度。*/
+    fix_size = good_align(size, GOOD_TAR_BLOCK_SIZE) - size;
+
+    /*也许已经对齐。*/
+    if (fix_size <= 0)
+        return 0;
+
+    return ((good_tar_write(tar, tmp, fix_size) == fix_size) ? 0 : -1);
+}
+
+int good_tar_write_trailer(good_tar_t *tar, uint8_t stuffing)
+{
+    assert(tar != NULL);
+
+    return good_block_write_trailer(tar->fd, 0, tar->buf);
+}
+
+int good_tar_read_hdr(good_tar_t *tar, char name[PATH_MAX], struct stat *attr, char linkname[PATH_MAX])
+{
+    good_tar_hdr hdr = {0};
+    int namelen = 0;
+    int linknamelen = 0;
+
+    assert(tar != NULL && name != NULL &&  attr != NULL && linkname != NULL);
+
+    assert(tar->fd >= 0);
+
+    /*完整的头部可能由多个组成。*/
+
+again:
+    
+    if(good_tar_read(tar,&hdr,GOOD_TAR_BLOCK_SIZE) != GOOD_TAR_BLOCK_SIZE)
+        goto final_error;
+
+    if(!good_tar_hdr_verify(&hdr))
+        goto final_error;
+    
+    if(hdr.typeflag == GOOD_USTAR_LONGLINK_TYPE)
+    {
+        /*长链接名需要特殊处理。*/
+
+        if (good_strncmp(hdr.name, GOOD_USTAR_LONGNAME_MAGIC, GOOD_USTAR_LONGNAME_MAGIC_LEN, 1) != 0)
+            goto final_error;
+
+        linknamelen = good_tar_hdr_get_size(&hdr);
+        if (linknamelen <= 0)
+            goto final_error;
+
+        if (good_tar_read(tar, linkname, linknamelen) != linknamelen)
+            goto final_error;
+
+        if (good_tar_read_align(tar, linknamelen) != 0)
+            goto final_error;
+
+        /*头部信息还不完整，继续读取。*/
+        goto again;
+
+    }
+    else if(hdr.typeflag == GOOD_USTAR_LONGNAME_TYPE)
+    {
+        /*长文件名需要特殊处理。*/
+
+        if (good_strncmp(hdr.name, GOOD_USTAR_LONGNAME_MAGIC, GOOD_USTAR_LONGNAME_MAGIC_LEN, 1) != 0)
+            goto final_error;
+
+        namelen = good_tar_hdr_get_size(&hdr);
+        if (namelen <= 0)
+            goto final_error;
+
+        if (good_tar_read(tar, name, namelen) != namelen)
+            goto final_error;
+
+        if (good_tar_read_align(tar, namelen) != 0)
+            goto final_error;
+
+        /*头部信息还不完整，继续读取。*/
+        goto again;
+    }
+    else
+    {
+        if (REGTYPE == hdr.typeflag || AREGTYPE == hdr.typeflag)
+            attr->st_mode = __S_IFREG;
+        else if (SYMTYPE == hdr.typeflag)
+            attr->st_mode = __S_IFLNK;
+        else if (DIRTYPE == hdr.typeflag)
+            attr->st_mode = __S_IFDIR;
+        else if (CHRTYPE == hdr.typeflag)
+            attr->st_mode = __S_IFCHR;
+        else if (BLKTYPE == hdr.typeflag)
+            attr->st_mode = __S_IFBLK;
+        else if (FIFOTYPE == hdr.typeflag)
+            attr->st_mode = __S_IFIFO;
+        else
+            goto final_error;
+
+        attr->st_size = good_tar_hdr_get_size(&hdr);
+        attr->st_mode |= good_tar_hdr_get_mode(&hdr);
+        attr->st_mtim.tv_sec = good_tar_hdr_get_mtime(&hdr);
+        attr->st_gid = good_tar_hdr_get_gid(&hdr);
+        attr->st_uid = good_tar_hdr_get_uid(&hdr);
+
+        if (namelen <= 100)
+            strncpy(name,hdr.name,GOOD_MIN(strlen(hdr.name),sizeof(hdr.name)));
+        if (linknamelen <= 100)
+            strncpy(linkname,hdr.linkname,GOOD_MIN(strlen(hdr.linkname),sizeof(hdr.linkname)));
+    }
+
+
+    return 0;
+
+final_error:
+
+    return -1;
+}
+
 int good_tar_write_hdr(good_tar_t *tar, const char *name, const struct stat *attr, const char *linkname)
 {
-    int namelen;
-    int linknamelen;
-    int longname_space;
-    int longlink_space;
-    good_tar_hdr *hdr;
-    char *longname;
-    char *longlink;
-    void *tmp;
+    good_tar_hdr hdr = {0};
+    int namelen = 0;
+    int linknamelen = 0;
     int chk;
 
     assert(tar != NULL && name != NULL && attr != NULL);
@@ -305,87 +479,72 @@ int good_tar_write_hdr(good_tar_t *tar, const char *name, const struct stat *att
     assert(name[0] != '\0');
     assert(S_ISREG(attr->st_mode) || S_ISDIR(attr->st_mode) || S_ISLNK(attr->st_mode));
 
-    hdr = (good_tar_hdr *)good_heap_alloc(GOOD_TAR_BLOCK_SIZE);
-    if (hdr == NULL)
-        goto final_error;
-
-    /**/
-    if(linkname != NULL && linkname[0] != '\0')
-    {
-        /*计算链接名的长度。*/
-        linknamelen = strlen(linkname);
-
-        /*链接名的长度大于或等于100时，需要特别处理。*/
-        if (linknamelen >= 100)
-        {
-            /*计算长链接名占用的空间。*/
-            longlink_space = good_align(linknamelen, GOOD_TAR_BLOCK_SIZE);
-            longlink = (char *)good_heap_alloc(longlink_space);
-            if (longlink == NULL)
-                goto final_error;
-
-            
-        }
-
-
-    }
-
-    /*计算文件名的长度。*/
+    /*计算文件名、链接名的长度。*/
     namelen = strlen(name);
+    linknamelen = strlen(linkname);
+
+    /*链接名的长度大于或等于100时，需要特别处理。*/
+    if (linknamelen >= 100)
+    {
+        /*清空头部准备复用。*/
+        memset(&hdr, 0, GOOD_TAR_BLOCK_SIZE);
+
+        /*填充长链接名的头部信息。*/
+        good_tar_hdr_fill(&hdr, GOOD_USTAR_LONGLINK_TYPE, GOOD_USTAR_LONGNAME_MAGIC, NULL, linknamelen, 0, 0);
+
+        /*长链接名的头部写入到文件。*/
+        if (good_tar_write(tar, &hdr, GOOD_TAR_BLOCK_SIZE) != GOOD_TAR_BLOCK_SIZE)
+            goto final_error;
+
+        /*长链接名写入到文件。*/
+        if (good_tar_write(tar, linkname, linknamelen) != linknamelen)
+            goto final_error;
+
+        /*也许需要写入对齐。*/
+        if (good_tar_write_align(tar, linknamelen) != 0)
+            goto final_error;
+    }
 
     /*文件名(包括路径)的长度大于或等于100时，需要特别处理。*/
     if (namelen >= 100)
-    {   
-        /*计算长文件名占用的空间。*/
-        longname_space = good_align(namelen,GOOD_TAR_BLOCK_SIZE);
-        longname = (char*)good_heap_alloc(longname_space);
-        if (longname == NULL)
-            goto final_error;
-
-        /*复制长文件名。*/
-        strncpy(longname,name,namelen);
+    {
+        /*清空头部准备复用。*/
+        memset(&hdr, 0, GOOD_TAR_BLOCK_SIZE);
 
         /*填充长文件名的头部信息。*/
-        good_tar_hdr_fill(hdr, GOOD_USTAR_LONGNAME_TYPE, GOOD_USTAR_LONGNAME_MAGIC,NULL,namelen, 0, 0);
+        good_tar_hdr_fill(&hdr, GOOD_USTAR_LONGNAME_TYPE, GOOD_USTAR_LONGNAME_MAGIC, NULL, namelen, 0, 0);
 
         /*长文件名的头部写入到文件。*/
-        chk = ((good_block_write(tar->fd, hdr, GOOD_TAR_BLOCK_SIZE,tar->buf) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
-        if (chk != 0)
+        if (good_tar_write(tar, &hdr, GOOD_TAR_BLOCK_SIZE) != GOOD_TAR_BLOCK_SIZE)
             goto final_error;
 
         /*长文件名写入到文件。*/
-        chk = ((good_block_write(tar->fd, longname, longname_space,tar->buf) == longname_space) ? 0 : -1);
-        if (chk != 0)
+        if (good_tar_write(tar, name, namelen) != namelen)
             goto final_error;
 
-        /*清空头部准备复用。*/
-        memset(hdr,0,GOOD_TAR_BLOCK_SIZE);
+        /*也许需要写入对齐。*/
+        if (good_tar_write_align(tar, namelen) != 0)
+            goto final_error;
     }
+
+    /*清空头部准备复用。*/
+    memset(&hdr, 0, GOOD_TAR_BLOCK_SIZE);
 
     /*填充头部信息。*/
     if (S_ISREG(attr->st_mode))
-        good_tar_hdr_fill(hdr, REGTYPE, name, NULL, attr->st_size, attr->st_mtim.tv_sec, attr->st_mode);
+        good_tar_hdr_fill(&hdr, REGTYPE, name, NULL, attr->st_size, attr->st_mtim.tv_sec, attr->st_mode);
     else if (S_ISDIR(attr->st_mode))
-        good_tar_hdr_fill(hdr, DIRTYPE, name, NULL,0, attr->st_mtim.tv_sec, attr->st_mode);
+        good_tar_hdr_fill(&hdr, DIRTYPE, name, NULL, 0, attr->st_mtim.tv_sec, attr->st_mode);
+    else if (S_ISLNK(attr->st_mode))
+        good_tar_hdr_fill(&hdr, SYMTYPE, name, linkname, 0, attr->st_mtim.tv_sec, attr->st_mode);
 
     /*写入到文件。*/
-    chk = ((good_block_write(tar->fd, hdr, GOOD_TAR_BLOCK_SIZE,tar->buf) == GOOD_TAR_BLOCK_SIZE) ? 0 : -1);
-    if (chk == 0)
-        goto final;
+    if (good_tar_write(tar, &hdr, GOOD_TAR_BLOCK_SIZE) != GOOD_TAR_BLOCK_SIZE)
+        goto final_error;
 
+    return 0;
 
 final_error:
 
-    /*出错了。*/
-    chk = -1;
-
-final:
-
-    good_heap_freep((void**)&hdr);
-    good_heap_freep((void**)&longname);
-    good_heap_freep((void**)&longlink);
-
-    return chk;
+    return -1;
 }
-
-/*------------------------------------------------------------------------------------------------*/
