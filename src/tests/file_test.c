@@ -282,7 +282,7 @@ void test_iconv()
     iconv_close(cd);
 }
 
-void test_tar(const char* tarfile)
+void test_tar_read(const char* tarfile)
 {
 
     good_tar_t t;
@@ -290,12 +290,14 @@ void test_tar(const char* tarfile)
     t.fd = good_open(tarfile,0,0,0);
     t.buf = good_buffer_alloc2(512 * 1024);
 
+    size_t bufsize = 1000000;
+    void *buf=good_heap_alloc(bufsize);
+
     while (1)
     {
         char name[PATH_MAX] = {0};
         struct stat attr = {0};
         char linkname[PATH_MAX] = {0};
-        char buf[100];
 
         if (good_tar_read_hdr(&t, name, &attr, linkname) != 0)
             break;
@@ -308,7 +310,7 @@ void test_tar(const char* tarfile)
 
             while (size<attr.st_size)
             {
-                size_t rsize = good_tar_read(&t,buf,GOOD_MIN(attr.st_size-size,100));
+                size_t rsize = good_tar_read(&t,buf,GOOD_MIN(attr.st_size-size,bufsize));
                 assert(rsize>0);
                 size += rsize;
             }
@@ -320,6 +322,81 @@ void test_tar(const char* tarfile)
         
     }
 
+    good_heap_freep(&buf);
+    good_buffer_freep(&t.buf);
+    good_closep(&t.fd);
+}
+
+int tar_dump(size_t depth, good_tree_t *node, void *opaque)
+{
+    good_allocator_t* m = NULL;
+    good_tar_t *t = (good_tar_t*)opaque;
+
+    if(depth == 0)
+        return 1;
+
+
+    char* name = node->alloc->pptrs[GOOD_DIRENT_NAME];
+    struct stat * attr = (struct stat*)node->alloc->pptrs[GOOD_DIRENT_STAT];
+
+    printf("%s\n",name);
+
+    if(S_ISREG(attr->st_mode))
+    {
+        good_tar_write_hdr(t,name,attr,NULL);
+
+        if(attr->st_size>0)
+        {
+            m = good_mmap2(name,0,0);
+            if(!m)
+                goto final_error;
+            if(good_tar_write(t,m->pptrs[0],m->sizes[0])!=m->sizes[0])
+                goto final_error;
+            
+            if(good_tar_write_align(t,m->sizes[0])!=0)
+                goto final_error;
+
+            good_munmap(&m);
+        }
+    }
+    else if(S_ISDIR(attr->st_mode))
+        good_tar_write_hdr(t,name,attr,NULL);
+    else if(S_ISLNK(attr->st_mode))
+    {
+        char linkname[PATH_MAX] = {0};
+        readlink(name,linkname,PATH_MAX);
+        good_tar_write_hdr(t,name,attr,linkname);
+    }    
+
+    return 1;
+
+final_error:
+
+     good_munmap(&m);
+
+    return -1;
+}
+
+void test_tar_write(const char* tarfile)
+{
+    good_tar_t t;
+
+    t.fd = good_open(tarfile,1,0,1);
+    t.buf = good_buffer_alloc2(512 * 1024);
+
+    size_t sizes[2] = {PATH_MAX,sizeof(struct stat)};
+    good_tree_t * dir = good_tree_alloc2(sizes,2);
+
+   strcpy(dir->alloc->pptrs[GOOD_DIRENT_NAME],"/tmp/ddd/");
+   good_dirscan(dir,100,0);
+
+
+    good_tree_iterator_t it = {0,tar_dump,&t};
+    good_tree_scan(dir,&it);
+
+    assert(good_tar_write_trailer(&t,0)==0);
+    
+    good_tree_free(&dir);
     good_buffer_freep(&t.buf);
     good_closep(&t.fd);
 }
@@ -340,8 +417,12 @@ int main(int argc, char **argv)
 
    // test_iconv();
 
+//    if(argc>=2)
+//         test_tar_read(argv[1]);
+
+    
    if(argc>=2)
-        test_tar(argv[1]);
+        test_tar_write(argv[1]);
 
     return 0;
 }

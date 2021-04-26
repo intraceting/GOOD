@@ -78,7 +78,9 @@ enum _good_tree_chain
 typedef struct _good_tree_iterator
 {
     /** 
-     * 最大深度。如果无法确定填多少合适，就填0。
+     * 最大深度。
+     * 
+     * 如果无法确定填多少合适，就填0。
     */
     size_t depth_max;
 

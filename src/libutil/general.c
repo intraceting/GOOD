@@ -160,6 +160,13 @@ struct tm* good_time_get(struct tm* tm,int utc)
 
 /*------------------------------------------------------------------------------------------------*/
 
+int isodigit(int c)
+{
+    return ((c >= '0' && c <= '7') ? 1 : 0);
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
 const char *good_strstr(const char *str, const char *sub, int caseAb)
 {
     assert(str != NULL && sub != NULL);
