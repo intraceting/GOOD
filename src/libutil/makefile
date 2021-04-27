@@ -51,6 +51,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/base64.o \
 	${OBJ_PATH}/clock.o \
 	${OBJ_PATH}/geometry.o \
+	${OBJ_PATH}/ndarray.o \
 	${OBJ_PATH}/allocator.o \
 	${OBJ_PATH}/mman.o \
 	${OBJ_PATH}/buffer.o \
