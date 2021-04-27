@@ -149,6 +149,7 @@ uint32_t good_tar_get_checksum(good_tar_hdr *hdr)
 
     assert(hdr != NULL);
 
+    /*较验和的字段长度8个字节，但只有6个数字，跟着一个NULL(0)，最后一个是空格。*/
     if (good_tar_char2num(hdr->chksum, 7, &val) != 0)
         return -1;
 
@@ -240,7 +241,7 @@ void good_tar_fill(good_tar_hdr *hdr, char typeflag,
     good_tar_num2char(time, hdr->mtime, sizeof(hdr->mtime));
     good_tar_num2char((mode & (S_IRWXU | S_IRWXG | S_IRWXO)), hdr->mode, sizeof(hdr->mode));
 
-    /*较验和的字段长度8个字切，但只有6个数字，跟着一个NULL(0)，最后一个是空格。*/
+    /*较验和的字段长度8个字节，但只有6个数字，跟着一个NULL(0)，最后一个是空格。*/
     memset(hdr->chksum,' ',sizeof(hdr->chksum));
     good_tar_num2char(good_tar_calc_checksum(hdr), hdr->chksum, 7);
 }
