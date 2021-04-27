@@ -146,7 +146,7 @@ void good_tar_fill(good_tar_hdr *hdr, char typeflag,
  * 
  * @return !0 一致，0 不一致。
 */
-int good_tar_verify(good_tar_hdr *hdr, const char *magic);
+int good_tar_verify(good_tar_hdr *hdr, const char *magic, size_t size);
 
 /**
  * 从TAR文件中读数据。

@@ -6,7 +6,7 @@
  */
 #include "tar.h"
 
-int good_tar_num2char(uintmax_t val,char *buf,size_t len)
+int good_tar_num2char(uintmax_t val, char *buf, size_t len)
 {
     char *tmpbuf;
     size_t tmplen;
@@ -15,7 +15,7 @@ int good_tar_num2char(uintmax_t val,char *buf,size_t len)
     assert(buf != NULL && len > 0);
 
     tmpbuf = buf;
-    tmplen = len - 1;// 预留结束字符位置。
+    tmplen = len - 1; // 预留结束字符位置。
     tmpval = val;
 
     /*尝试8进制格式化输出。*/
@@ -27,13 +27,13 @@ int good_tar_num2char(uintmax_t val,char *buf,size_t len)
     } while (tmplen);
 
     /*有余数时表示空间不足，尝试base-256编码输出。*/
-    if(tmpval)
+    if (tmpval)
     {
         tmpbuf = buf;
         tmplen = len; // 不需要保留结束字符位置。
         tmpval = val;
 
-        memset(tmpbuf,0,tmplen);
+        memset(tmpbuf, 0, tmplen);
 
         do
         {
@@ -47,7 +47,7 @@ int good_tar_num2char(uintmax_t val,char *buf,size_t len)
             return -1;
 
         /*如果标志位如果被占用，返回失败。*/
-        if(*tmpbuf & '\x80')
+        if (*tmpbuf & '\x80')
             return -1;
 
         /*设置base-256编码标志。*/
@@ -57,7 +57,7 @@ int good_tar_num2char(uintmax_t val,char *buf,size_t len)
     return 0;
 }
 
-int good_tar_char2num(const char *buf,size_t len,uintmax_t *val)
+int good_tar_char2num(const char *buf, size_t len, uintmax_t *val)
 {
     const char *tmpbuf;
     size_t tmplen;
@@ -149,7 +149,7 @@ uint32_t good_tar_get_checksum(good_tar_hdr *hdr)
 
     assert(hdr != NULL);
 
-    if (good_tar_char2num(hdr->chksum, sizeof(hdr->chksum), &val) != 0)
+    if (good_tar_char2num(hdr->chksum, 7, &val) != 0)
         return -1;
 
     return val;
@@ -216,8 +216,8 @@ gid_t good_tar_get_gid(good_tar_hdr *hdr)
 }
 
 void good_tar_fill(good_tar_hdr *hdr, char typeflag,
-                       const char name[100], const char linkname[100],
-                       int64_t size, time_t time, mode_t mode)
+                   const char name[100], const char linkname[100],
+                   int64_t size, time_t time, mode_t mode)
 {
     assert(hdr != NULL && name != NULL);
     assert(size >= 0);
@@ -236,21 +236,23 @@ void good_tar_fill(good_tar_hdr *hdr, char typeflag,
     strncpy(hdr->magic, TMAGIC, TMAGLEN);
     strncpy(hdr->version, TVERSION, TVERSLEN);
 
-    good_tar_num2char(size,hdr->size,sizeof(hdr->size));
-    good_tar_num2char(time,hdr->mtime,sizeof(hdr->mtime));
-    good_tar_num2char((mode & (S_IRWXU | S_IRWXG | S_IRWXO)),hdr->mode,sizeof(hdr->mode));
-    
-    good_tar_num2char(good_tar_calc_checksum(hdr),hdr->chksum,sizeof(hdr->chksum));
+    good_tar_num2char(size, hdr->size, sizeof(hdr->size));
+    good_tar_num2char(time, hdr->mtime, sizeof(hdr->mtime));
+    good_tar_num2char((mode & (S_IRWXU | S_IRWXG | S_IRWXO)), hdr->mode, sizeof(hdr->mode));
+
+    /*较验和的字段长度8个字切，但只有6个数字，跟着一个NULL(0)，最后一个是空格。*/
+    memset(hdr->chksum,' ',sizeof(hdr->chksum));
+    good_tar_num2char(good_tar_calc_checksum(hdr), hdr->chksum, 7);
 }
 
-int good_tar_verify(good_tar_hdr *hdr,const char *magic)
+int good_tar_verify(good_tar_hdr *hdr, const char *magic, size_t size)
 {
     uint32_t old_sum = 0;
     uint32_t now_sum = 0;
 
-    assert(hdr != NULL && magic != NULL);
+    assert(hdr != NULL && magic != NULL && size > 0);
 
-    if (good_strncmp(hdr->magic, magic,strlen(magic), 1) != 0)
+    if (good_strncmp(hdr->magic, magic, size, 1) != 0)
         return 0;
 
     old_sum = good_tar_get_checksum(hdr);
@@ -323,25 +325,25 @@ int good_tar_read_hdr(good_tar_t *tar, char name[PATH_MAX], struct stat *attr, c
     int namelen = 0;
     int linknamelen = 0;
 
-    assert(tar != NULL && name != NULL &&  attr != NULL && linkname != NULL);
+    assert(tar != NULL && name != NULL && attr != NULL && linkname != NULL);
 
     assert(tar->fd >= 0);
 
     /*完整的头部可能由多个组成，因此可能要多次读取多个头部。*/
 
 again:
-    
-    if(good_tar_read(tar,&hdr,GOOD_TAR_BLOCK_SIZE) != GOOD_TAR_BLOCK_SIZE)
+
+    if (good_tar_read(tar, &hdr, GOOD_TAR_BLOCK_SIZE) != GOOD_TAR_BLOCK_SIZE)
         goto final_error;
 
-    if(!good_tar_verify(&hdr,TMAGIC))
+    if (!good_tar_verify(&hdr, TMAGIC, TMAGLEN))
         goto final_error;
-    
-    if(hdr.typeflag == GOOD_USTAR_LONGLINK_TYPE)
+
+    if (hdr.typeflag == GOOD_USTAR_LONGLINK_TYPE)
     {
         /*长链接名需要特殊处理。*/
 
-        if (good_strncmp(hdr.name, GOOD_USTAR_LONGNAME_MAGIC, GOOD_USTAR_LONGNAME_MAGIC_LEN-1, 1) != 0)
+        if (good_strncmp(hdr.name, GOOD_USTAR_LONGNAME_MAGIC, GOOD_USTAR_LONGNAME_MAGIC_LEN - 1, 1) != 0)
             goto final_error;
 
         linknamelen = good_tar_get_size(&hdr);
@@ -356,13 +358,12 @@ again:
 
         /*头部信息还不完整，继续读取。*/
         goto again;
-
     }
-    else if(hdr.typeflag == GOOD_USTAR_LONGNAME_TYPE)
+    else if (hdr.typeflag == GOOD_USTAR_LONGNAME_TYPE)
     {
         /*长文件名需要特殊处理。*/
 
-        if (good_strncmp(hdr.name, GOOD_USTAR_LONGNAME_MAGIC, GOOD_USTAR_LONGNAME_MAGIC_LEN-1, 1) != 0)
+        if (good_strncmp(hdr.name, GOOD_USTAR_LONGNAME_MAGIC, GOOD_USTAR_LONGNAME_MAGIC_LEN - 1, 1) != 0)
             goto final_error;
 
         namelen = good_tar_get_size(&hdr);
@@ -402,11 +403,10 @@ again:
         attr->st_uid = good_tar_get_uid(&hdr);
 
         if (namelen <= 100)
-            strncpy(name,hdr.name,GOOD_MIN(strlen(hdr.name),sizeof(hdr.name)));
+            strncpy(name, hdr.name, GOOD_MIN(strlen(hdr.name), sizeof(hdr.name)));
         if (linknamelen <= 100)
-            strncpy(linkname,hdr.linkname,GOOD_MIN(strlen(hdr.linkname),sizeof(hdr.linkname)));
+            strncpy(linkname, hdr.linkname, GOOD_MIN(strlen(hdr.linkname), sizeof(hdr.linkname)));
     }
-
 
     return 0;
 
@@ -432,7 +432,7 @@ int good_tar_write_hdr(good_tar_t *tar, const char *name, const struct stat *att
     namelen = strlen(name);
 
     /*计算链接名的长度，可能为NULL(0)。*/
-    if(linkname)
+    if (linkname)
         linknamelen = strlen(linkname);
 
     /*链接名的长度大于或等于100时，需要特别处理。*/
