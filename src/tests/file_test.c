@@ -14,6 +14,7 @@
 #include "libutil/notify.h"
 #include "libutil/iconv.h"
 #include "libutil/tar.h"
+#include "libutil/termios.h"
 
 void test_dir()
 {
@@ -401,6 +402,27 @@ void test_tar_write(const char* tarfile)
     good_closep(&t.fd);
 }
 
+void test_termios()
+{
+    printf("终端按键测试。\n");
+
+    assert(good_tcattr_cbreak(STDIN_FILENO,NULL)==0);
+    
+    while(1)
+    {
+        good_poll(STDIN_FILENO,1,-1);
+
+        char buf[10] = {0};
+
+        long n = read(STDIN_FILENO,buf,10);
+
+        for(long i = 0;i<n;i++)
+            printf("%c(%02X)",buf[i],buf[i]);
+        printf("\n");
+
+    }
+}
+
 int main(int argc, char **argv)
 {
     
@@ -421,8 +443,10 @@ int main(int argc, char **argv)
   //       test_tar_read(argv[1]);
 
     
-   if(argc>=2)
-        test_tar_write(argv[1]);
+ //  if(argc>=2)
+ //       test_tar_write(argv[1]);
+
+    test_termios();
 
     return 0;
 }

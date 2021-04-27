@@ -48,7 +48,7 @@ int good_notify_watch(int fd,good_notify_event_t *event,time_t timeout)
             return -1;
 
         /* 导入缓存。 */
-        if( good_buffer_import_atmost(event->buf,fd,INT64_MAX)<=0)
+        if( good_buffer_import_atmost(event->buf,fd,SIZE_MAX)<=0)
             return -1;
     }
 

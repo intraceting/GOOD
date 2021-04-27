@@ -219,7 +219,7 @@ void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it);
  * 
  * @warning 不会在末尾添加'\n'(换行)字符。
  * 
- * @return >=0 输出的长度，< 0 失败。
+ * @return >=0 成功(输出的长度)，< 0 失败。
 */
 ssize_t good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,...);
 
@@ -230,7 +230,7 @@ ssize_t good_tree_fprintf(FILE* fp,size_t depth,const good_tree_t *node,const ch
  * 
  * @warning 不会在末尾添加'\n'(换行)字符。
  * 
- * @return >=0 输出的长度，< 0 失败。
+ * @return >=0 成功(输出的长度)，< 0 失败。
 */
 ssize_t good_tree_vfprintf(FILE* fp,size_t depth,const good_tree_t *node,const char* fmt,va_list args);
 
