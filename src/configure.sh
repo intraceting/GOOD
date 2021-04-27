@@ -72,7 +72,7 @@ DATE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
 HOST_PLATFORM=$(uname -m)
 TARGET_PLATFORM=$(uname -m)
 BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
-PC_PATH=${BUILD_PATH}/pkgconfig/
+PKG_PATH=${BUILD_PATH}/pkgconfig/
 #
 while getopts "b:p:?" ARGKEY 
 do
@@ -99,14 +99,14 @@ fi
 echo "HOST_PLATFORM=${HOST_PLATFORM}"
 echo "TARGET_PLATFORM=${TARGET_PLATFORM}"
 echo "BUILD_PATH=${BUILD_PATH}"
-echo "PC_PATH=${PC_PATH}"
+echo "PKG_PATH=${PKG_PATH}"
 
 #
-mkdir -p "${PC_PATH}"
+mkdir -p "${PKG_PATH}"
 
 #
-LIBUTIL_DEPEND_PC=${PC_PATH}/libutil-depend.pc
-LIBUTIL_PC=${PC_PATH}/libutil.pc
+LIBUTIL_DEPEND_PC=${PKG_PATH}/libutil-depend.pc
+LIBUTIL_PC=${PKG_PATH}/libutil.pc
 
 #
 PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
@@ -115,20 +115,20 @@ PKG_LIBS="-ldl -pthread -lrt -lc -lm"
 #
 HAVE_UNIXODBC=$(CheckHavePackage "unixodbc-dev|unixODBC-devel")
 if [ ${HAVE_UNIXODBC} -ge 1 ];then
-PKG_FLAGS="${PKG_FLAGS} -DHAVE_UNIXODBC"
+PKG_FLAGS="${PKG_FLAGS} -lodbc"
 fi
 
 #
 HAVE_SQLITE=$(CheckHavePackage "libsqlite3-dev|sqlite-devel")
 if [ ${HAVE_SQLITE} -ge 1 ];then
-PKG_FLAGS="${PKG_FLAGS} -DHAVE_SQLITE $(pkg-config --cflags sqlite3)"
+PKG_FLAGS="${PKG_FLAGS} $(pkg-config --cflags sqlite3)"
 PKG_LIBS="${PKG_LIBS} $(pkg-config --libs sqlite3)"
 fi
 
 #
 HAVE_OPENSSL=$(CheckHavePackage "libssl-dev|openssl-devel")
 if [ ${HAVE_OPENSSL} -ge 1 ];then
-PKG_FLAGS="${PKG_FLAGS} -DHAVE_OPENSSL $(pkg-config --cflags openssl)"
+PKG_FLAGS="${PKG_FLAGS} $(pkg-config --cflags openssl)"
 PKG_LIBS="${PKG_LIBS} $(pkg-config --libs openssl)"
 fi
 
@@ -138,7 +138,7 @@ echo "HAVE_SQLITE=${HAVE_SQLITE}"
 echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
 
 #
-echo "Name: libcwutil dependent item" > ${LIBUTIL_DEPEND_PC}
+echo "Name: libutil dependent item" > ${LIBUTIL_DEPEND_PC}
 echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBUTIL_DEPEND_PC}
 echo "Version: ${DATE_TIME}" >> ${LIBUTIL_DEPEND_PC}
 echo "Cflags: ${PKG_FLAGS}" >> ${LIBUTIL_DEPEND_PC}
@@ -146,8 +146,8 @@ echo "Libs: ${PKG_LIBS}" >> ${LIBUTIL_DEPEND_PC}
 
 #
 PKG_FLAGS="${PKG_FLAGS} -I${SHELL_PWD}"
-PKG_LIBS="${PKG_LIBS} -lgood_util"
-PKG_LIBS="${PKG_LIBS} -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/"
+PKG_LIBS="-lgood_util ${PKG_LIBS} "
+PKG_LIBS="-L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ ${PKG_LIBS}"
 
 #
 echo "Name: libutil" > ${LIBUTIL_PC}

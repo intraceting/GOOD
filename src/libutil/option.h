@@ -48,6 +48,21 @@ int good_option_set(good_tree_t *opt, const char *key, const char *value);
 const char* good_option_get(good_tree_t *opt, const char *key,size_t index,const char* defval);
 
 /**
+ * 获取一个选项的值(整型)。
+*/
+int good_option_get_int(good_tree_t *opt, const char *key,size_t index,int defval);
+
+/**
+ * 获取一个选项的值(长整型)。
+*/
+long good_option_get_long(good_tree_t *opt, const char *key,size_t index,long defval);
+
+/**
+ * 获取一个选项的值(浮点型)。
+*/
+double good_option_get_double(good_tree_t *opt, const char *key,size_t index,double defval);
+
+/**
  * 统计选项值的数量。
  * 
  * @param defval 默认值，可以为NULL(0)。
@@ -72,7 +87,7 @@ int good_option_remove(good_tree_t *opt, const char *key);
 
 /**
  * 格式化打印。
- * 
+ *  
  * @return >=0 输出的长度，< 0 失败。
 */
 ssize_t good_option_fprintf(FILE *fp,good_tree_t *opt);
@@ -83,48 +98,5 @@ ssize_t good_option_fprintf(FILE *fp,good_tree_t *opt);
  * @return >=0 输出的长度，< 0 失败。
 */
 ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt);
-
-/**
- * 解析参数选项。
- * 
- * @warning 未关联键的值，使用前缀做为键。
- * 
- * @param prefix 键的前缀字符串。
-*/
-void good_option_parse(good_tree_t *opt,int argc, char* argv[],const char *prefix);
-
-/**
- * 导入参数选项。
- * 
- * @warning 注释行将被忽略。
- * 
- * @param note 注释字符，可以为'\0'。
- * @param argv0 命令字符串，可以为NULL(0)。
- * @param prefix 键的前缀字符串。
-*/
-void good_option_fimport(good_tree_t *opt,FILE *fp,char note,const char *argv0,const char *prefix);
-
-/**
- * 导入参数选项。
- * 
- * @warning 注释行将被忽略。
- * 
- * @param note 注释字符，可以为'\0'。
- * @param argv0 命令字符串，可以为NULL(0)。
- * @param prefix 键的前缀字符串。
-*/
-void good_option_import(good_tree_t *opt,const char *name,char note,const char *argv0,const char *prefix);
-
-/**
- * 导入参数选项。
- * 
- * @warning 注释行将被忽略。
- * 
- * @param note 注释字符，可以为'\0'。
- * @param argv0 命令字符串，可以为NULL(0)。
- * @param prefix 键的前缀字符串。
-*/
-void good_option_memimport(good_tree_t *opt,const char *text,size_t len,char note,const char *argv0,const char *prefix);
-
 
 #endif //GOOD_UTIL_OPTION_H

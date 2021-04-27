@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "libutil/option.h"
+#include "libutil/getargs.h"
 
 
 int dump2(size_t deep, good_tree_t *node, void *opaque)
@@ -85,13 +86,13 @@ int main(int argc, char **argv)
     good_option_snprintf(buf,100,t);
 
 
-    good_option_parse(t,argc,argv,"--");
+    good_getargs(t,argc,argv,"--");
 
     printf("\n--------------------------------------\n");
     good_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
     
-    good_option_import(t,good_option_get(t,"--test-import",0,NULL),'#',"test-import","--");
+    good_getargs_file(t,good_option_get(t,"--test-import",0,NULL),'#',"test-import","--");
 
 
     printf("\n--------------------------------------\n");
