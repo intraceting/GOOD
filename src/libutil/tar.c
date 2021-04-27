@@ -15,7 +15,7 @@ int good_tar_num2char(uintmax_t val,char *buf,size_t len)
     assert(buf != NULL && len > 0);
 
     tmpbuf = buf;
-    tmplen = len - 1;// 预留结字符位置。
+    tmplen = len - 1;// 预留结束字符位置。
     tmpval = val;
 
     /*尝试8进制格式化输出。*/
@@ -30,7 +30,7 @@ int good_tar_num2char(uintmax_t val,char *buf,size_t len)
     if(tmpval)
     {
         tmpbuf = buf;
-        tmplen = len; // 不需要保留结字符位置。
+        tmplen = len; // 不需要保留结束字符位置。
         tmpval = val;
 
         memset(tmpbuf,0,tmplen);
@@ -131,7 +131,8 @@ uint32_t good_tar_calc_checksum(good_tar_hdr *hdr)
         sum += *GOOD_PTR2PTR(uint8_t, hdr, i);
     }
 
-    /*跳过checksum(8bytes)字段*/
+    /*-----跳过checksum(8bytes)字段------*/
+
     for (i += 8; i < 512; ++i) //...........
     {
         sum += *GOOD_PTR2PTR(uint8_t, hdr, i);

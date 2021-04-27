@@ -417,12 +417,12 @@ int main(int argc, char **argv)
 
    // test_iconv();
 
-//    if(argc>=2)
-//         test_tar_read(argv[1]);
+    if(argc>=2)
+         test_tar_read(argv[1]);
 
     
-   if(argc>=2)
-        test_tar_write(argv[1]);
+ //  if(argc>=2)
+ //       test_tar_write(argv[1]);
 
     return 0;
 }
