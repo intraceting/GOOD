@@ -33,7 +33,7 @@ void good_getargs(good_tree_t *opt,int argc, char* argv[],const char *prefix)
 }
 
 
-static ssize_t _good_option_getline(FILE *fp,char **line, size_t *len, size_t *rows, char note)
+static ssize_t _good_getargs_getline(FILE *fp,char **line, size_t *len, size_t *rows, char note)
 {
     char *line_p = NULL;
     ssize_t chk = -1;
@@ -72,7 +72,7 @@ void good_getargs_fp(good_tree_t *opt,FILE *fp,char note,const char *argv0,const
     if(argv0)
         good_option_set(opt,it_key,argv0);
 
-    while (_good_option_getline(fp,&line, &len, &rows,note) != -1)
+    while (_good_getargs_getline(fp,&line, &len, &rows,note) != -1)
     {
         /* 去掉字符串两端所有控制字符。 */
         good_strtrim(line,iscntrl,2);
