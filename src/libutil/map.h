@@ -122,9 +122,9 @@ int good_map_init(good_map_t* map,size_t size);
 good_allocator_t* good_map_find(good_map_t* map,const void* key,size_t ksize,size_t vsize);
 
 /**
- * 擦除。
+ * 删除。
 */
-void good_map_erase(good_map_t* map,const void* key,size_t ksize);
+void good_map_remove(good_map_t* map,const void* key,size_t ksize);
 
 /**
  * 扫描节点。

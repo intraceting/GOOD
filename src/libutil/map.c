@@ -132,7 +132,7 @@ good_allocator_t *good_map_find(good_map_t *map, const void *key, size_t ksize, 
     GOOD_ERRNO_AND_RETURN1(EAGAIN, NULL);
 }
 
-void good_map_erase(good_map_t *map, const void *key, size_t ksize)
+void good_map_remove(good_map_t *map, const void *key, size_t ksize)
 {
     good_tree_t *node = NULL;
 

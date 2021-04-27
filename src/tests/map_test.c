@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     good_map_scan(&m);
 
     for(int i = 0;i<10000;i++)
-        good_map_erase(&m,&i,sizeof(i));
+        good_map_remove(&m,&i,sizeof(i));
 
     traversal_tree(m.table);
 
