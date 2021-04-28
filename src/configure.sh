@@ -108,28 +108,31 @@ mkdir -p "${PKG_PATH}"
 LIBUTIL_DEPEND_PC=${PKG_PATH}/libutil-depend.pc
 LIBUTIL_PC=${PKG_PATH}/libutil.pc
 
-#
-PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
-PKG_LIBS="-ldl -pthread -lrt -lc -lm"
+#-fopenmp
+PKG_FLAGS=" ${PKG_FLAGS} "
+PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${PKG_FLAGS}"
+#-fopenmp
+PKG_LIBS=" ${PKG_LIBS} "
+PKG_LIBS="-ldl -pthread -lrt -lc -lm ${PKG_LIBS}"
 
 #
 HAVE_UNIXODBC=$(CheckHavePackage "unixodbc-dev|unixODBC-devel")
 if [ ${HAVE_UNIXODBC} -ge 1 ];then
-PKG_FLAGS="${PKG_FLAGS} -lodbc"
+PKG_LIBS=" -lodbc ${PKG_LIBS}"
 fi
 
 #
 HAVE_SQLITE=$(CheckHavePackage "libsqlite3-dev|sqlite-devel")
 if [ ${HAVE_SQLITE} -ge 1 ];then
-PKG_FLAGS="${PKG_FLAGS} $(pkg-config --cflags sqlite3)"
-PKG_LIBS="${PKG_LIBS} $(pkg-config --libs sqlite3)"
+PKG_FLAGS=" $(pkg-config --cflags sqlite3) ${PKG_FLAGS}"
+PKG_LIBS=" $(pkg-config --libs sqlite3) ${PKG_LIBS}"
 fi
 
 #
 HAVE_OPENSSL=$(CheckHavePackage "libssl-dev|openssl-devel")
 if [ ${HAVE_OPENSSL} -ge 1 ];then
-PKG_FLAGS="${PKG_FLAGS} $(pkg-config --cflags openssl)"
-PKG_LIBS="${PKG_LIBS} $(pkg-config --libs openssl)"
+PKG_FLAGS=" $(pkg-config --cflags openssl) ${PKG_FLAGS}"
+PKG_LIBS=" $(pkg-config --libs openssl) ${PKG_LIBS}"
 fi
 
 #
@@ -146,8 +149,8 @@ echo "Libs: ${PKG_LIBS}" >> ${LIBUTIL_DEPEND_PC}
 
 #
 PKG_FLAGS="${PKG_FLAGS} -I${SHELL_PWD}"
-PKG_LIBS="-lgood_util ${PKG_LIBS} "
-PKG_LIBS="-L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ ${PKG_LIBS}"
+PKG_LIBS=" -lgood_util ${PKG_LIBS}"
+PKG_LIBS=" -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ ${PKG_LIBS}"
 
 #
 echo "Name: libutil" > ${LIBUTIL_PC}

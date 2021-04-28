@@ -36,7 +36,7 @@ int _good_clock_create(void *opaque)
 
 good_clock_t *_good_clock_init(uint64_t set)
 {
-    static atomic_int init = 0;
+    static int init = 0;
     static pthread_key_t key = -1;
 
     int chk = 0;

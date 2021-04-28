@@ -9,16 +9,65 @@
 
 #include "general.h"
 
+
 /**
- * 多维数组格式。
+ * 简单的多维数组。
+ * 
+*/
+typedef struct _good_ndarray
+{
+    /**
+     * 数据的指针。
+    */
+    void *ptr;
+
+    /**
+     * 格式。
+    */
+    int format;
+
+    /**
+     * 块数量。
+    */
+    size_t blocks;
+
+    /**
+     * 高度。
+    */
+    size_t height;
+
+    /**
+     * 宽度。
+    */
+    size_t width;
+
+    /**
+     * 宽度对齐的大小(bytes)。
+    */
+    size_t width_pitch;
+
+    /**
+     * 深度。
+    */
+    size_t depth;
+
+    /**
+     * 元素大小(bytes)。
+    */
+    size_t data_bytes;
+    
+}good_ndarray_t;
+
+
+/**
+ * 多维数组的格式。
  * 
 */
 typedef enum _good_ndarray_fmt
 {
-    /*
+    /**
      * 
-     * NHWC(NWCH)格式。
-     * 
+     * NHWC格式。
      * 
      * [AB....AB....AB....AB....AB....XXX]
      * [..............................XXX]
@@ -55,70 +104,16 @@ typedef enum _good_ndarray_fmt
 }good_ndarray_fmt;
 
 /**
- * 多维数组的属性。
- * 
-*/
-typedef struct _good_ndarray_attr
-{
-    /**
-     * 格式。
-    */
-    int format;
-
-    /**
-     * 块数量。
-    */
-    size_t blocks;
-
-    /**
-     * 高度。
-    */
-    size_t height;
-
-    /**
-     * 宽度。
-    */
-    size_t width;
-
-    /**
-     * 宽度对齐的大小(bytes)。
-    */
-    size_t width_pitch;
-
-    /**
-     * 深度。
-    */
-    size_t depth;
-
-    /**
-     * 数据大小(bytes)。
-    */
-    size_t data_bytes;
-    
-}good_ndarray_attr;
-
-
-/**
  * 多维数组复制的参数。
  * 
 */
 typedef struct _good_ndarray_copy_param
 {
-    /**
-     * 目标数组的属性。
-    */
-    good_ndarray_attr dst_attr;
-
     /* 目标起始位置。*/
     size_t dst_n; /** 0 是开始。*/
     size_t dst_x; /** 0 是开始。*/
     size_t dst_y; /** 0 是开始。*/
     size_t dst_z; /** 0 是开始。*/
-
-    /**
-     * 源数组的属性。
-    */
-    good_ndarray_attr src_attr;
 
     /* 源起始位置。*/
     size_t src_n; /** 0 是开始。*/
@@ -132,17 +127,29 @@ typedef struct _good_ndarray_copy_param
     size_t width;  /** 1 是开始。*/
     size_t depth;  /** 1 是开始。*/
 
+    /**
+     * 复制函数。
+     * 
+     * 如果源和目标的元素大小不一样，此函数不能为NULL(0)。
+    */
+    void (*copy_cb)(void *dst, size_t dst_dbytes, const void *src, size_t src_dbytes, void *opaque);
+
+    /**
+    * 环境指针。
+    */
+    void *opaque;
+
 } good_ndarray_copy_param;
 
 /**
  * 计算多维数组宽度对齐的大小(bytes)。
 */
-size_t good_ndarray_width_pitch(const good_ndarray_attr *attr, size_t align);
+size_t good_ndarray_width_pitch(const good_ndarray_t *ary, size_t align);
 
 /**
  * 计算多维数组占用空间的大小(bytes)。
 */
-size_t good_ndarray_area_size(const good_ndarray_attr *attr);
+size_t good_ndarray_area_size(const good_ndarray_t *ary);
 
 /**
  * 计算多维数组坐标点内存偏移量(bytes)。
@@ -151,9 +158,8 @@ size_t good_ndarray_area_size(const good_ndarray_attr *attr);
  * @param x 宽的坐标，0 是开始。
  * @param y 高的坐标，0 是开始。
  * @param z 深的坐标，0 是开始。
- * 
 */
-size_t good_ndarray_offset(const good_ndarray_attr *attr,size_t n,size_t x,size_t y,size_t z);
+size_t good_ndarray_offset(const good_ndarray_t *ary,size_t n,size_t x,size_t y,size_t z);
 
 /** 
  * 多维数组的复制。
@@ -165,6 +171,6 @@ size_t good_ndarray_offset(const good_ndarray_attr *attr,size_t n,size_t x,size_
  * @param param 参数的指针。
  * 
 */
-void good_ndarray_copy(void *dst,const void *src,good_ndarray_copy_param *param);
+void good_ndarray_copy(good_ndarray_t *dst,const good_ndarray_t *src,good_ndarray_copy_param *param);
 
 #endif //GOOD_UTIL_NDARRAY_H

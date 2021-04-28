@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "libutil/geometry.h"
+#include "libutil/ndarray.h"
 
 
 
@@ -88,12 +89,123 @@ void test3()
 
 }
 
+void test4()
+{
+    good_ndarray_t s = {0};
+    good_ndarray_t d = {0};
+
+    s.format = GOOD_NDARRAY_NCHW;
+    s.blocks = 3;
+    s.width = 16;
+    s.height = 16;
+    s.depth = 3;
+    s.data_bytes = 4;
+
+    d.format = GOOD_NDARRAY_NHWC;
+    d.blocks = 3;
+    d.width = 16;
+    d.height = 16;
+    d.depth = 3;
+    d.data_bytes = 4;
+
+    s.width_pitch = good_ndarray_width_pitch(&s,5);
+    d.width_pitch = good_ndarray_width_pitch(&d,60);
+
+    s.ptr = good_heap_alloc(good_ndarray_area_size(&s));
+    d.ptr = good_heap_alloc(good_ndarray_area_size(&d));
+
+    for (size_t n = 0; n < s.blocks; n++)
+    {
+        for (size_t z = 0; z < s.depth; z++)
+        {
+            for (size_t y = 0; y < s.height; y++)
+            {
+                for (size_t x = 0; x < s.width; x++)
+                {
+                    size_t f = good_ndarray_offset(&s, n, x, y, z);
+
+                    *GOOD_PTR2PTR(int, s.ptr, f) = f/4+1;
+                }
+            }
+        }
+    }
+
+    good_ndarray_copy_param p = {0};
+
+    p.blocks = d.blocks;
+    p.width = d.width;
+    p.height = d.height;
+    p.depth = d.depth;
+
+    good_ndarray_copy(&d,&s,&p);
+
+    for (size_t n = 0; n < p.blocks; n++)
+    {
+        
+            
+#if 0
+                for (size_t x = 0; x < p.width; x++)
+                {
+                    size_t df = good_ndarray_offset(&d, n, x, y, z);
+                    size_t sf = good_ndarray_offset(&s, n, x, y, z);
+
+                    int a = *GOOD_PTR2PTR(int, d.ptr, df);
+                    int b = *GOOD_PTR2PTR(int, s.ptr, sf);
+
+               //     printf("[%ld,%ld,%ld,%ld]:%d,%d\n",n,z,y,x,a,b);
+
+                    assert( a==b );
+                }
+#else
+        #if 0
+            for (size_t z = 0; z < p.depth; z++)
+            {
+            size_t sf = good_ndarray_offset(&s, n, 0, 0, z);
+            for (size_t y = 0; y < p.height; y++)
+            {
+                for (size_t x = 0; x < p.width; x++)
+                {
+
+                    int b = *GOOD_PTR2PTR(int, s.ptr, sf + y *s.width_pitch + x * s.data_bytes);
+                    printf("%d,", b);
+
+                }
+                printf("\n");
+            }
+            #else 
+            for (size_t y = 0; y < p.height; y++)
+            {
+                size_t df = good_ndarray_offset(&d, n, 0, y, 0);
+
+                for (size_t x = 0; x < p.width; x++)
+                {
+                    for (size_t z = 0; z < p.depth; z++)
+                    {
+                        int a = *GOOD_PTR2PTR(int, d.ptr, df + x * d.depth * d.data_bytes + z * d.data_bytes);
+                        printf("%d,", a);
+                    }
+                    
+                }
+
+                printf("\n");
+            }
+        #endif 
+#endif
+        
+    }
+
+
+}
+
 int main(int argc, char **argv)
 {
     //test1();
     //test2();
 
-    test3();
+ //   test3();
+
+    test4();
+
 
     return 0;
 }

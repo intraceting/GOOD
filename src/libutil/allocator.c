@@ -27,7 +27,7 @@ typedef struct _good_allocator_hdr
     /**
     * 引用计数器。
     */
-    atomic_uint refcount;
+    int refcount;
 
     /**
     * 析构函数。
@@ -106,7 +106,7 @@ good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers)
         GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
 
     in_p->magic = GOOD_ALLOCATOR_MAGIC;
-    atomic_init(&in_p->refcount, 1);
+    in_p->refcount = 1;
     in_p->destroy_cb = NULL;
     in_p->opaque = NULL;
 
@@ -164,7 +164,7 @@ good_allocator_t *good_allocator_refer(good_allocator_t *src)
 
     assert(in_p->magic == GOOD_ALLOCATOR_MAGIC);
 
-    assert(atomic_fetch_add_explicit(&in_p->refcount, 1, memory_order_acq_rel) > 0);
+    assert(good_atomic_fetch_and_add(&in_p->refcount, 1) > 0);
 
     return src;
 }
@@ -180,7 +180,7 @@ void good_allocator_unref(good_allocator_t **dst)
 
     assert(in_p->magic == GOOD_ALLOCATOR_MAGIC);
 
-    if (atomic_fetch_add_explicit(&in_p->refcount, -1, memory_order_acq_rel) == 1)
+    if (good_atomic_fetch_and_add(&in_p->refcount, -1) == 1)
     {
         if (in_p->destroy_cb)
             in_p->destroy_cb(&in_p->out, in_p->opaque);
@@ -227,7 +227,7 @@ good_allocator_t *good_allocator_privatize(good_allocator_t **dst)
 
     new_p = dst_p = *dst;
 
-    if (atomic_load(dst_p->refcount) > 1)
+    if (good_atomic_load((int*)dst_p->refcount) > 1)
     {
         /* 当前不是唯一引用，克隆一份。*/
         new_p = good_allocator_clone(dst_p);

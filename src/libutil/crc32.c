@@ -32,7 +32,7 @@ static int _good_crc32_init(void *opaque)
 
 uint32_t good_crc32_sum(const void *data,size_t size,uint32_t old)
 {
-    static atomic_int init = 0;
+    static int init = 0;
     static uint32_t table[256] = {0};
 
     uint32_t sum = ~old;

@@ -10,39 +10,41 @@
 
 size_t good_align(size_t size, size_t align)
 {
+    size_t padding = 0;
+
     if (size > 0 && align > 1)
     {
-        size_t padding = size % align;
-        return (size + ((padding > 0) ? align - padding : 0));
+        padding = size % align;
+
+        size += ((padding > 0) ? align - padding : 0);
     }
 
     return size;
 }
 
-int good_once(atomic_int *status, int (*routine)(void *opaque), void *opaque)
+int good_once(int *status, int (*routine)(void *opaque), void *opaque)
 {
     int chk, ret;
-    atomic_int cmp = 0;
 
     assert(status != NULL && opaque != NULL);
 
-    if (atomic_compare_exchange_strong(status, &cmp, 1))
+    if (good_atomic_compare_and_swap(status,0, 1))
     {
         ret = 0;
 
         chk = routine(opaque);
 
-        atomic_store(status, ((chk == 0) ? 2 : 0));
+        good_atomic_store(status, ((chk == 0) ? 2 : 0));
     }
     else
     {
         ret = 1;
 
-        while (atomic_load(status) == 1)
+        while (good_atomic_load(status) == 1)
             pthread_yield();
     }
 
-    chk = ((atomic_load(status) == 2) ? 0 : -1);
+    chk = ((good_atomic_load(status) == 2) ? 0 : -1);
 
     return (chk == 0 ? ret : -1);
 }
