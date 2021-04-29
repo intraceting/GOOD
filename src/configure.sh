@@ -108,11 +108,11 @@ mkdir -p "${PKG_PATH}"
 LIBUTIL_DEPEND_PC=${PKG_PATH}/libutil-depend.pc
 LIBUTIL_PC=${PKG_PATH}/libutil.pc
 
-#-fopenmp
-PKG_FLAGS=" ${PKG_FLAGS} "
+#
+PKG_FLAGS=" ${PKG_FLAGS} -fopenmp"
 PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${PKG_FLAGS}"
-#-fopenmp
-PKG_LIBS=" ${PKG_LIBS} "
+#
+PKG_LIBS=" ${PKG_LIBS} -fopenmp"
 PKG_LIBS="-ldl -pthread -lrt -lc -lm ${PKG_LIBS}"
 
 #

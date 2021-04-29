@@ -93,11 +93,10 @@ size_t good_ndarray_offset(const good_ndarray_t *ary,size_t n,size_t x,size_t y,
     return size;
 }
 
-void good_ndarray_copy(good_ndarray_t *dst,const good_ndarray_t *src,good_ndarray_copy_param *param)
+void good_ndarray_copy(good_ndarray_t *dst, const good_ndarray_t *src, good_ndarray_copy_param *param)
 {
-    //size_t dst_offset = -1;
-    //size_t src_offset = -1;
-    long processors = 1;
+    size_t cores = 1;
+    size_t count = 0;
 
     assert(dst != NULL && src != NULL && param != NULL);
 
@@ -112,53 +111,42 @@ void good_ndarray_copy(good_ndarray_t *dst,const good_ndarray_t *src,good_ndarra
     assert(param->blocks > 0 && param->height > 0 && param->width > 0 && param->depth > 0);
 
     assert(param->dst_n + param->blocks <= dst->blocks &&
-                      param->dst_x + param->width <= dst->width &&
-                      param->dst_y + param->height <= dst->height &&
-                      param->dst_z + param->depth <= dst->depth);
+           param->dst_x + param->width <= dst->width &&
+           param->dst_y + param->height <= dst->height &&
+           param->dst_z + param->depth <= dst->depth);
 
     assert(param->src_n + param->blocks <= src->blocks &&
-                      param->src_x + param->width <= src->width &&
-                      param->src_y + param->height <= src->height &&
-                      param->src_z + param->depth <= src->depth);
+           param->src_x + param->width <= src->width &&
+           param->src_y + param->height <= src->height &&
+           param->src_z + param->depth <= src->depth);
 
     assert(param->copy_cb == NULL && dst->data_bytes == src->data_bytes);
 
-    processors = sysconf(_SC_NPROCESSORS_ONLN);
+    cores = sysconf(_SC_NPROCESSORS_ONLN);
+    count = param->blocks * param->depth * param->height * param->width;
 
-    #pragma omp parallel for num_threads(param->blocks)
-    for (size_t n = 0; n < param->blocks; n++)
+    #pragma omp parallel for num_threads(cores)
+    for (size_t i = 0; i < count; i++)
     {
-        for (size_t z = 0; z < param->depth; z++)
+        size_t n = i / (param->depth * param->height * param->width);
+        size_t z = (i % (param->depth * param->height * param->width)) / (param->width * param->height);
+        size_t y = ((i % (param->depth * param->height * param->width)) % (param->width * param->height)) / param->width;
+        size_t x = ((i % (param->depth * param->height * param->width)) % (param->width * param->height)) % param->width;
+
+        size_t dst_offset = good_ndarray_offset(dst, n + param->dst_n, x + param->dst_x, y + param->dst_y, z + param->dst_z);
+        size_t src_offset = good_ndarray_offset(src, n + param->src_n, x + param->src_x, y + param->src_y, z + param->src_z);
+
+        if (param->copy_cb)
         {
-            for (size_t y = 0; y < param->height; y++)
-            {
-                for (size_t x = 0; x < param->width; x++)
-                {
-                    size_t dst_offset = good_ndarray_offset(dst, n + param->dst_n, x + param->dst_x, y + param->dst_y, z + param->dst_z);
-                    size_t src_offset = good_ndarray_offset(src, n + param->src_n, x + param->src_x, y + param->src_y, z + param->src_z);
-
-                    if (param->copy_cb)
-                    {
-                        param->copy_cb(GOOD_PTR2PTR(void, dst->ptr, dst_offset), dst->data_bytes,
-                                       GOOD_PTR2PTR(void, src->ptr, src_offset), src->data_bytes,
-                                       param->opaque);
-                    }
-                    else
-                    {
-                        memcpy(GOOD_PTR2PTR(void, dst->ptr, dst_offset),
-                               GOOD_PTR2PTR(void, src->ptr, src_offset),
-                               GOOD_MIN(dst->data_bytes, src->data_bytes));
-                    }
-
-                    int a = *GOOD_PTR2PTR(int, dst->ptr, dst_offset);
-                    int b = *GOOD_PTR2PTR(int, src->ptr, src_offset);
-
-                  //  printf("[%ld,%ld,%ld,%ld]:%d,%d\n",n,z,y,x,a,b);
-
-                    assert( a==b );
-                }
-            }
+            param->copy_cb(GOOD_PTR2PTR(void, dst->ptr, dst_offset), dst->data_bytes,
+                           GOOD_PTR2PTR(void, src->ptr, src_offset), src->data_bytes,
+                           param->opaque);
+        }
+        else
+        {
+            memcpy(GOOD_PTR2PTR(void, dst->ptr, dst_offset),
+                   GOOD_PTR2PTR(void, src->ptr, src_offset),
+                   GOOD_MIN(dst->data_bytes, src->data_bytes));
         }
     }
-
 }

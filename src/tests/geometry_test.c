@@ -94,17 +94,19 @@ void test4()
     good_ndarray_t s = {0};
     good_ndarray_t d = {0};
 
-    s.format = GOOD_NDARRAY_NCHW;
+    //s.format = GOOD_NDARRAY_NCHW;
+    s.format = GOOD_NDARRAY_NHWC;
     s.blocks = 3;
-    s.width = 16;
-    s.height = 16;
+    s.width = 3;
+    s.height = 3;
     s.depth = 3;
     s.data_bytes = 4;
 
-    d.format = GOOD_NDARRAY_NHWC;
+    //d.format = GOOD_NDARRAY_NHWC;
+    d.format = GOOD_NDARRAY_NCHW;
     d.blocks = 3;
-    d.width = 16;
-    d.height = 16;
+    d.width = 3;
+    d.height = 3;
     d.depth = 3;
     d.data_bytes = 4;
 
@@ -139,61 +141,66 @@ void test4()
 
     good_ndarray_copy(&d,&s,&p);
 
+#if 0
+    // for (size_t n = 0; n < p.blocks; n++)
+    // {
+    //     for (size_t z = 0; z < p.depth; z++)
+    //     {
+    //         for (size_t y = 0; y < p.height; y++)
+    //         {
+    //             for (size_t x = 0; x < p.width; x++)
+    //             {
+    //                 size_t df = good_ndarray_offset(&d, n, x, y, z);
+    //                 size_t sf = good_ndarray_offset(&s, n, x, y, z);
+
+    //                 int a = *GOOD_PTR2PTR(int, d.ptr, df);
+    //                 int b = *GOOD_PTR2PTR(int, s.ptr, sf);
+
+    //                 //     printf("[%ld,%ld,%ld,%ld]:%d,%d\n",n,z,y,x,a,b);
+
+    //                 assert(a == b);
+    //             }
+    //         }
+    //     }
+    // }
+#else
     for (size_t n = 0; n < p.blocks; n++)
     {
-        
-            
 #if 0
-                for (size_t x = 0; x < p.width; x++)
-                {
-                    size_t df = good_ndarray_offset(&d, n, x, y, z);
-                    size_t sf = good_ndarray_offset(&s, n, x, y, z);
-
-                    int a = *GOOD_PTR2PTR(int, d.ptr, df);
-                    int b = *GOOD_PTR2PTR(int, s.ptr, sf);
-
-               //     printf("[%ld,%ld,%ld,%ld]:%d,%d\n",n,z,y,x,a,b);
-
-                    assert( a==b );
-                }
-#else
-        #if 0
-            for (size_t z = 0; z < p.depth; z++)
-            {
+        for (size_t z = 0; z < p.depth; z++)
+        {
             size_t sf = good_ndarray_offset(&s, n, 0, 0, z);
             for (size_t y = 0; y < p.height; y++)
             {
                 for (size_t x = 0; x < p.width; x++)
                 {
 
-                    int b = *GOOD_PTR2PTR(int, s.ptr, sf + y *s.width_pitch + x * s.data_bytes);
+                    //int b = *GOOD_PTR2PTR(int, s.ptr, sf + y * s.width_pitch + x * s.data_bytes);
                     printf("%d,", b);
-
                 }
                 printf("\n");
             }
-            #else 
-            for (size_t y = 0; y < p.height; y++)
+        }
+#else
+        for (size_t y = 0; y < p.height; y++)
+        {
+            size_t df = good_ndarray_offset(&d, n, 0, y, 0);
+
+            for (size_t x = 0; x < p.width; x++)
             {
-                size_t df = good_ndarray_offset(&d, n, 0, y, 0);
-
-                for (size_t x = 0; x < p.width; x++)
+                for (size_t z = 0; z < p.depth; z++)
                 {
-                    for (size_t z = 0; z < p.depth; z++)
-                    {
-                        int a = *GOOD_PTR2PTR(int, d.ptr, df + x * d.depth * d.data_bytes + z * d.data_bytes);
-                        printf("%d,", a);
-                    }
-                    
+                    //int a = *GOOD_PTR2PTR(int, d.ptr, df + x * d.depth * d.data_bytes + z * d.data_bytes);
+                    int a = *GOOD_PTR2PTR(int, d.ptr, df + y * d.width_pitch + x * d.data_bytes);
+                    printf("%d,", a);
                 }
-
-                printf("\n");
             }
-        #endif 
-#endif
-        
-    }
 
+            printf("\n");
+        }
+#endif
+    }
+#endif
 
 }
 
