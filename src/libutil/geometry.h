@@ -12,7 +12,7 @@
 /**
  * 点
  * 
- */
+*/
 typedef struct _good_point
 {
     /**
