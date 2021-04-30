@@ -131,6 +131,6 @@ void good_map_remove(good_map_t* map,const void* key,size_t ksize);
  * 
  * 深度优先遍历节点。
 */
-void good_map_scan(const good_map_t *map);
+void good_map_scan(good_map_t *map);
 
 #endif //GOOD_UTIL_MAP_H

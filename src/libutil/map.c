@@ -159,7 +159,7 @@ static int _good_map_scan_cb(size_t depth, good_tree_t *node, void *opaque)
     return map->dump_cb(node->alloc, map->opaque);
 }
 
-void good_map_scan(const good_map_t *map)
+void good_map_scan(good_map_t *map)
 {
     assert(map != NULL);
     assert(map->dump_cb != NULL);

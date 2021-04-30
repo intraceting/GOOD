@@ -63,7 +63,7 @@ typedef struct _good_ndarray
  * 多维数组的格式。
  * 
 */
-typedef enum _good_ndarray_fmt
+enum _good_ndarray_fmt
 {
     /**
      * 
@@ -101,7 +101,7 @@ typedef enum _good_ndarray_fmt
     GOOD_NDARRAY_NCHW = 2
 #define GOOD_NDARRAY_NCHW   GOOD_NDARRAY_NCHW
 
-}good_ndarray_fmt;
+};
 
 /**
  * 多维数组复制的参数。
