@@ -46,11 +46,11 @@
 /**
  * 比较两个值，相同则用新值替换旧值。
 */
-#define good_atomic_compare_and_swap    __sync_bool_compare_and_swap
+#define good_atomic_compare_and_swap(ptr, oldval, newval)     __sync_bool_compare_and_swap((ptr), (oldval), newval)
 
 /**
  * 加法，返回旧值。
 */
-#define good_atomic_fetch_and_add   __sync_fetch_and_add
+#define good_atomic_fetch_and_add(ptr, val)   __sync_fetch_and_add(ptr, val) 
 
 #endif //GOOD_UTIL_ATOMIC_H
