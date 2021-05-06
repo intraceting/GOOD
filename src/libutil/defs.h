@@ -99,6 +99,11 @@
 #define GOOD_ERRNO_AND_RETURN1(E, V) ({errno=(E);return (V); })
 
 /**
+ * 设置出错码，并跳转。
+*/
+#define GOOD_ERRNO_AND_GOTO1(E, M) ({errno=(E);goto M; })
+
+/**
  * 计算数组大小。
 */
 #define GOOD_ARRAY_SIZE(V) (sizeof((V)) / sizeof((V)[0]))

@@ -968,7 +968,6 @@ pid_t good_popen(const char *cmd,char * const envp[], int *stdin_fd, int *stdout
 
         good_closep(&out2in_fd[1]);
         good_closep(&out2in_fd[0]);
-
         
         if (stdout_fd)
             dup2(in2out_fd[1], STDOUT_FILENO);
@@ -977,7 +976,6 @@ pid_t good_popen(const char *cmd,char * const envp[], int *stdin_fd, int *stdout
 
         good_closep(&in2out_fd[0]);
         good_closep(&in2out_fd[1]);
-
         
         if (stderr_fd)
             dup2(in2err_fd[1], STDERR_FILENO);
@@ -990,7 +988,7 @@ pid_t good_popen(const char *cmd,char * const envp[], int *stdin_fd, int *stdout
         /* 这个基本都支持。*/
         execle("/bin/sh", "sh", "-c", cmd,NULL,envp);
 
-        /*Maybe it will never be here.*/
+        /*也许永远也不可能到这里.*/
         _exit(127);
     }
     else

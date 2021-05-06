@@ -29,7 +29,7 @@ typedef struct _good_vector
     void *data;
 
     /**
-     * 元素类型。
+     * 元素类型(Bytes)。
      * 
     */
     size_t type;
