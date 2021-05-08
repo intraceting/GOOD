@@ -1,0 +1,119 @@
+/*
+ * This file is part of GOOD.
+ * 
+ * MIT License
+ * 
+ */
+#ifndef GOOD_UTIL_MTX_H
+#define GOOD_UTIL_MTX_H
+
+#include "general.h"
+#include "scsi.h"
+#include "tree.h"
+
+/**
+ * 元件类型。
+*/
+enum _good_mtx_element_type
+{
+    /** Medium transport element.*/
+    GOOD_MXT_ELEMENT_CHANGER = 1,
+#define GOOD_MXT_ELEMENT_CHANGER GOOD_MXT_ELEMENT_CHANGER
+
+    /** Storage element.*/
+    GOOD_MXT_ELEMENT_STORAGE = 2,
+#define GOOD_MXT_ELEMENT_STORAGE GOOD_MXT_ELEMENT_STORAGE
+
+    /** Import / Export Element. */
+    GOOD_MXT_ELEMENT_IE_PORT = 3,
+#define GOOD_MXT_ELEMENT_IE_PORT GOOD_MXT_ELEMENT_IE_PORT
+
+    /** Data transfer element (drives). */
+    GOOD_MXT_ELEMENT_DXFER = 4
+#define GOOD_MXT_ELEMENT_DXFER GOOD_MXT_ELEMENT_DXFER
+#define GOOD_MXT_ELEMENT_DRIVER GOOD_MXT_ELEMENT_DXFER
+};
+
+/**
+ * 元件的字段。
+*/
+enum _good_mtx_element_field
+{
+    /** 地址字段。*/
+    GOOD_MTX_ELEMENT_ADDR = 0,
+#define GOOD_MTX_ELEMENT_ADDR GOOD_MTX_ELEMENT_ADDR
+
+    /** 类型字段。*/
+    GOOD_MTX_ELEMENT_TYPE = 1,
+#define GOOD_MTX_ELEMENT_TYPE GOOD_MTX_ELEMENT_TYPE
+
+    /** 介质有无字段。*/
+    GOOD_MTX_ELEMENT_ISFULL = 2,
+#define GOOD_MTX_ELEMENT_ISFULL GOOD_MTX_ELEMENT_ISFULL
+
+    /** 条码字段。*/
+    GOOD_MTX_ELEMENT_BARCODE = 3,
+#define GOOD_MTX_ELEMENT_BARCODE GOOD_MTX_ELEMENT_BARCODE
+
+    /** DVCID字段。*/
+    GOOD_MTX_ELEMENT_DVCID = 4
+#define GOOD_MTX_ELEMENT_DVCID GOOD_MTX_ELEMENT_DVCID
+};
+
+
+/**
+ * 移动介质。
+ * 
+ * cdb = 0xA5
+ * 
+ * @param t 机械臂地址
+ * @param src 源槽位地址
+ * @param dst 目标槽位地址
+ * 
+ * @return 0 成功，-1 失败。
+ */
+int good_mtx_move_medium(int fd, uint16_t t, uint16_t src, uint16_t dst,
+                         uint32_t timeout, good_scsi_io_stat *stat);
+
+/**
+ * 是否允许介质移动到出入口。
+ * 
+ * cdb = 0x1E
+ * 
+ * @param disable 0 允许，!0 不允许。
+ *
+ * @return 0 成功，-1 失败。 
+*/
+int good_mtx_prevent_medium_removal(int fd, int disable,
+                                    uint32_t timeout, good_scsi_io_stat *stat);
+
+/**
+ * 查询设备信息。
+ * 
+ * cdb = 0x1A
+ * 
+ * @return 0 成功，-1 失败。 
+*/
+int good_mtx_mode_sense(int fd, uint8_t pctrl, uint8_t pcode, uint8_t spcode,
+                        uint8_t *transfer, uint8_t transferlen,
+                        uint32_t timeout, good_scsi_io_stat *stat);
+
+/**
+ * 查询设备元件状态。
+ * 
+ * cdb = 0xB8
+ * 
+ * @param transferlen 返回的数据最大长度。2MB是支持的最大长度，原因未知。
+ * 
+ * @return 0 成功，-1 失败。 
+*/
+int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_t count,
+                                 uint8_t *transfer, uint32_t transferlen,
+                                 uint32_t timeout, good_scsi_io_stat *stat);
+
+/**
+ * 分析设备无件状态，构造结构化数据。
+*/
+void good_mtx_parse_element_status(good_tree_t *father,uint8_t *element,uint16_t count);
+
+#endif //GOOD_UTIL_MTX_H
