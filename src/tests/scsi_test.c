@@ -36,6 +36,36 @@ void test_get_sn()
     good_closep(&fd);
 }
 
+int dump2(size_t deep, good_tree_t *node, void *opaque)
+{
+    if(deep==0)
+    {
+        good_tree_fprintf(stderr,deep,node,"haha\n");
+    }
+    else
+    {
+        good_tree_fprintf(stderr,deep,node,"%hu\t|%hhu\t|%hhu\t|%-36s\t|%-20s\t|\n",
+        *GOOD_PTR2PTR(uint16_t, node->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0),
+        *node->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE],
+        *node->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL],
+        node->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE],
+        node->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID]);
+    }
+
+    return 1;
+}
+
+void traversal(good_tree_t *root)
+{
+    printf("\n-------------------------------------\n");
+
+    good_tree_iterator_t it = {0,dump2,NULL};
+    good_tree_scan(root,&it);
+
+    printf("\n-------------------------------------\n");
+}
+
+
 void test_move()
 {
     int fd = good_open("/dev/sg9",0,0,0);
@@ -72,6 +102,14 @@ void test_move()
     uint8_t * buf2 = (uint8_t*) good_heap_alloc(buf2size);
 
     assert(good_mtx_read_element_status(fd,GOOD_MXT_ELEMENT_DXFER,driver_address,driver_count,buf2,2*1024*1024,-1,&stat)==0);
+
+    good_tree_t *t = good_tree_alloc(NULL);
+
+    good_mtx_parse_element_status(t,buf2,driver_count);
+
+    traversal(t);
+
+    good_tree_free(&t);
 
     good_closep(&fd);
 }

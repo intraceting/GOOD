@@ -210,6 +210,9 @@ char *good_strtrim(char *str, int (*isctype_cb)(int c),int where)
     tmp = str;
     len = strlen(str);
 
+    if (len <= 0)
+        goto final;
+
     if (0 == where)
     {
         while (*tmp)
@@ -226,6 +229,9 @@ char *good_strtrim(char *str, int (*isctype_cb)(int c),int where)
             blklen++;
         }
 
+        if (blklen <= 0)
+            goto final;
+
         for (size_t i = 0; i < len - blklen; i++)
             str[i] = str[i + blklen];
 
@@ -237,6 +243,8 @@ char *good_strtrim(char *str, int (*isctype_cb)(int c),int where)
         good_strtrim(str,isctype_cb,0);
         good_strtrim(str,isctype_cb,1);
     }
+
+final:
 
     return str;
 }

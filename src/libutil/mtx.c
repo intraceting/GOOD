@@ -76,7 +76,7 @@ void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16
     for (uint16_t i = 0; i < count; i++)
     {
         /*申请节点。*/
-        size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), 36, 32};
+        size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), 36+1, 32+1};
         good_tree_t *one = good_tree_alloc2(sizes, 5);
 
         /*如果节点申请失败提结束。*/
@@ -135,10 +135,13 @@ void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16
         }
 
         /*清除两端的空格。*/
-        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE], isblank, 2);
-        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID], isblank, 2);
+        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE], iscntrl, 2);
+        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID], iscntrl, 2);
 
         /*添加到子节点末尾。*/
         good_tree_insert2(father, one, 0);
+
+        /*下一页。*/
+        ptr += psize;
     }
 }
