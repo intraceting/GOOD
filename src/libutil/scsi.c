@@ -20,20 +20,21 @@ int good_scsi_sgioctl(int fd,struct sg_io_hdr *hdr)
     return ioctl(fd,SG_IO,hdr);
 }
 
-int good_scsi_sgioctl2(int fd,
-                       int direction,
+int good_scsi_sgioctl2(int fd, int direction,
                        uint8_t *cdb, uint8_t cdblen,
-                       uint8_t *transfer, unsigned int transferlen,
-                       uint8_t *sense, uint8_t senselen,
-                       uint8_t *status,
-                       unsigned int timeout)
+                       uint8_t *transfer, uint32_t transferlen,
+                       uint32_t timeout, good_scsi_io_stat *stat)
 {
     struct sg_io_hdr hdr = {0};
     int chk;
 
     assert(fd >= 0 && cdb != NULL && cdblen > 0);
-    assert((transfer != NULL && transferlen > 0) ||(transfer == NULL && transferlen <= 0));
-    assert((sense != NULL && senselen > 0) ||(sense == NULL && senselen <= 0));
+    assert((transfer != NULL && transferlen > 0) ||
+           (transfer == NULL && transferlen <= 0));
+    assert(stat != NULL);
+
+    /*clear*/
+    memset(stat,0,sizeof(*stat));
 
     hdr.interface_id = 'S';
     hdr.dxfer_direction = direction;
@@ -41,35 +42,65 @@ int good_scsi_sgioctl2(int fd,
     hdr.cmd_len = cdblen;
     hdr.dxferp = transfer;
     hdr.dxfer_len = transferlen;
-    hdr.sbp = sense;
-    hdr.mx_sb_len = senselen;
+    hdr.sbp = stat->sense;
+    hdr.mx_sb_len = sizeof(stat->sense);
     hdr.timeout = timeout;
 
     chk = good_scsi_sgioctl(fd,&hdr);
     if(chk != 0)
         return -1;
 
-    if(status)
-        *status = hdr.status;
+    stat->status = hdr.status;
+    stat->host_status = hdr.host_status;
+    stat->driver_status = hdr.driver_status;
+    stat->senselen_wr = hdr.sb_len_wr;
+    stat->resid = hdr.resid;
 
     return 0;
 }
 
-int good_scsi_test(int fd,uint8_t *sense, uint8_t senselen,uint8_t *status,unsigned int timeout)
+uint8_t good_scsi_sense_key(uint8_t *sense)
+{
+    assert(sense != NULL);
+
+    return sense[2] & 0xf;
+}
+
+uint8_t good_scsi_sense_code(uint8_t *sense)
+{
+    assert(sense != NULL);
+
+    return sense[12];
+}
+
+uint8_t good_scsi_sense_qualifier(uint8_t *sense)
+{
+    assert(sense != NULL);
+
+    return sense[13];
+}
+
+int good_scsi_test(int fd, uint32_t timeout, good_scsi_io_stat *stat)
 {
     uint8_t cdb[6] = {0};
     
     cdb[0] = 0x00; /*00H is TEST UNIT READY*/
 
-    return good_scsi_sgioctl2(fd,SG_DXFER_NONE,cdb,6,NULL,0,sense,senselen,status,timeout);
+    return good_scsi_sgioctl2(fd,SG_DXFER_NONE,cdb,6,NULL,0,timeout,stat);
 }
 
-int good_scsi_inquiry(int fd,
-                      int vpd, uint8_t vid,
-                      uint8_t *transfer, unsigned int transferlen,
-                      uint8_t *sense, uint8_t senselen,
-                      uint8_t *status,
-                      unsigned int timeout)
+int good_mtx_request_sense(int fd,uint32_t timeout, good_scsi_io_stat *stat)
+{
+    uint8_t cdb[6] = {0};
+    
+    cdb[0] = 0x03; /*03H is Request Sense*/
+
+    return good_scsi_sgioctl2(fd,SG_DXFER_NONE,cdb,6,NULL,0,timeout,stat);
+}
+
+int good_scsi_inquiry(int fd,int vpd, uint8_t vid,
+                      uint8_t *transfer, uint32_t transferlen,
+                      uint32_t timeout,good_scsi_io_stat *stat)
 {
     uint8_t cdb[6] = {0};
   
@@ -78,25 +109,22 @@ int good_scsi_inquiry(int fd,
     cdb[2] = (vpd ? vid : 0x00); /* Return PAGE CODE */
     cdb[4] = transferlen;
 
-    return good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,6,transfer,transferlen,sense,senselen,status,timeout);
+    return good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,6,transfer,transferlen,timeout,stat);
 }
 
-int good_scsi_inquiry_sn(int fd,
-                         char buf[64],
-                         uint8_t *sense, uint8_t senselen,
-                         uint8_t *status,
-                         unsigned int timeout)
+int good_scsi_inquiry_sn(int fd,char buf[64],
+                         uint32_t timeout,good_scsi_io_stat *stat)
 {
     uint8_t tmp[255] = {0};
     int chk;
 
-    assert(buf != NULL && status != NULL);
+    assert(buf != NULL);
 
-    chk = good_scsi_inquiry(fd,1,0x80,tmp,255,sense,senselen,status,timeout);
+    chk = good_scsi_inquiry(fd,1,0x80,tmp,255,timeout,stat);
     if(chk != 0)
         return -1;
 
-    if(*status != GOOD)
+    if(stat->status != GOOD)
         return -1;
 
     /* Just copy SN。  */
@@ -108,25 +136,19 @@ int good_scsi_inquiry_sn(int fd,
     return 0;
 }
 
-int good_scsi_inquiry_baseinfo(int fd,
-                               uint8_t *type,
-                               char vendor[16],
-                               char product[32],
-                               uint8_t *sense, uint8_t senselen,
-                               uint8_t *status,
-                               unsigned int timeout)
+int good_scsi_inquiry_baseinfo(int fd,uint8_t *type,char vendor[16],char product[32],
+                               uint32_t timeout,good_scsi_io_stat *stat)
 {
     uint8_t tmp[255] = {0};
     int chk;
 
     assert(type != NULL || vendor != NULL || product != NULL);
-    assert(status != NULL);
 
-    chk = good_scsi_inquiry(fd,0,0x00,tmp,255,sense,senselen,status,timeout);
+    chk = good_scsi_inquiry(fd,0,0x00,tmp,255,timeout,stat);
     if(chk != 0)
         return -1;
 
-    if(*status != GOOD)
+    if(stat->status != GOOD)
         return -1;
 
     /* Copy TYPE，VENDOR，PRODUCT。*/

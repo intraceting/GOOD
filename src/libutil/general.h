@@ -207,17 +207,22 @@ uint8_t* good_endian_ntoh(uint8_t* dst,int len);
 /**
  * 16位整型数值，网络字节序转本地字节序。
 */
-uint16_t good_endian_ntoh16(uint16_t num);
+uint16_t good_endian_ntoh16(uint16_t src);
 
 /**
  * 32位整型数值，网络字节序转本地字节序。
 */
-uint32_t good_endian_ntoh32(uint32_t num);
+uint32_t good_endian_ntoh32(uint32_t src);
+
+/**
+ * 24位整型数值，网络字节序转本地字节序。
+*/
+uint32_t good_endian_ntoh24(const uint8_t* src);
 
 /**
  * 64位整型数值，网络字节序转本地字节序。
 */
-uint64_t good_endian_ntoh64(uint64_t num);
+uint64_t good_endian_ntoh64(uint64_t src);
 
 /**
  * 本地字节序转网络字节序。
@@ -229,17 +234,22 @@ uint8_t* good_endian_hton(uint8_t* dst,int len);
 /**
  * 16位整型数值，本地字节序转网络字节序。
 */
-uint16_t good_endian_hton16(uint16_t num);
+uint16_t good_endian_hton16(uint16_t src);
 
 /**
  * 32位整型数值，本地字节序转网络字节序。
 */
-uint32_t good_endian_hton32(uint32_t num);
+uint32_t good_endian_hton32(uint32_t src);
+
+/**
+ * 24位整型数值，本地字节序转网络字节序。
+*/
+uint8_t* good_endian_hton24(uint8_t* dst,uint32_t src);
 
 /**
  * 64位整型数值，本地字节序转网络字节序。
 */
-uint64_t good_endian_hton64(uint64_t num);
+uint64_t good_endian_hton64(uint64_t src);
 
 /*------------------------------------------------------------------------------------------------*/
 

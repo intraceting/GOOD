@@ -391,19 +391,37 @@ uint8_t* good_endian_ntoh(uint8_t* dst,int len)
     return dst;
 }
 
-uint16_t good_endian_ntoh16(uint16_t num)
+uint16_t good_endian_ntoh16(uint16_t src)
 {
-    return *((uint16_t*)good_endian_ntoh((uint8_t*)&num,sizeof(num)));
+    return *((uint16_t*)good_endian_ntoh((uint8_t*)&src,sizeof(src)));
 }
 
-uint32_t good_endian_ntoh32(uint32_t num)
+uint32_t good_endian_ntoh32(uint32_t src)
 {
-    return *((uint32_t*)good_endian_ntoh((uint8_t*)&num,sizeof(num)));
+    return *((uint32_t*)good_endian_ntoh((uint8_t*)&src,sizeof(src)));
 }
 
-uint64_t good_endian_ntoh64(uint64_t num)
+uint32_t good_endian_ntoh24(const uint8_t* src)
 {
-    return *((uint64_t*)good_endian_ntoh((uint8_t*)&num,sizeof(num)));
+    uint32_t dst = 0;
+
+    if (good_endian_check(0))
+    {
+        memcpy(&dst, src, 3);
+        good_endian_swap((uint8_t*)&dst, 3);
+    }
+    else
+    {
+        memcpy(&dst, src, 3);
+        dst >>= 8;
+    }
+
+    return dst;
+}
+
+uint64_t good_endian_ntoh64(uint64_t src)
+{
+    return *((uint64_t*)good_endian_ntoh((uint8_t*)&src,sizeof(src)));
 }
 
 uint8_t* good_endian_hton(uint8_t* dst,int len)
@@ -414,19 +432,35 @@ uint8_t* good_endian_hton(uint8_t* dst,int len)
     return dst;
 }
 
-uint16_t good_endian_hton16(uint16_t num)
+uint16_t good_endian_hton16(uint16_t src)
 {
-    return *((uint16_t *)good_endian_hton((uint8_t *)&num, sizeof(num)));
+    return *((uint16_t *)good_endian_hton((uint8_t *)&src, sizeof(src)));
 }
 
-uint32_t good_endian_hton32(uint32_t num)
+uint32_t good_endian_hton32(uint32_t src)
 {
-    return *((uint32_t *)good_endian_hton((uint8_t *)&num, sizeof(num)));
+    return *((uint32_t *)good_endian_hton((uint8_t *)&src, sizeof(src)));
 }
 
-uint64_t good_endian_hton64(uint64_t num)
+uint8_t* good_endian_hton24(uint8_t* dst,uint32_t src)
 {
-    return *((uint64_t *)good_endian_hton((uint8_t *)&num, sizeof(num)));
+    if (good_endian_check(0))
+    {
+        memcpy(dst, &src, 3);
+        good_endian_swap(dst, 3);
+    }
+    else
+    {
+        src <<= 8;
+        memcpy(dst, &src, 3);
+    }
+
+    return dst;
+}
+
+uint64_t good_endian_hton64(uint64_t src)
+{
+    return *((uint64_t *)good_endian_hton((uint8_t *)&src, sizeof(src)));
 }
 
 /*------------------------------------------------------------------------------------------------*/
