@@ -61,6 +61,20 @@ enum _good_mtx_element_field
 };
 
 /**
+ * 初始化设备元件状态。
+ * 
+ * 可能会花费较长的间。
+ * 
+ * @param address 开始地址。
+ * @param count 数量，为0时忽略address，并初始化所有元件状态。
+ * 
+ * @return 0 成功，-1 失败。
+ *  
+*/
+int good_mtx_inventory(int fd, uint16_t address, uint16_t count,
+                       uint32_t timeout, good_scsi_io_stat *stat);
+
+/**
  * 移动介质。
  * 
  * cdb = 0xA5
@@ -71,7 +85,7 @@ enum _good_mtx_element_field
  * 
  * @return 0 成功，-1 失败。
  * 
- * @warning  SENSE key = 0x06 仓门被打开过，需要重新盘点介质。
+ * @warning  SENSE key = 0x06 设备仓门被打开过，需要重新盘点介质。
  */
 int good_mtx_move_medium(int fd, uint16_t t, uint16_t src, uint16_t dst,
                          uint32_t timeout, good_scsi_io_stat *stat);
@@ -122,6 +136,7 @@ void good_mtx_parse_element_status(good_tree_t *father,uint8_t *element,uint16_t
  * 
  * @return 0 成功，-1 失败。 
 */
-int good_mtx_inventory(int fd,good_tree_t *father,uint32_t timeout, good_scsi_io_stat *stat);
+int good_mtx_inquiry_element_status(good_tree_t *father,int fd,uint32_t timeout, good_scsi_io_stat *stat);
+
 
 #endif //GOOD_UTIL_MTX_H

@@ -6,6 +6,20 @@
  */
 #include "mtx.h"
 
+int good_mtx_inventory(int fd, uint16_t address, uint16_t count,
+                       uint32_t timeout, good_scsi_io_stat *stat)
+{
+
+    uint8_t cdb[10] = {0};
+
+    cdb[0] = 0x37; /* 0x37 or E7 Initialize Element Status With Range */
+    GOOD_PTR2OBJ(uint8_t, cdb, 1) |= (count > 0 ? 0x01 : 0);
+    GOOD_PTR2OBJ(uint16_t, cdb, 2) = good_endian_hton16(address);
+    GOOD_PTR2OBJ(uint16_t, cdb, 6) = good_endian_hton16(count);
+
+    return good_scsi_sgioctl2(fd, SG_DXFER_NONE, cdb, 10, NULL, 0, timeout, stat);
+}                       
+
 int good_mtx_move_medium(int fd, uint16_t t, uint16_t src, uint16_t dst,
                          uint32_t timeout, good_scsi_io_stat *stat)
 {
@@ -152,7 +166,7 @@ next:
     }
 }
 
-int good_mtx_inventory(int fd,good_tree_t *father,uint32_t timeout, good_scsi_io_stat *stat)
+int good_mtx_inquiry_element_status(good_tree_t *father,int fd,uint32_t timeout, good_scsi_io_stat *stat)
 {
     char buf[255] = {0};
     int buf2size = 0;

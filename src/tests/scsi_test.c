@@ -67,11 +67,17 @@ void test_move()
 {
     int fd = good_open("/dev/sg10",0,0,0);
 
+    
+
     good_scsi_io_stat stat = {0};
+
+    assert(good_mtx_inventory(fd,0,0,1000,&stat)==0);
+
+    assert(good_mtx_inventory(fd,5000,10,1000,&stat)==0);
 
     for (int i = 0; i < 4; i++)
     {
-        assert(good_mtx_move_medium(fd, 1, 1000+i, 500+i, -1, &stat) == 0);
+        assert(good_mtx_move_medium(fd, 0, 500+i, 1000+i, -1, &stat) == 0);
 
         printf("%hhx,%hhx,%hhx\n", good_scsi_sense_key(stat.sense), good_scsi_sense_code(stat.sense), good_scsi_sense_qualifier(stat.sense));
     }
@@ -105,7 +111,7 @@ void test_move()
 
     good_tree_t *t = good_tree_alloc(NULL);
 
-    assert(good_mtx_inventory(fd,t,-1,&stat)==0);
+    assert(good_mtx_inquiry_element_status(t,fd,-1,&stat)==0);
 
     traversal(t);
 
