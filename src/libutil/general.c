@@ -404,11 +404,6 @@ uint16_t good_endian_ntoh16(uint16_t src)
     return *((uint16_t*)good_endian_ntoh((uint8_t*)&src,sizeof(src)));
 }
 
-uint32_t good_endian_ntoh32(uint32_t src)
-{
-    return *((uint32_t*)good_endian_ntoh((uint8_t*)&src,sizeof(src)));
-}
-
 uint32_t good_endian_ntoh24(const uint8_t* src)
 {
     uint32_t dst = 0;
@@ -425,6 +420,11 @@ uint32_t good_endian_ntoh24(const uint8_t* src)
     }
 
     return dst;
+}
+
+uint32_t good_endian_ntoh32(uint32_t src)
+{
+    return *((uint32_t*)good_endian_ntoh((uint8_t*)&src,sizeof(src)));
 }
 
 uint64_t good_endian_ntoh64(uint64_t src)
@@ -445,11 +445,6 @@ uint16_t good_endian_hton16(uint16_t src)
     return *((uint16_t *)good_endian_hton((uint8_t *)&src, sizeof(src)));
 }
 
-uint32_t good_endian_hton32(uint32_t src)
-{
-    return *((uint32_t *)good_endian_hton((uint8_t *)&src, sizeof(src)));
-}
-
 uint8_t* good_endian_hton24(uint8_t* dst,uint32_t src)
 {
     if (good_endian_check(0))
@@ -464,6 +459,11 @@ uint8_t* good_endian_hton24(uint8_t* dst,uint32_t src)
     }
 
     return dst;
+}
+
+uint32_t good_endian_hton32(uint32_t src)
+{
+    return *((uint32_t *)good_endian_hton((uint8_t *)&src, sizeof(src)));
 }
 
 uint64_t good_endian_hton64(uint64_t src)

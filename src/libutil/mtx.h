@@ -39,23 +39,23 @@ enum _good_mtx_element_type
 */
 enum _good_mtx_element_field
 {
-    /** 地址字段。*/
+    /** 地址字段索引。*/
     GOOD_MTX_ELEMENT_ADDR = 0,
 #define GOOD_MTX_ELEMENT_ADDR GOOD_MTX_ELEMENT_ADDR
 
-    /** 类型字段。*/
+    /** 类型字段索引。*/
     GOOD_MTX_ELEMENT_TYPE = 1,
 #define GOOD_MTX_ELEMENT_TYPE GOOD_MTX_ELEMENT_TYPE
 
-    /** 介质有无字段。*/
+    /** 介质有无字段索引。*/
     GOOD_MTX_ELEMENT_ISFULL = 2,
 #define GOOD_MTX_ELEMENT_ISFULL GOOD_MTX_ELEMENT_ISFULL
 
-    /** 条码字段。*/
+    /** 条码字段索引。*/
     GOOD_MTX_ELEMENT_BARCODE = 3,
 #define GOOD_MTX_ELEMENT_BARCODE GOOD_MTX_ELEMENT_BARCODE
 
-    /** DVCID字段。*/
+    /** DVCID字段索引。*/
     GOOD_MTX_ELEMENT_DVCID = 4
 #define GOOD_MTX_ELEMENT_DVCID GOOD_MTX_ELEMENT_DVCID
 };
@@ -115,5 +115,13 @@ int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_
  * 分析设备无件状态，构造结构化数据。
 */
 void good_mtx_parse_element_status(good_tree_t *father,uint8_t *element,uint16_t count);
+
+
+/**
+ * 查询设备所有元件状态。
+ * 
+ * @return 0 成功，-1 失败。 
+*/
+int good_mtx_inventory(int fd,good_tree_t *father,uint32_t timeout, good_scsi_io_stat *stat);
 
 #endif //GOOD_UTIL_MTX_H

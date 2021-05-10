@@ -87,17 +87,21 @@ void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16
         uint8_t volsize = (pvoltag ? 36 : 0);
 
         /*获取部分字段。*/
-        *GOOD_PTR2PTR(uint16_t, one->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0) = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, ptr, 0));
-        *one->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE] = type;
-        *one->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL] = (ptr[2] & 0x01) ? 1 : 0;
+        GOOD_PTR2OBJ(uint16_t, one->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0) = good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, ptr, 0));
+        GOOD_PTR2OBJ(uint8_t, one->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE],0) = type;
+        GOOD_PTR2OBJ(uint8_t, one->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL],0) = ((ptr[2] & 0x01) ? 1 : 0);
         if (volsize > 0)
             memcpy(one->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE], ptr + 12, volsize);
 
-        /*是否有驱动器信息。*/
+        /*是否有机械臂或驱动器信息。*/
         uint8_t dvcid_set = ptr[12 + volsize] & 0x0F;
 
-        /*驱动器才有下面的数据。*/
-        if ((GOOD_MXT_ELEMENT_DXFER == type) && (dvcid_set != 0))
+        /*0x01或0x02有效。*/
+        if(dvcid_set == 0)
+            goto next;
+
+        /*机械臂或驱动器才有下面的数据。*/
+        if (GOOD_MXT_ELEMENT_CHANGER == type ||GOOD_MXT_ELEMENT_DXFER == type)
         {
             uint8_t dvcid_type = ptr[13 + volsize] & 0x0F;
             uint8_t dvcid_length = ptr[15 + volsize];
@@ -134,6 +138,8 @@ void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16
             }
         }
 
+next:
+
         /*清除两端的空格。*/
         good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE], iscntrl, 2);
         good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID], iscntrl, 2);
@@ -144,4 +150,68 @@ void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16
         /*下一页。*/
         ptr += psize;
     }
+}
+
+int good_mtx_inventory(int fd,good_tree_t *father,uint32_t timeout, good_scsi_io_stat *stat)
+{
+    char buf[255] = {0};
+    int buf2size = 0;
+    uint8_t *buf2 = NULL;
+    int chk;
+
+    chk = good_mtx_mode_sense(fd, 0, 0x1d, 0, buf, 255, timeout, stat);
+    if(chk != 0)
+        return -1;
+
+    /**/
+    buf2size = 0x00ffffff;/*15MB enough!*/
+    buf2 = (uint8_t*) good_heap_alloc(buf2size);
+    if(!buf2)
+        return -1;
+
+    /*GOOD_MXT_ELEMENT_CHANGER:4+2,4+4*/
+    chk = good_mtx_read_element_status(fd, GOOD_MXT_ELEMENT_CHANGER,
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 2)),
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 4)),
+                                       buf2, 2 * 1024 * 1024, -1, stat);
+    if(chk != 0)
+        goto final;
+
+    good_mtx_parse_element_status(father,buf2,good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 4)));
+
+    /*GOOD_MXT_ELEMENT_STORAGE:4+6,4+8*/
+    chk = good_mtx_read_element_status(fd, GOOD_MXT_ELEMENT_STORAGE,
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 6)),
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 8)),
+                                       buf2, 2 * 1024 * 1024, -1, stat);
+    if(chk != 0)
+        goto final;
+
+    good_mtx_parse_element_status(father,buf2,good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 8)));
+
+    /*GOOD_MXT_ELEMENT_IE_PORT:4+10,4+12*/
+    chk = good_mtx_read_element_status(fd, GOOD_MXT_ELEMENT_IE_PORT,
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 10)),
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 12)),
+                                       buf2, 2 * 1024 * 1024, -1, stat);
+    if(chk != 0)
+        goto final;
+
+    good_mtx_parse_element_status(father,buf2,good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 12)));
+
+    /*GOOD_MXT_ELEMENT_DXFER:4+14,4+16*/
+    chk = good_mtx_read_element_status(fd, GOOD_MXT_ELEMENT_DXFER,
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 14)),
+                                       good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 16)),
+                                       buf2, 2 * 1024 * 1024, -1, stat);
+    if(chk != 0)
+        goto final;
+
+    good_mtx_parse_element_status(father,buf2,good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, buf, 4 + 16)));
+
+final:
+
+    good_heap_freep((void**)&buf2);
+    
+    return chk;
 }

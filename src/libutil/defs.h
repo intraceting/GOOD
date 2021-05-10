@@ -71,6 +71,14 @@
 #define GOOD_PTR2PTR(T, PTR, OF) ((T *)(((char *)(PTR)) + (OF)))
 
 /**
+ * 转换指针对象。
+ * 
+ * @note 支持针地址偏移(Bytes)。
+ * 
+*/
+#define GOOD_PTR2OBJ(T, PTR, OF) (*GOOD_PTR2PTR(T,PTR,OF))
+
+/**
  * 数值比较，返回最大值。
  * 
 */

@@ -44,10 +44,10 @@ int dump2(size_t deep, good_tree_t *node, void *opaque)
     }
     else
     {
-        good_tree_fprintf(stderr,deep,node,"%hu\t|%hhu\t|%hhu\t|%-36s\t|%-20s\t|\n",
-        *GOOD_PTR2PTR(uint16_t, node->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0),
-        *node->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE],
-        *node->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL],
+        good_tree_fprintf(stderr,deep,node,"%-10hu\t|%-10hhu\t|%-10hhu\t|%-36s\t|%-20s\t|\n",
+        GOOD_PTR2OBJ(uint16_t, node->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0),
+        GOOD_PTR2OBJ(uint8_t,node->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE],0),
+        GOOD_PTR2OBJ(uint8_t,node->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL],0),
         node->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE],
         node->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID]);
     }
@@ -68,13 +68,16 @@ void traversal(good_tree_t *root)
 
 void test_move()
 {
-    int fd = good_open("/dev/sg9",0,0,0);
+    int fd = good_open("/dev/sg10",0,0,0);
 
     good_scsi_io_stat stat = {0};
 
-     assert(good_mtx_move_medium(fd,1,1000,500,-1,&stat)==0);
+    for (int i = 0; i < 4; i++)
+    {
+        assert(good_mtx_move_medium(fd, 1, 1000+i, 500+i, -1, &stat) == 0);
 
-      printf("%hhx,%hhx,%hhx\n",good_scsi_sense_key(stat.sense),good_scsi_sense_code(stat.sense),good_scsi_sense_qualifier(stat.sense));
+        printf("%hhx,%hhx,%hhx\n", good_scsi_sense_key(stat.sense), good_scsi_sense_code(stat.sense), good_scsi_sense_qualifier(stat.sense));
+    }
 
     // assert(good_mtx_prevent_medium_removal(fd,1,-1,&stat)==0);
 
@@ -84,28 +87,28 @@ void test_move()
 
     // printf("%hhx,%hhx,%hhx\n",good_scsi_sense_key(stat.sense),good_scsi_sense_code(stat.sense),good_scsi_sense_qualifier(stat.sense));
 
-    char buf[255] = {0};
-    assert(good_mtx_mode_sense(fd, 0, 0x1d, 0, buf, 255, -1, &stat) == 0);
+    // char buf[255] = {0};
+    // assert(good_mtx_mode_sense(fd, 0, 0x1d, 0, buf, 255, -1, &stat) == 0);
 
-    /**/
-    uint16_t changer_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 2));
-    uint16_t changer_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf,4 + 4));
-    uint16_t storage_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 6));
-    uint16_t storage_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 8));
-    uint16_t storage_ie_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 10));
-    uint16_t storage_ie_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 12));
-    uint16_t driver_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 14));
-    uint16_t driver_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 16));
+    // /**/
+    // uint16_t changer_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 2));
+    // uint16_t changer_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf,4 + 4));
+    // uint16_t storage_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 6));
+    // uint16_t storage_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 8));
+    // uint16_t storage_ie_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 10));
+    // uint16_t storage_ie_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 12));
+    // uint16_t driver_address = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 14));
+    // uint16_t driver_count = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, buf, 4 + 16));
 
-    /**/
-    int buf2size = (0x00ffffff); /*15MB enough!*/
-    uint8_t * buf2 = (uint8_t*) good_heap_alloc(buf2size);
+    // /**/
+    // int buf2size = (0x00ffffff); /*15MB enough!*/
+    // uint8_t * buf2 = (uint8_t*) good_heap_alloc(buf2size);
 
-    assert(good_mtx_read_element_status(fd,GOOD_MXT_ELEMENT_DXFER,driver_address,driver_count,buf2,2*1024*1024,-1,&stat)==0);
+    // assert(good_mtx_read_element_status(fd,GOOD_MXT_ELEMENT_DXFER,driver_address,driver_count,buf2,2*1024*1024,-1,&stat)==0);
 
     good_tree_t *t = good_tree_alloc(NULL);
 
-    good_mtx_parse_element_status(t,buf2,driver_count);
+    assert(good_mtx_inventory(fd,t,-1,&stat)==0);
 
     traversal(t);
 
