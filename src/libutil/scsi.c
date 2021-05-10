@@ -112,37 +112,11 @@ int good_scsi_inquiry(int fd,int vpd, uint8_t vid,
     return good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,6,transfer,transferlen,timeout,stat);
 }
 
-int good_scsi_inquiry_sn(int fd,char buf[64],
-                         uint32_t timeout,good_scsi_io_stat *stat)
+int good_scsi_inquiry_standard(int fd, uint8_t *type, char vendor[8], char product[16],
+                               uint32_t timeout, good_scsi_io_stat *stat)
 {
     uint8_t tmp[255] = {0};
     int chk;
-
-    assert(buf != NULL);
-
-    chk = good_scsi_inquiry(fd,1,0x80,tmp,255,timeout,stat);
-    if(chk != 0)
-        return -1;
-
-    if(stat->status != GOOD)
-        return -1;
-
-    /* Just copy SN。  */
-    memcpy(buf, tmp + 4, GOOD_MIN(tmp[3], 32));
-
-    /* 去掉两端的空格。 */
-    good_strtrim(buf,isspace,2);
-
-    return 0;
-}
-
-int good_scsi_inquiry_baseinfo(int fd,uint8_t *type,char vendor[16],char product[32],
-                               uint32_t timeout,good_scsi_io_stat *stat)
-{
-    uint8_t tmp[255] = {0};
-    int chk;
-
-    assert(type != NULL || vendor != NULL || product != NULL);
 
     chk = good_scsi_inquiry(fd,0,0x00,tmp,255,timeout,stat);
     if(chk != 0)
@@ -151,7 +125,7 @@ int good_scsi_inquiry_baseinfo(int fd,uint8_t *type,char vendor[16],char product
     if(stat->status != GOOD)
         return -1;
 
-    /* Copy TYPE，VENDOR，PRODUCT。*/
+    /* TYPE，VENDOR，PRODUCT。*/
     if(type)
         *type = tmp[0] & 0x1f;
     if(vendor)
@@ -164,6 +138,32 @@ int good_scsi_inquiry_baseinfo(int fd,uint8_t *type,char vendor[16],char product
         good_strtrim(vendor,isspace,2);
     if(product)
         good_strtrim(product,isspace,2);
+
+    return 0;
+}
+
+int good_scsi_inquiry_serial(int fd, uint8_t *type, char serial[255],
+                             uint32_t timeout, good_scsi_io_stat *stat)
+{
+    uint8_t tmp[255] = {0};
+    int chk;
+
+    chk = good_scsi_inquiry(fd,1,0x80,tmp,255,timeout,stat);
+    if(chk != 0)
+        return -1;
+
+    if(stat->status != GOOD)
+        return -1;
+
+    /* TYPE，SERIAL。*/
+    if(type)
+        *type = tmp[0] & 0x1f;
+    if(serial)
+        memcpy(serial, tmp + 4, tmp[3]);
+
+    /* 去掉两端的空格。 */
+    if(serial)
+        good_strtrim(serial,isspace,2);
 
     return 0;
 }

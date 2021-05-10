@@ -14,24 +14,21 @@
 
 void test_get_sn()
 {
-    int fd = good_open("/dev/sg7",0,0,0);
+    int fd = good_open("/dev/sg10",0,0,0);
 
     good_scsi_io_stat stat = {0};
     
     uint8_t type = 0;
     char vendor[32] = {0};
     char product[64] = {0};
-
-    assert(good_scsi_inquiry_baseinfo(fd,&type,vendor,product,3000,&stat)==0);
-
-    printf("type:%s(%hhu),vendor:%s,product:%s\n",good_scsi_type2string(type),type,vendor,product);
-
     char sn[64]={0};
 
-    assert(good_scsi_inquiry_sn(fd,sn,3000,&stat)==0);
+    assert(good_scsi_inquiry_standard(fd,&type,vendor,product,3000,&stat)==0);
 
-    printf("sn:%s\n",sn);
+    printf("type:%s(%hhu),vendor:%s,product:%s",good_scsi_type2string(type),type,vendor,product);
 
+    assert(good_scsi_inquiry_serial(fd,NULL,sn,3000,&stat)==0);
+    printf(",sn:%s\n",sn);
 
     good_closep(&fd);
 }
@@ -120,7 +117,7 @@ void test_move()
 int main(int argc, char **argv)
 {
 
-  //  test_get_sn();
+    test_get_sn();
 
     test_move();
 

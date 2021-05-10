@@ -107,37 +107,40 @@ int good_mtx_request_sense(int fd,uint32_t timeout, good_scsi_io_stat *stat);
  * cdb = 0x12H
  * 
  * @param vpd 是否查询虚拟页面。0 否，!0 是。
- * @param vid 虚拟页面ID。
+ * @param pcd 页面ID。
  * 
  * @return 0 成功，-1 失败。
 */
-int good_scsi_inquiry(int fd,int vpd, uint8_t vid,
+int good_scsi_inquiry(int fd,int vpd, uint8_t pcd,
                       uint8_t *transfer, uint32_t transferlen,
                       uint32_t timeout,good_scsi_io_stat *stat);
 
 /** 
- * 获取设备序列号。
+ * 获取设备标准信息。
  * 
- * cdb = 0x12, vpd = 1, vid = 0x80
+ * cdb = 0x12, VPD = 0, PCD = 0x00
  * 
- * @param status 状态的指针，不能为NULL(0)。
+ * @param type 返回类型，可以为NULL(0)。
+ * @param vendor 返回生产商，可以为NULL(0)。
+ * @param product 返回产品名称，可以为NULL(0)。
  * 
  * @return 0 成功，-1 失败。
 */
-int good_scsi_inquiry_sn(int fd,char buf[64],
-                         uint32_t timeout,good_scsi_io_stat *stat);
+int good_scsi_inquiry_standard(int fd, uint8_t *type, char vendor[8], char product[16],
+                               uint32_t timeout, good_scsi_io_stat *stat);
 
 /** 
- * 获取设备基本信息。
+ * 获取设备SN信息。
  * 
- * cdb = 0x12, vpd = 0, vid = 0x00
+ * cdb = 0x12, VPD = 1, PCD = 0x80
  * 
- * @param status 状态的指针，不能为NULL(0)。
+ * @param type 返回类型，可以为NULL(0)。
+ * @param serial 返回SN码，可以为NULL(0)。
  * 
  * @return 0 成功，-1 失败。
 */
-int good_scsi_inquiry_baseinfo(int fd,uint8_t *type,char vendor[16],char product[32],
-                               uint32_t timeout,good_scsi_io_stat *stat);
+int good_scsi_inquiry_serial(int fd, uint8_t *type, char serial[255],
+                             uint32_t timeout, good_scsi_io_stat *stat);
 
 /**
  * 设备类型数字编码转字符串编码。

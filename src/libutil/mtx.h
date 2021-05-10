@@ -60,7 +60,6 @@ enum _good_mtx_element_field
 #define GOOD_MTX_ELEMENT_DVCID GOOD_MTX_ELEMENT_DVCID
 };
 
-
 /**
  * 移动介质。
  * 
@@ -71,6 +70,8 @@ enum _good_mtx_element_field
  * @param dst 目标槽位地址
  * 
  * @return 0 成功，-1 失败。
+ * 
+ * @warning  SENSE key = 0x06 仓门被打开过，需要重新盘点介质。
  */
 int good_mtx_move_medium(int fd, uint16_t t, uint16_t src, uint16_t dst,
                          uint32_t timeout, good_scsi_io_stat *stat);
@@ -115,7 +116,6 @@ int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_
  * 分析设备无件状态，构造结构化数据。
 */
 void good_mtx_parse_element_status(good_tree_t *father,uint8_t *element,uint16_t count);
-
 
 /**
  * 查询设备所有元件状态。

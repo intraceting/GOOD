@@ -13,9 +13,9 @@ int good_mtx_move_medium(int fd, uint16_t t, uint16_t src, uint16_t dst,
     uint8_t cdb[12] = {0};
 
     cdb[0] = 0xA5; /* 0xA5 Move Medium code */
-    *GOOD_PTR2PTR(uint16_t, cdb, 2) = good_endian_hton16(t);
-    *GOOD_PTR2PTR(uint16_t, cdb, 4) = good_endian_hton16(src);
-    *GOOD_PTR2PTR(uint16_t, cdb, 6) = good_endian_hton16(dst);
+    GOOD_PTR2OBJ(uint16_t, cdb, 2) = good_endian_hton16(t);
+    GOOD_PTR2OBJ(uint16_t, cdb, 4) = good_endian_hton16(src);
+    GOOD_PTR2OBJ(uint16_t, cdb, 6) = good_endian_hton16(dst);
 
     return good_scsi_sgioctl2(fd, SG_DXFER_NONE, cdb, 12, NULL, 0, timeout, stat);
 }
@@ -54,8 +54,8 @@ int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_
 
     cdb[0] = 0xB8;                                                 /* 0xB8 Read Element Status */
     cdb[1] = 0x10 | (type & 0x0F);                                 /*VolTag = 1*/
-    *GOOD_PTR2PTR(uint16_t, cdb, 2) = good_endian_hton16(address); /*2,3*/
-    *GOOD_PTR2PTR(uint16_t, cdb, 4) = good_endian_hton16(count);   /*4,5*/
+    GOOD_PTR2OBJ(uint16_t, cdb, 2) = good_endian_hton16(address); /*2,3*/
+    GOOD_PTR2OBJ(uint16_t, cdb, 4) = good_endian_hton16(count);   /*4,5*/
     cdb[6] = 0x01;                                                 /*DVCID = 1*/
     good_endian_hton24(cdb + 7, transferlen);                      /*7,8,9*/
 
@@ -70,7 +70,7 @@ void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16
     uint8_t type = element[8];
     int pvoltag = (element[9] & 0x80) ? 1 : 0;
     int avoltag = (element[9] & 0x40) ? 1 : 0;
-    uint16_t psize = good_endian_ntoh16(*GOOD_PTR2PTR(uint16_t, element, 10));
+    uint16_t psize = good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, element, 10));
     uint8_t *ptr = element + 16; /*First Page*/
 
     for (uint16_t i = 0; i < count; i++)
@@ -141,8 +141,8 @@ void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16
 next:
 
         /*清除两端的空格。*/
-        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE], iscntrl, 2);
-        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID], iscntrl, 2);
+        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE], isspace, 2);
+        good_strtrim(one->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID], isspace, 2);
 
         /*添加到子节点末尾。*/
         good_tree_insert2(father, one, 0);
