@@ -66,6 +66,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/epoll.o \
 	${OBJ_PATH}/scsi.o \
 	${OBJ_PATH}/mtx.o \
+	${OBJ_PATH}/mt.o \
 	${OBJ_PATH}/blockio.o \
 	${OBJ_PATH}/tar.o \
 	${OBJ_PATH}/termios.o

@@ -11,6 +11,7 @@
 #include "libutil/general.h"
 #include "libutil/scsi.h"
 #include "libutil/mtx.h"
+#include "libutil/mt.h"
 
 void test_get_sn()
 {
@@ -41,12 +42,12 @@ int dump2(size_t deep, good_tree_t *node, void *opaque)
     }
     else
     {
-        good_tree_fprintf(stderr,deep,node,"%-10hu\t|%-10hhu\t|%-10hhu\t|%-36s\t|%-20s\t|\n",
-        GOOD_PTR2OBJ(uint16_t, node->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0),
-        GOOD_PTR2OBJ(uint8_t,node->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE],0),
-        GOOD_PTR2OBJ(uint8_t,node->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL],0),
-        node->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE],
-        node->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID]);
+        good_tree_fprintf(stderr, deep, node, "%-6hu\t|%-2hhu\t|%-2hhu\t|%-10s\t|%-10s\t|\n",
+                          GOOD_PTR2OBJ(uint16_t, node->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0),
+                          GOOD_PTR2OBJ(uint8_t, node->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE], 0),
+                          GOOD_PTR2OBJ(uint8_t, node->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL], 0),
+                          node->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE],
+                          node->alloc->pptrs[GOOD_MTX_ELEMENT_DVCID]);
     }
 
     return 1;
@@ -63,7 +64,7 @@ void traversal(good_tree_t *root)
 }
 
 
-void test_move()
+void test_mtx()
 {
     int fd = good_open("/dev/sg10",0,0,0);
 
@@ -77,7 +78,7 @@ void test_move()
 
     for (int i = 0; i < 4; i++)
     {
-        assert(good_mtx_move_medium(fd, 0, 500+i, 1000+i, -1, &stat) == 0);
+        assert(good_mtx_move_medium(fd, 0,1000+i, 500+i, -1, &stat) == 0);
 
         printf("%hhx,%hhx,%hhx\n", good_scsi_sense_key(stat.sense), good_scsi_sense_code(stat.sense), good_scsi_sense_qualifier(stat.sense));
     }
@@ -120,12 +121,48 @@ void test_move()
     good_closep(&fd);
 }
 
+void test_mt()
+{
+    int fd = good_open("/dev/st6",1,0,0);
+
+    good_scsi_io_stat stat = {0};
+
+    good_mt_compression(fd,0);
+    good_mt_blocksize(fd,0);
+
+    assert(good_mt_verify(fd,3000,&stat)==0);
+
+    assert(good_mt_locate(fd,0,0,100,3000,&stat)==0);
+
+     printf("%hhx,%hhx,%hhx\n", good_scsi_sense_key(stat.sense), good_scsi_sense_code(stat.sense), good_scsi_sense_qualifier(stat.sense));
+
+
+    good_write(fd,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",30);
+    good_write(fd,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",30);
+
+  //  good_mt_writefm(fd,10);
+
+    uint64_t block = -1;
+    uint64_t file = -1;
+    uint32_t part = -1;
+
+     assert(good_mt_read_position(fd,&block,&file,&part,3000,&stat)==0);
+
+    
+
+     printf("%lu,%lu,%u\n",block,file,part);
+
+    good_closep(&fd);
+}
+
 int main(int argc, char **argv)
 {
 
     test_get_sn();
 
-    test_move();
+    test_mtx();
+
+    test_mt();
 
     return 0;
 }

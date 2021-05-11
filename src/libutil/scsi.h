@@ -48,6 +48,15 @@ typedef struct _good_scsi_io_stat
 
 
 /**
+ * 设备类型数字编码转字符串编码。
+ * 
+ * 参考lsscsi命令。
+ * 
+ * @return 字符串的指针。
+ */
+const char *good_scsi_type2string(uint8_t type);
+
+/**
  * 通用的SCSI-V3指令接口。
  * 
  * @param hdr 指令的指针。 in sg.h
@@ -142,14 +151,6 @@ int good_scsi_inquiry_standard(int fd, uint8_t *type, char vendor[8], char produ
 int good_scsi_inquiry_serial(int fd, uint8_t *type, char serial[255],
                              uint32_t timeout, good_scsi_io_stat *stat);
 
-/**
- * 设备类型数字编码转字符串编码。
- * 
- * 参考lsscsi命令。
- * 
- * @return 字符串的指针。
- */
-const char *good_scsi_type2string(uint8_t type);
 
 
 

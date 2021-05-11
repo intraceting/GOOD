@@ -916,7 +916,7 @@ int good_open(const char *file, int rw, int nonblock, int create)
     flag |= __O_LARGEFILE;
     flag |= __O_CLOEXEC;
 
-    return open(file, flag | __O_LARGEFILE | __O_CLOEXEC, mode);
+    return open(file, flag, mode);
 }
 
 int good_open2(int fd2, const char *file, int rw, int nonblock, int create)

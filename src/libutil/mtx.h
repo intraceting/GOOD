@@ -91,7 +91,9 @@ int good_mtx_move_medium(int fd, uint16_t t, uint16_t src, uint16_t dst,
                          uint32_t timeout, good_scsi_io_stat *stat);
 
 /**
- * 是否允许介质移动到出入口。
+ * 限制介质是否允许能被移动到出入仓位。
+ * 
+ * 不影响介质的导入。
  * 
  * cdb = 0x1E
  * 
@@ -118,7 +120,7 @@ int good_mtx_mode_sense(int fd, uint8_t pctrl, uint8_t pcode, uint8_t spcode,
  * 
  * cdb = 0xB8
  * 
- * @param transferlen 返回的数据最大长度。2MB是支持的最大长度，原因未知。
+ * @param transferlen 返回数据的最大长度。2MB是支持的最大长度，原因未知。
  * 
  * @return 0 成功，-1 失败。 
 */
@@ -128,13 +130,18 @@ int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_
 
 /**
  * 分析设备无件状态，构造结构化数据。
+ * 
+ * @see good_mtx_read_element_status
 */
-void good_mtx_parse_element_status(good_tree_t *father,uint8_t *element,uint16_t count);
+void good_mtx_parse_element_status(good_tree_t *father,const uint8_t *element,uint16_t count);
 
 /**
  * 查询设备所有元件状态。
  * 
  * @return 0 成功，-1 失败。 
+ * 
+ * @see good_mtx_read_element_status
+ * @see good_mtx_parse_element_status
 */
 int good_mtx_inquiry_element_status(good_tree_t *father,int fd,uint32_t timeout, good_scsi_io_stat *stat);
 

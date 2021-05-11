@@ -76,7 +76,7 @@ int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_
     return good_scsi_sgioctl2(fd, SG_DXFER_FROM_DEV, cdb, 12, transfer, transferlen, timeout, stat);
 }
 
-void good_mtx_parse_element_status(good_tree_t *father, uint8_t *element, uint16_t count)
+void good_mtx_parse_element_status(good_tree_t *father, const uint8_t *element, uint16_t count)
 {
     assert(father != NULL && element != NULL && count > 0);
 
@@ -178,7 +178,7 @@ int good_mtx_inquiry_element_status(good_tree_t *father,int fd,uint32_t timeout,
         return -1;
 
     /**/
-    buf2size = 0x00ffffff;/*15MB enough!*/
+    buf2size = 0x00ffffff;/*15MB MAX!!!*/
     buf2 = (uint8_t*) good_heap_alloc(buf2size);
     if(!buf2)
         return -1;

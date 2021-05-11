@@ -6,6 +6,33 @@
  */
 #include "scsi.h"
 
+const char* good_scsi_type2string(uint8_t type)
+{
+    switch(type)
+    {
+        case TYPE_DISK:
+            return "Direct-Access";
+        case TYPE_TAPE:
+            return "Sequential-Access";
+        case 0x02:
+            return "Printer";
+        case TYPE_PROCESSOR:
+            return "Processor";
+        case TYPE_WORM:
+            return "Write-once";
+        case TYPE_ROM:
+            return "CD-ROM";
+        case TYPE_SCANNER:
+            return "Scanner";
+        case TYPE_MEDIUM_CHANGER:
+            return "Medium Changer";
+        case TYPE_ENCLOSURE:
+            return "Enclosure";
+        default:
+            return "Reserved";
+    }
+}
+
 int good_scsi_sgioctl(int fd,struct sg_io_hdr *hdr)
 {
     assert(fd >= 0 && hdr != NULL);
@@ -166,31 +193,4 @@ int good_scsi_inquiry_serial(int fd, uint8_t *type, char serial[255],
         good_strtrim(serial,isspace,2);
 
     return 0;
-}
-
-const char* good_scsi_type2string(uint8_t type)
-{
-    switch(type)
-    {
-        case TYPE_DISK:
-            return "Direct-Access";
-        case TYPE_TAPE:
-            return "Sequential-Access";
-        case 0x02:
-            return "Printer";
-        case TYPE_PROCESSOR:
-            return "Processor";
-        case TYPE_WORM:
-            return "Write-once";
-        case TYPE_ROM:
-            return "CD-ROM";
-        case TYPE_SCANNER:
-            return "Scanner";
-        case TYPE_MEDIUM_CHANGER:
-            return "Medium Changer";
-        case TYPE_ENCLOSURE:
-            return "Enclosure";
-        default:
-            return "Reserved";
-    }
 }
