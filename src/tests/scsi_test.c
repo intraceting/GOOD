@@ -78,7 +78,7 @@ void test_mtx()
 
     for (int i = 0; i < 4; i++)
     {
-        assert(good_mtx_move_medium(fd, 0,1000+i, 500+i, -1, &stat) == 0);
+        assert(good_mtx_move_medium(fd, 0,1029+i, 500+i, -1, &stat) == 0);
 
         printf("%hhx,%hhx,%hhx\n", good_scsi_sense_key(stat.sense), good_scsi_sense_code(stat.sense), good_scsi_sense_qualifier(stat.sense));
     }
@@ -123,7 +123,7 @@ void test_mtx()
 
 void test_mt()
 {
-    int fd = good_open("/dev/st1",1,0,0);
+    int fd = good_open("/dev/st0",1,0,0);
 
     good_scsi_io_stat stat = {0};
 
@@ -155,6 +155,7 @@ void test_mt()
      good_allocator_t *c = good_mt_read_attribute(fd,0,0x0400,100,&stat);
      good_allocator_t *d = good_mt_read_attribute(fd,0,0x0401,100,&stat);
      good_allocator_t *e = good_mt_read_attribute(fd,0,0x0405,100,&stat);
+     good_allocator_t *f = good_mt_read_attribute(fd,0,0x0806,100,&stat);
 
      good_endian_ntoh(a->pptrs[GOOD_MT_ATTR_VALUE],GOOD_PTR2U16(a->pptrs[GOOD_MT_ATTR_LENGTH],0));
      good_endian_ntoh(b->pptrs[GOOD_MT_ATTR_VALUE],GOOD_PTR2U16(b->pptrs[GOOD_MT_ATTR_LENGTH],0));
@@ -164,6 +165,19 @@ void test_mt()
      printf("MANUFACTURER:%s\n",c->pptrs[GOOD_MT_ATTR_VALUE], 0);
      printf("SERIAL NUMBER:%s\n",d->pptrs[GOOD_MT_ATTR_VALUE], 0);
      printf("DENSITY:%s\n",good_mt_density2string(GOOD_PTR2U8(e->pptrs[GOOD_MT_ATTR_VALUE], 0)));
+     printf("BARCODE:%s\n",f->pptrs[GOOD_MT_ATTR_VALUE], 0);
+
+
+    size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), sizeof(uint16_t), 32+1};
+    good_allocator_t *g = good_allocator_alloc(sizes,5);
+
+    GOOD_PTR2U16(g->pptrs[GOOD_MT_ATTR_ID],0) = 0x0806;
+    GOOD_PTR2U16(g->pptrs[GOOD_MT_ATTR_FORMAT],0) = 1;
+    GOOD_PTR2U16(g->pptrs[GOOD_MT_ATTR_LENGTH],0) = 32;
+
+    memcpy(g->pptrs[GOOD_MT_ATTR_VALUE],"aaaaaa",5);
+
+    assert(good_mt_write_attribute(fd,0,g,3000,&stat)==0);
 
 
      good_allocator_unref(&a);
@@ -171,6 +185,8 @@ void test_mt()
      good_allocator_unref(&c);
      good_allocator_unref(&d);
      good_allocator_unref(&e);
+     good_allocator_unref(&f);
+     good_allocator_unref(&g);
 
     good_closep(&fd);
 }

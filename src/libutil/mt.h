@@ -24,7 +24,13 @@ enum _good_mt_attr_field
     GOOD_MT_ATTR_READONLY = 1,
 #define GOOD_MT_ATTR_READONLY GOOD_MT_ATTR_READONLY
 
-    /** 格式 字段索引. */
+    /** 格式 字段索引. 
+     *  
+     *  00b BINARY.
+     *  01b ASCII The ATTRIBUTE VALUE field contains left-aligned ASCII data.
+     *  10b TEXT The attribute contains textual data. 
+     *  11b Reserved.
+    */
     GOOD_MT_ATTR_FORMAT = 2,
 #define GOOD_MT_ATTR_FORMAT GOOD_MT_ATTR_FORMAT
 
@@ -173,7 +179,7 @@ int good_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *par
  */
 
 /** 
- * 读取磁带属性。
+ * 读取磁带的属性。
  * 
  * 如果属性值的是二进制数据，并且也是整型数据时，以网络字节序存储。
  * 
@@ -186,5 +192,17 @@ int good_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *par
 */
 good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
                                          uint32_t timeout, good_scsi_io_stat *stat);
+
+/** 
+ * 写入磁带的属性。
+ * 
+ * 如果属性值的是二进制数据，并且也是整型数据时，以网络字节序存储。
+ * 
+ * cdb = 0x8D
+ * 
+ * @return 0 成功，-1 失败。
+*/
+int good_mt_write_attribute(int fd, uint8_t part, const good_allocator_t *attr,
+                            uint32_t timeout, good_scsi_io_stat *stat);
 
 #endif //GOOD_UTIL_MT_H

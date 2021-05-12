@@ -117,6 +117,8 @@ good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
     if(chk!=0)
         return NULL;
 
+    //printf("%u\n",good_endian_ntoh32(GOOD_PTR2U32(buf, 0)));
+
     len = good_endian_ntoh16(GOOD_PTR2U16(buf, 7)); /*7,8*/
 
     size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), sizeof(uint16_t), len + 1};
@@ -131,4 +133,27 @@ good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
     memcpy(alloc->pptrs[GOOD_MT_ATTR_VALUE], GOOD_PTR2PTR(void,buf,9), len);
 
     return alloc;
+}
+
+int good_mt_write_attribute(int fd, uint8_t part, const good_allocator_t *attr,
+                            uint32_t timeout, good_scsi_io_stat *stat)
+{
+    uint8_t buf[255]= {0};
+    uint8_t cdb[16] = {0};
+
+    assert(attr != NULL);
+    assert(4 + 5 + GOOD_PTR2U16(attr->pptrs[GOOD_MT_ATTR_LENGTH], 0) <= 255);
+
+    cdb[0] = 0x8D; /* 0x8D Write Attribute */
+    cdb[1] = 0x01; /* 0x01 Write SYNC */
+    cdb[7] = part;
+    GOOD_PTR2U32(cdb,10) = good_endian_hton32(sizeof(buf)); /*10,11,12,13*/
+
+    GOOD_PTR2U32(buf, 0) = good_endian_hton32(4 + GOOD_PTR2U16(attr->pptrs[GOOD_MT_ATTR_LENGTH], 0));
+    GOOD_PTR2U32(buf, 4) = good_endian_hton16(GOOD_PTR2U16(attr->pptrs[GOOD_MT_ATTR_ID], 0));
+    GOOD_PTR2U32(buf, 6) |= (GOOD_PTR2U8(attr->pptrs[GOOD_MT_ATTR_FORMAT], 0) & 0x03);
+    GOOD_PTR2U32(buf, 7) = good_endian_hton16(GOOD_PTR2U16(attr->pptrs[GOOD_MT_ATTR_LENGTH], 0));
+    memcpy(GOOD_PTR2PTR(void,buf,9),attr->pptrs[GOOD_MT_ATTR_VALUE],GOOD_PTR2U16(attr->pptrs[GOOD_MT_ATTR_LENGTH],0));
+
+    return good_scsi_sgioctl2(fd,SG_DXFER_TO_DEV,cdb,16,buf, sizeof(buf), timeout, stat);
 }
