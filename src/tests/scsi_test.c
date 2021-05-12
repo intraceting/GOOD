@@ -66,7 +66,7 @@ void traversal(good_tree_t *root)
 
 void test_mtx()
 {
-    int fd = good_open("/dev/sg10",0,0,0);
+    int fd = good_open("/dev/sg9",0,0,0);
 
     
 
@@ -123,7 +123,7 @@ void test_mtx()
 
 void test_mt()
 {
-    int fd = good_open("/dev/st6",1,0,0);
+    int fd = good_open("/dev/st1",1,0,0);
 
     good_scsi_io_stat stat = {0};
 
@@ -148,9 +148,29 @@ void test_mt()
 
      assert(good_mt_read_position(fd,&block,&file,&part,3000,&stat)==0);
 
-    
-
      printf("%lu,%lu,%u\n",block,file,part);
+
+     good_allocator_t *a = good_mt_read_attribute(fd,0,0x0000,100,&stat);
+     good_allocator_t *b = good_mt_read_attribute(fd,0,0x0001,100,&stat);
+     good_allocator_t *c = good_mt_read_attribute(fd,0,0x0400,100,&stat);
+     good_allocator_t *d = good_mt_read_attribute(fd,0,0x0401,100,&stat);
+     good_allocator_t *e = good_mt_read_attribute(fd,0,0x0405,100,&stat);
+
+     good_endian_ntoh(a->pptrs[GOOD_MT_ATTR_VALUE],GOOD_PTR2U16(a->pptrs[GOOD_MT_ATTR_LENGTH],0));
+     good_endian_ntoh(b->pptrs[GOOD_MT_ATTR_VALUE],GOOD_PTR2U16(b->pptrs[GOOD_MT_ATTR_LENGTH],0));
+
+     printf("REMAINING CAPACITY:%lu\n",GOOD_PTR2U64(a->pptrs[GOOD_MT_ATTR_VALUE], 0));
+     printf("MAXIMUM CAPACITY:%lu\n",GOOD_PTR2U64(b->pptrs[GOOD_MT_ATTR_VALUE], 0));
+     printf("MANUFACTURER:%s\n",c->pptrs[GOOD_MT_ATTR_VALUE], 0);
+     printf("SERIAL NUMBER:%s\n",d->pptrs[GOOD_MT_ATTR_VALUE], 0);
+     printf("DENSITY:%s\n",good_mt_density2string(GOOD_PTR2U8(e->pptrs[GOOD_MT_ATTR_VALUE], 0)));
+
+
+     good_allocator_unref(&a);
+     good_allocator_unref(&b);
+     good_allocator_unref(&c);
+     good_allocator_unref(&d);
+     good_allocator_unref(&e);
 
     good_closep(&fd);
 }

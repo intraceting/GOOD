@@ -13,9 +13,9 @@ int good_mtx_inventory(int fd, uint16_t address, uint16_t count,
     uint8_t cdb[10] = {0};
 
     cdb[0] = 0x37; /* 0x37 or E7 Initialize Element Status With Range */
-    GOOD_PTR2OBJ(uint8_t, cdb, 1) |= (count > 0 ? 0x01 : 0);
-    GOOD_PTR2OBJ(uint16_t, cdb, 2) = good_endian_hton16(address);
-    GOOD_PTR2OBJ(uint16_t, cdb, 6) = good_endian_hton16(count);
+    GOOD_PTR2U8(cdb, 1) |= (count > 0 ? 0x01 : 0);
+    GOOD_PTR2U16(cdb, 2) = good_endian_hton16(address);
+    GOOD_PTR2U16(cdb, 6) = good_endian_hton16(count);
 
     return good_scsi_sgioctl2(fd, SG_DXFER_NONE, cdb, 10, NULL, 0, timeout, stat);
 }                       
@@ -27,9 +27,9 @@ int good_mtx_move_medium(int fd, uint16_t t, uint16_t src, uint16_t dst,
     uint8_t cdb[12] = {0};
 
     cdb[0] = 0xA5; /* 0xA5 Move Medium code */
-    GOOD_PTR2OBJ(uint16_t, cdb, 2) = good_endian_hton16(t);
-    GOOD_PTR2OBJ(uint16_t, cdb, 4) = good_endian_hton16(src);
-    GOOD_PTR2OBJ(uint16_t, cdb, 6) = good_endian_hton16(dst);
+    GOOD_PTR2U16(cdb, 2) = good_endian_hton16(t);
+    GOOD_PTR2U16(cdb, 4) = good_endian_hton16(src);
+    GOOD_PTR2U16(cdb, 6) = good_endian_hton16(dst);
 
     return good_scsi_sgioctl2(fd, SG_DXFER_NONE, cdb, 12, NULL, 0, timeout, stat);
 }
@@ -66,12 +66,12 @@ int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_
 {
     uint8_t cdb[12] = {0};
 
-    cdb[0] = 0xB8;                                                 /* 0xB8 Read Element Status */
-    cdb[1] = 0x10 | (type & 0x0F);                                 /*VolTag = 1*/
-    GOOD_PTR2OBJ(uint16_t, cdb, 2) = good_endian_hton16(address); /*2,3*/
-    GOOD_PTR2OBJ(uint16_t, cdb, 4) = good_endian_hton16(count);   /*4,5*/
-    cdb[6] = 0x01;                                                 /*DVCID = 1*/
-    good_endian_hton24(cdb + 7, transferlen);                      /*7,8,9*/
+    cdb[0] = 0xB8;                                      /* 0xB8 Read Element Status */
+    cdb[1] = 0x10 | (type & 0x0F);                      /*VolTag = 1*/
+    GOOD_PTR2U16(cdb, 2) = good_endian_hton16(address); /*2,3*/
+    GOOD_PTR2U16(cdb, 4) = good_endian_hton16(count);   /*4,5*/
+    cdb[6] = 0x01;                                      /*DVCID = 1*/
+    good_endian_hton24(cdb + 7, transferlen);           /*7,8,9*/
 
     return good_scsi_sgioctl2(fd, SG_DXFER_FROM_DEV, cdb, 12, transfer, transferlen, timeout, stat);
 }
@@ -85,7 +85,7 @@ void good_mtx_parse_element_status(good_tree_t *father, const uint8_t *element, 
     int pvoltag = (element[9] & 0x80) ? 1 : 0;
     int avoltag = (element[9] & 0x40) ? 1 : 0;
     uint16_t psize = good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, element, 10));
-    uint8_t *ptr = element + 16; /*First Page*/
+    const uint8_t *ptr = element + 16; /*First Page*/
 
     for (uint16_t i = 0; i < count; i++)
     {
@@ -101,9 +101,9 @@ void good_mtx_parse_element_status(good_tree_t *father, const uint8_t *element, 
         uint8_t volsize = (pvoltag ? 36 : 0);
 
         /*获取部分字段。*/
-        GOOD_PTR2OBJ(uint16_t, one->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0) = good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, ptr, 0));
-        GOOD_PTR2OBJ(uint8_t, one->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE],0) = type;
-        GOOD_PTR2OBJ(uint8_t, one->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL],0) = ((ptr[2] & 0x01) ? 1 : 0);
+        GOOD_PTR2U16(one->alloc->pptrs[GOOD_MTX_ELEMENT_ADDR], 0) = good_endian_ntoh16(GOOD_PTR2U16(ptr, 0));
+        GOOD_PTR2U8(one->alloc->pptrs[GOOD_MTX_ELEMENT_TYPE],0) = type;
+        GOOD_PTR2U8(one->alloc->pptrs[GOOD_MTX_ELEMENT_ISFULL],0) = ((ptr[2] & 0x01) ? 1 : 0);
         if (volsize > 0)
             memcpy(one->alloc->pptrs[GOOD_MTX_ELEMENT_BARCODE], ptr + 12, volsize);
 

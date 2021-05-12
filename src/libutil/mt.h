@@ -32,9 +32,9 @@ enum _good_mt_attr_field
     GOOD_MT_ATTR_LENGTH = 3,
 #define GOOD_MT_ATTR_LENGTH GOOD_MT_ATTR_LENGTH
 
-    /** 数据 字段索引. */
-    GOOD_MT_ATTR_DATA = 4
-#define GOOD_MT_ATTR_DATA GOOD_MT_ATTR_DATA
+    /** 值 字段索引. */
+    GOOD_MT_ATTR_VALUE = 4
+#define GOOD_MT_ATTR_VALUE GOOD_MT_ATTR_VALUE
 
 };
 
@@ -125,25 +125,66 @@ int good_mt_locate(int fd, int cp, uint8_t part, uint64_t block,
 int good_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *part,
                           uint32_t timeout, good_scsi_io_stat *stat);
 
+/*
+ * See "Medium auxiliary memory attributes (MAM)" from the manufacturer's SCSI manual.
+ * ______________________________________________________________________________________________
+ * |Attribute Identifier|Name                               |Attribute Length(in bytes)|Format  |
+ * ----------------------------------------------------------------------------------------------
+ * |0000h               |REMAINING CAPACITY IN PARTITION    |8                         |BINARY  |
+ * |0001h               |MAXIMUM CAPACITY IN PARTITION      |8                         |BINARY  |
+ * |0002h               |TAPEALERT FLAGS                    |8                         |BINARY  |
+ * |0003h               |LOAD COUNT                         |8                         |BINARY  |
+ * |0004h               |MAM SPACE REMAINING                |8                         |BINARY  |
+ * |0005h               |ASSIGNING ORGANIZATION             |8                         |ASCII   |
+ * |0006h               |FORMATTED DENSITY CODE             |1                         |BINARY  |
+ * |0007h               |INITIALIZATION COUNT               |2                         |BINARY  |
+ * 
+ * ----------------------------------------------------------------------------------------------
+ * |0220h               |TOTAL MBYTES WRITTEN IN MEDIUM LIFE|8                         |BINARY  |
+ * |0221h               |TOTAL MBYTES READ IN MEDIUM LIFE   |8                         |BINARY  |
+ * |0222h               |TOTAL MBYTES WRITTEN IN CURRENT    |8                         |BINARY  |
+ * |0223h               |TOTAL MBYTES READ IN CURRENT       |8                         |BINARY  |
+ * 
+ * ----------------------------------------------------------------------------------------------
+ * |0400h               |MEDIUM MANUFACTURER                |8                         |ASCII   |
+ * |0401h               |MEDIUM SERIAL NUMBER               |32                        |ASCII   |
+ * |0402h               |MEDIUM LENGTH                      |4                         |BINARY  |
+ * |0403h               |MEDIUM WIDTH                       |4                         |BINARY  |
+ * |0404h               |ASSIGNING ORGANIZATION             |8                         |ASCII   |
+ * |0405h               |MEDIUM DENSITY CODE                |1                         |BINARY  |
+ * |0406h               |MEDIUM MANUFACTURE DATE            |8                         |ASCII   |
+ * |0407h               |MAM CAPACITY                       |8                         |BINARY  |
+ * |0408h               |MEDIUM TYPE                        |1                         |BINARY  |
+ * |0409h               |MEDIUM TYPE INFORMATION            |2                         |BINARY  |
+ * 
+ * ----------------------------------------------------------------------------------------------
+ * |0800h               |APPLICATION VENDOR                 |8                         |ASCII   |
+ * |0801h               |APPLICATION NAME                   |32                        |ASCII   |
+ * |0802h               |APPLICATION VERSION                |8                         |ASCII   |
+ * |0803h               |USER MEDIUM TEXT LABEL             |160                       |TEXT    |
+ * |0804h               |DATE AND TIME LAST WRITTEN         |12                        |ASCII   |
+ * |0805h               |TEXT LOCALIZATION IDENTIFIER       |1                         |BINARY  |
+ * |0806h               |BARCODE                            |32                        |ASCII   |
+ * |0807h               |OWNING HOST TEXTUAL NAME           |80                        |TEXT    |
+ * |0808h               |MEDIA POOL                         |160                       |TEXT    |
+ * |0809h               |MEDIUM TYPE INFORMATION            |2                         |BINARY  |
+ * |080Bh               |APPLICATION FORMAT VERSION         |16                        |ASCII   |
+ * ----------------------------------------------------------------------------------------------
+ */
 
 /** 
  * 读取磁带属性。
  * 
+ * 如果属性值的是二进制数据，并且也是整型数据时，以网络字节序存储。
+ * 
  * cdb = 0x8C
  * 
- * @return 0 成功，-1 失败。
-*/
-int good_mt_read_attribute(int fd, uint8_t part, uint16_t fid, uint8_t *transfer, uint32_t transferlen,
-                           uint32_t timeout, good_scsi_io_stat *stat);
-
-/**
- * 分析属性内容。
+ * @param part 分区号。
+ * @param id 字段ID。
  * 
- * 如果是二进制数据，则数据字节序为网络字节序。
- * 
- * @see good_mt_read_attribute
- * @see good_mt_write_attribute
+ * @return !NULL(0) 成功(属性的指针)，NULL(0) 失败。
 */
-good_allocator_t *good_mt_parse_attribute(const uint8_t *attribute);
+good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
+                                         uint32_t timeout, good_scsi_io_stat *stat);
 
 #endif //GOOD_UTIL_MT_H

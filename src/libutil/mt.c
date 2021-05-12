@@ -87,49 +87,48 @@ int good_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *par
     if(chk == 0)
     {
         if(block)
-            *block = good_endian_ntoh64(GOOD_PTR2OBJ(uint64_t, buf,8)); /*8,9,10,11,12,13,14,15*/
+            *block = good_endian_ntoh64(GOOD_PTR2U64(buf,8)); /*8,9,10,11,12,13,14,15*/
         if(file)
-            *file = good_endian_ntoh64(GOOD_PTR2OBJ(uint64_t, buf,16)); /*16,17,18,19,20,21,22,23*/
+            *file = good_endian_ntoh64(GOOD_PTR2U64(buf,16)); /*16,17,18,19,20,21,22,23*/
         if(part)
-            *part = good_endian_ntoh32(GOOD_PTR2OBJ(uint32_t, buf,4)); /*4,5,6,7*/
+            *part = good_endian_ntoh32(GOOD_PTR2U32(buf,4)); /*4,5,6,7*/
     }
 
     return chk;
 }
 
-int good_mt_read_attribute(int fd, uint8_t part, uint16_t fid, uint8_t *transfer, uint32_t transferlen,
-                           uint32_t timeout, good_scsi_io_stat *stat)
-{
-    uint8_t cdb[16] = {0};
-
-    cdb[0] = 0x8C; /* 0x8C Read Attribute */
-    cdb[1] = 0x00; /* 0x00 VALUE  */
-    cdb[7] = part;
-    GOOD_PTR2OBJ(uint16_t, cdb ,8) = good_endian_hton16(fid); /*8,9*/
-    GOOD_PTR2OBJ(uint32_t, cdb,10) = good_endian_hton32(transferlen); /*10,11,12,13*/
-
-    return good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,16,transfer, transferlen, timeout, stat);
-}
-
-good_allocator_t *good_mt_parse_attribute(const uint8_t *attribute)
+good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
+                                         uint32_t timeout, good_scsi_io_stat *stat)
 {
     good_allocator_t *alloc = NULL;
     uint16_t len = 0;
 
-    assert(attribute != NULL);
+    uint8_t buf[255]= {0};
+    uint8_t cdb[16] = {0};
+    int chk;
 
-    len = good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, attribute, 7)); /*7,8*/
+    cdb[0] = 0x8C; /* 0x8C Read Attribute */
+    cdb[1] = 0x00; /* 0x00 VALUE  */
+    cdb[7] = part;
+    GOOD_PTR2U16(cdb ,8) = good_endian_hton16(id); /*8,9*/
+    GOOD_PTR2U32(cdb,10) = good_endian_hton32(sizeof(buf)); /*10,11,12,13*/
+
+    chk = good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,16,buf, sizeof(buf), timeout, stat);
+    if(chk!=0)
+        return NULL;
+
+    len = good_endian_ntoh16(GOOD_PTR2U16(buf, 7)); /*7,8*/
 
     size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), sizeof(uint16_t), len + 1};
     alloc = good_allocator_alloc(sizes,5);
     if(!alloc)
         return NULL;
 
-    GOOD_PTR2OBJ(uint16_t, alloc->pptrs[GOOD_MT_ATTR_ID], 0) = good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, attribute, 4)); /*4,5*/
-    GOOD_PTR2OBJ(uint8_t, alloc->pptrs[GOOD_MT_ATTR_READONLY], 0) = (attribute[6] >> 7);
-    GOOD_PTR2OBJ(uint8_t, alloc->pptrs[GOOD_MT_ATTR_FORMAT], 0) = (attribute[6] & 0x03);
-    GOOD_PTR2OBJ(uint16_t, alloc->pptrs[GOOD_MT_ATTR_LENGTH], 0) = good_endian_ntoh16(GOOD_PTR2OBJ(uint16_t, attribute, 7)); /*7,8*/
-    memcpy(alloc->pptrs[GOOD_MT_ATTR_DATA], GOOD_PTR2PTR(void,attribute,9), len);
+    GOOD_PTR2U16(alloc->pptrs[GOOD_MT_ATTR_ID], 0) = good_endian_ntoh16(GOOD_PTR2U16(buf, 4)); /*4,5*/
+    GOOD_PTR2U8(alloc->pptrs[GOOD_MT_ATTR_READONLY], 0) = (buf[6] >> 7);
+    GOOD_PTR2U8(alloc->pptrs[GOOD_MT_ATTR_FORMAT], 0) = (buf[6] & 0x03);
+    GOOD_PTR2U16(alloc->pptrs[GOOD_MT_ATTR_LENGTH], 0) = good_endian_ntoh16(GOOD_PTR2U16(buf, 7)); /*7,8*/
+    memcpy(alloc->pptrs[GOOD_MT_ATTR_VALUE], GOOD_PTR2PTR(void,buf,9), len);
 
     return alloc;
 }
