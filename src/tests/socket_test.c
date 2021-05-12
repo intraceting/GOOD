@@ -71,8 +71,11 @@ void test_connect()
 
     //int n = good_gethostbyname("www.taobao.com",GOOD_IPV4,&addr,1,NULL);
     //int n = good_gethostbyname("localhost",GOOD_IPV4,&addr,1,NULL);
-    good_inet_pton("192.168.100.4",GOOD_IPV4,&addr);
-    addr.addr4.sin_port = good_endian_hton16(8090);
+    //good_inet_pton("192.168.100.4",GOOD_IPV4,&addr);
+    //addr.addr4.sin_port = good_endian_hton16(8090);
+
+    assert(good_sockaddr_from_string(&addr,"www.taobao.com:443",1)==0);
+    //assert(good_sockaddr_from_string(&addr,"192.168.100.4:8090")==0);
 
     int s = good_socket(GOOD_IPV4,0);
 
@@ -86,6 +89,21 @@ void test_connect()
     good_closep(&s);
 }
 
+void test_group()
+{
+    int s = good_socket(GOOD_IPV4,1);
+
+    good_sockaddr_t addr={0};
+    good_inet_pton("224.0.0.5",GOOD_IPV4,&addr);
+    addr.addr4.sin_port = good_endian_hton16(8090);
+
+    assert(good_socket_option_multicast(s,&addr,NULL,1)==0);
+
+    assert(good_bind(s,&addr)==0);
+
+
+    good_closep(&s);
+}
 
 int main(int argc, char **argv)
 {
@@ -94,6 +112,8 @@ int main(int argc, char **argv)
     //test_ifname();
 
     test_connect();
+
+  //  test_group();
 
     return 0;
 }

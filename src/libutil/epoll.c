@@ -18,10 +18,10 @@ int good_epoll_create()
     return fd;
 }
 
-int good_epoll_mark(int efd, int fd, const struct epoll_event *event, int first)
+int good_epoll_mark(int efd, int fd, const good_epoll_event *event, int first)
 {
     int opt = 0;
-    struct epoll_event mark = {0,0};
+    good_epoll_event mark = {0,0};
 
     assert(efd >= 0 && fd >= 0 && event != NULL);
     assert(event->events & (GOOD_EPOLL_INPUT | GOOD_EPOLL_OUTPUT));
@@ -47,7 +47,7 @@ int good_epoll_drop(int efd, int fd)
     return epoll_ctl(efd,EPOLL_CTL_DEL,fd, NULL);
 }
 
-int good_epoll_wait(int efd,struct epoll_event * events,int max,int timeout)
+int good_epoll_wait(int efd,good_epoll_event* events,int max,int timeout)
 {
     int chk;
     uint32_t tmp;

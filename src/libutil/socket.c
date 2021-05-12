@@ -44,20 +44,22 @@ int good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *ad
 
 int good_inet_pton(const char *name, sa_family_t family, good_sockaddr_t *addr)
 {
+    int chk = -1;
+
     assert(name != NULL && (family == GOOD_IPV4 || family == GOOD_IPV6) && addr != NULL);
 
     /*bind family*/
     addr->family = family;
 
     if (addr->family == GOOD_IPV4)
-        return inet_pton(family, name, &addr->addr4.sin_addr);
+        chk = (inet_pton(family, name, &addr->addr4.sin_addr) == 1 ? 0 : -1);
     if (addr->family == GOOD_IPV6)
-        return inet_pton(family, name, &addr->addr6.sin6_addr);
+        chk = (inet_pton(family, name, &addr->addr6.sin6_addr) == 1 ? 0 : -1);
 
-    return -1;
+    return chk;
 }
 
-char *good_inet_ntop(good_sockaddr_t *addr, char *name, size_t max)
+char *good_inet_ntop(const good_sockaddr_t *addr, char *name, size_t max)
 {
     assert(addr != NULL && name != NULL && max > 0);
     assert(addr->family == GOOD_IPV4 || addr->family == GOOD_IPV6);
@@ -167,7 +169,7 @@ char *good_mac_fetch(const char *ifname, char addr[12])
 
 int good_socket_option(int fd,int level, int name,void *data,int *len,int direction)
 {
-    assert(fd >= 0 && level != 0 && name != 0 && data != NULL && len != NULL && (direction == 1 || direction == 2));
+    assert(fd >= 0 && level >= 0 && name > 0 && data != NULL && len != NULL && (direction == 1 || direction == 2));
 
     if(direction == 1)
         return getsockopt(fd,level,name,data,len);
@@ -179,7 +181,7 @@ int good_sockopt_option_int(int fd,int level, int name,int *flag,int direction)
 {
     socklen_t len = sizeof(int);
 
-    assert(fd >= 0 && level != 0 && name != 0 && flag != NULL && (direction == 1 || direction == 2));
+    assert(fd >= 0 && level >= 0 && name > 0 && flag != NULL && (direction == 1 || direction == 2));
 
     return good_socket_option(fd,level,name,flag,&len,direction);
 }
@@ -188,7 +190,7 @@ int good_sockopt_option_timeout(int fd,int name, struct timeval *tv,int directio
 {
     socklen_t len = sizeof(struct timeval);
 
-    assert(fd >= 0 && name != 0 && tv != NULL && (direction == 1 || direction == 2));
+    assert(fd >= 0 && name > 0 && tv != NULL && (direction == 1 || direction == 2));
 
     return good_socket_option(fd,SOL_SOCKET,name,tv,&len,direction);
 }
@@ -202,15 +204,16 @@ int good_socket_option_linger(int fd,struct linger *lg,int direction)
     return good_socket_option(fd,SOL_SOCKET,SO_LINGER,lg,&len,direction);  
 }
 
-int good_socket_option_multicast(int fd,int name,good_sockaddr_t *multiaddr,const char* ifaddr,int direction)
+int good_socket_option_multicast(int fd,good_sockaddr_t *multiaddr, const char *ifaddr,int enable)
 {
     socklen_t len = sizeof(struct ip_mreq);
     socklen_t len6 = sizeof(struct ipv6_mreq);
     struct ip_mreq st_mreq = {0};
     struct ipv6_mreq st_mreq6 = {0};
+    int name;
     int chk;
 
-    assert(fd >= 0 && name != 0 && multiaddr != NULL && (direction == 1 || direction == 2));
+    assert(fd >= 0 && multiaddr != NULL);
 
     assert(multiaddr->family == GOOD_IPV4 || multiaddr->family == GOOD_IPV6);
 
@@ -219,14 +222,18 @@ int good_socket_option_multicast(int fd,int name,good_sockaddr_t *multiaddr,cons
         st_mreq.imr_multiaddr = multiaddr->addr4.sin_addr;
         st_mreq.imr_interface.s_addr = (ifaddr ? inet_addr(ifaddr) : INADDR_ANY);
 
-        chk = good_socket_option(fd,IPPROTO_IP,name,&st_mreq,&len,direction);  
+        name = (enable ? IP_ADD_MEMBERSHIP : IP_DROP_MEMBERSHIP);
+
+        chk = good_socket_option(fd,IPPROTO_IP,name,&st_mreq,&len,2);  
     }
     else if(multiaddr->family == GOOD_IPV6)
     {
         st_mreq6.ipv6mr_multiaddr = multiaddr->addr6.sin6_addr;
         st_mreq6.ipv6mr_interface = (ifaddr ? if_nametoindex(ifaddr) : 0);
 
-        chk = good_socket_option(fd,IPPROTO_IP,name,&st_mreq,&len,direction); 
+        name = (enable ? IPV6_JOIN_GROUP : IPV6_LEAVE_GROUP);
+
+        chk = good_socket_option(fd,IPPROTO_IP,name,&st_mreq,&len,2); 
     }
 
     return chk;
@@ -314,4 +321,70 @@ final:
         good_fflag_del(fd, O_NONBLOCK);
 
     return chk;
+}
+
+int good_sockaddr_from_string(good_sockaddr_t *dst, const char *src, int try_lookup)
+{
+    char name[68] = {0};
+    uint16_t port = 0;
+    int chk;
+
+    assert(dst != NULL && src != NULL);
+
+    if (strchr(src, ','))
+    {
+        dst->family = GOOD_IPV6;
+        sscanf(src, "%[^,]%*[, ]%hu", name, &port);
+    }
+    else if (strchr(src, ':'))
+    {
+        dst->family = GOOD_IPV4;
+        sscanf(src, "%[^:]%*[: ]%hu", name, &port);
+    }
+    else
+    {
+        strncpy(name,src,62);
+    }
+
+    /*尝试直接转换。*/
+    chk = good_inet_pton(name, dst->family, dst);
+    if (chk != 0 && try_lookup)
+    {
+        /*可能是域名。*/
+        chk = (good_gethostbyname(name, dst->family, dst, 1, NULL) == 1 ? 0 : -1);
+    }
+
+    /*地址转换成功后，再转换端口号。*/
+    if(chk==0)
+    {
+        if(dst->family == GOOD_IPV6)
+            dst->addr6.sin6_port = good_endian_hton16(port);
+        if(dst->family == GOOD_IPV4)
+            dst->addr4.sin_port = good_endian_hton16(port);
+    }
+
+    return chk;
+}
+
+char *good_sockaddr_to_string(char dst[68],const good_sockaddr_t *src)
+{
+    assert(dst != NULL && src != NULL);
+
+    assert(src->family == GOOD_IPV4 || src->family == GOOD_IPV6);
+
+    if (good_inet_ntop(src, dst, INET6_ADDRSTRLEN) == NULL)
+        return NULL;
+
+    if (src->family == GOOD_IPV6)
+    {
+        if(src->addr6.sin6_port)
+            sprintf(dst + strlen(dst), ",%hu", good_endian_ntoh16(src->addr6.sin6_port));
+    }
+    if (src->family == GOOD_IPV4)
+    {
+        if(src->addr4.sin_port)
+            sprintf(dst + strlen(dst), ":%hu", good_endian_ntoh16(src->addr4.sin_port));
+    }
+
+    return dst;
 }

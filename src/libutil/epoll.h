@@ -39,6 +39,14 @@ enum _good_epoll_event
 #define GOOD_EPOLL_ERROR GOOD_EPOLL_ERROR
 };
 
+
+/**
+ * 事件结构体。
+ * 
+ * @warning 不能使用原始事件的值。
+*/
+typedef struct epoll_event good_epoll_event;
+
 /**
  * 创建EPOLL句柄
  * 
@@ -53,7 +61,7 @@ int good_epoll_create();
  * 
  * @return 0 成功，-1 失败。
 */
-int good_epoll_mark(int efd, int fd,const struct epoll_event * event, int first);
+int good_epoll_mark(int efd, int fd,const good_epoll_event *event, int first);
 
 /**
  * 删除句柄(文件或SOCKET)和事件。
@@ -69,6 +77,6 @@ int good_epoll_drop(int efd, int fd);
  * 
  * @return > 0 事件数量，<= 0 超时或出错。
 */
-int good_epoll_wait(int efd,struct epoll_event * events,int max,int timeout);
+int good_epoll_wait(int efd,good_epoll_event *events,int max,int timeout);
 
 #endif //GOOD_UTIL_EPOLL_H

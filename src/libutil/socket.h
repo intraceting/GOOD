@@ -89,7 +89,7 @@ int good_gethostbyname(const char *name, sa_family_t family, good_sockaddr_t *ad
 /**
  * IP字符串转IP地址。
  *
- * @return 1 成功，<= 0 失败。
+ * @return 0 成功，-1 失败。
 */
 int good_inet_pton(const char *name, sa_family_t family, good_sockaddr_t *addr);
 
@@ -98,7 +98,7 @@ int good_inet_pton(const char *name, sa_family_t family, good_sockaddr_t *addr);
  *
  * @return !NULL(0) IP字符串指针，NULL(0) 失败。
 */
-char *good_inet_ntop(good_sockaddr_t *addr, char *name, size_t max);
+char *good_inet_ntop(const good_sockaddr_t *addr, char *name, size_t max);
 
 /**
  * 获取网络接口信息
@@ -163,13 +163,15 @@ int good_sockopt_option_timeout(int fd, int name, struct timeval *tv, int direct
 int good_socket_option_linger(int fd, struct linger *lg, int direction);
 
 /**
- * 获取或设置SOCKET选项(multicast)。
+ * 启用或禁用SOCKET组播选项(multicast)。
  * 
- * @param direction 方向。 1 读，2 写。
+ * @param ifaddr 地址的指针，为NULL(0)使用默认值。IPv4 点分十进制字符串地址；IPv6 网络接口名称。
+ * @param enable 开关。!0 启用，0 禁用。
  * 
  * @return 0 成功，-1 失败。
 */
-int good_socket_option_multicast(int fd, int name, good_sockaddr_t *multiaddr, const char *ifaddr, int direction);
+int good_socket_option_multicast(int fd,good_sockaddr_t *multiaddr, const char *ifaddr,int enable);
+
 
 /**
  * 创建一个SOCKET句柄。
@@ -183,7 +185,7 @@ int good_socket(sa_family_t family, int udp);
 /**
  * 绑定地址到SOCKET句柄。
  *
- * @return 0 成功(SOCKET句柄)，!0 失败。
+ * @return 0 成功，!0 失败。
 */
 int good_bind(int fd, const good_sockaddr_t *addr);
 
@@ -205,5 +207,27 @@ int good_accept(int fd, good_sockaddr_t *addr);
  * 
 */
 int good_connect(int fd, good_sockaddr_t *addr, time_t timeout);
+
+/**
+ * 字符地址转SOCKET地址。
+ * 
+ * IPv4： Address:Port 
+ * IPv6： Address,Port
+ * 
+ * @param try_lookup !0 尝式域名解析，0 禁用载名解析。
+ * 
+ * @return 0 成功，-1 失败。
+*/
+int good_sockaddr_from_string(good_sockaddr_t *dst,const char *src, int try_lookup);
+
+/**
+ * SOCKET地址转字符地址。
+ * 
+ * IPv4： Address:Port 
+ * IPv6： Address,Port
+ * 
+ * @return !NULL(0) 成功，NULL(0) 失败。
+*/
+char *good_sockaddr_to_string(char dst[68],const good_sockaddr_t *src);
 
 #endif //GOOD_UTIL_SOCKET_H
