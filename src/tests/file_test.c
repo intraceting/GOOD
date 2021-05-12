@@ -388,7 +388,7 @@ void test_tar_write(const char* tarfile)
     size_t sizes[2] = {PATH_MAX,sizeof(struct stat)};
     good_tree_t * dir = good_tree_alloc2(sizes,2);
 
-   strcpy(dir->alloc->pptrs[GOOD_DIRENT_NAME],"/tmp/ddd/");
+   strcpy(dir->alloc->pptrs[GOOD_DIRENT_NAME],"/tmp/");
    good_dirscan(dir,100,0);
 
 
@@ -443,10 +443,10 @@ int main(int argc, char **argv)
   //       test_tar_read(argv[1]);
 
     
- //  if(argc>=2)
- //       test_tar_write(argv[1]);
+   if(argc>=2)
+        test_tar_write(argv[1]);
 
-    test_termios();
+  //  test_termios();
 
     return 0;
 }
