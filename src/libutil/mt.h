@@ -189,6 +189,8 @@ int good_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *par
  * @param id 字段ID。
  * 
  * @return !NULL(0) 成功(属性的指针)，NULL(0) 失败。
+ * 
+ * @warning 磁带物理只读锁不影响此功能。
 */
 good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
                                          uint32_t timeout, good_scsi_io_stat *stat);
@@ -201,6 +203,8 @@ good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
  * cdb = 0x8D
  * 
  * @return 0 成功，-1 失败。
+ * 
+ * @warning 磁带物理只读锁不影响此功能。
 */
 int good_mt_write_attribute(int fd, uint8_t part, const good_allocator_t *attr,
                             uint32_t timeout, good_scsi_io_stat *stat);
