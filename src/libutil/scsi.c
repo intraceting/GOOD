@@ -80,7 +80,7 @@ int good_scsi_sgioctl2(int fd, int direction,
     stat->status = hdr.status;
     stat->host_status = hdr.host_status;
     stat->driver_status = hdr.driver_status;
-    stat->senselen_wr = hdr.sb_len_wr;
+    stat->senselen = hdr.sb_len_wr;
     stat->resid = hdr.resid;
 
     return 0;

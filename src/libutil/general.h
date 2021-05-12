@@ -139,11 +139,11 @@ char* good_strtrim(char* str,int (*isctype_cb)(int c),int where);
 /**
  * 字符串分割。
  * 
- * @param str 待分割的字符串。可能会被修改。
- * @param delim 分割字符串。全字匹配，并区分大小写。
- * @param saveptr 临时指针。不可支持访问。
+ * @param str 待分割字符串的指针。可能会被修改。
+ * @param delim 分割字符的串指针。全字匹配，并区分大小写。
+ * @param saveptr 临时的指针。不可支持访问。
  * 
- * @return NULL(0) 结束，!NULL(0) 分割后的字符串首地址。
+ * @return !NULL(0) 分割后字符串的指针，NULL(0) 结束。
 */
 char *good_strtok(char *str, const char *delim, char **saveptr);
 

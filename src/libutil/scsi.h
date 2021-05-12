@@ -20,14 +20,14 @@ typedef struct _good_scsi_io_stat
     int32_t resid;
 
     /** 
-     * 响应信息。 
+     * 感知信息。 
     */
     uint8_t sense[255];
 
     /** 
-     * 响应信息的写入长度。
+     * 感知信息的长度。
     */
-    uint8_t senselen_wr;
+    uint8_t senselen;
 
     /** 
      * 状态。

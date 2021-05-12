@@ -21,10 +21,6 @@ typedef struct _good_map
      * 表格。
      * 
      * @note 尽量不要直接修改。
-     * 
-     * @see good_tree_scan()
-     * @see good_tree_fprintf()
-     * @see good_tree_vfprintf()
     */
     good_tree_t *table;
 
