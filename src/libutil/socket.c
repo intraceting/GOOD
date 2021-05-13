@@ -331,15 +331,20 @@ int good_sockaddr_from_string(good_sockaddr_t *dst, const char *src, int try_loo
 
     assert(dst != NULL && src != NULL);
 
-    if (strchr(src, ','))
+    if (strchr(src, '['))
     {
         dst->family = GOOD_IPV6;
-        sscanf(src, "%[^,]%*[, ]%hu", name, &port);
+        sscanf(src, "%*[[ ]%[^] ]%*[] :,]%hu", name, &port);
+    }
+    else if (strchr(src, ','))
+    {
+        dst->family = GOOD_IPV6;
+        sscanf(src, "%[^, ]%*[, ]%hu", name, &port);
     }
     else if (strchr(src, ':'))
     {
         dst->family = GOOD_IPV4;
-        sscanf(src, "%[^:]%*[: ]%hu", name, &port);
+        sscanf(src, "%[^: ]%*[: ]%hu", name, &port);
     }
     else
     {
@@ -368,23 +373,72 @@ int good_sockaddr_from_string(good_sockaddr_t *dst, const char *src, int try_loo
 
 char *good_sockaddr_to_string(char dst[68],const good_sockaddr_t *src)
 {
+    char buf[INET6_ADDRSTRLEN] = {0};
+
     assert(dst != NULL && src != NULL);
 
     assert(src->family == GOOD_IPV4 || src->family == GOOD_IPV6);
 
-    if (good_inet_ntop(src, dst, INET6_ADDRSTRLEN) == NULL)
+    if (good_inet_ntop(src, buf, INET6_ADDRSTRLEN) == NULL)
         return NULL;
 
     if (src->family == GOOD_IPV6)
     {
         if(src->addr6.sin6_port)
-            sprintf(dst + strlen(dst), ",%hu", good_endian_ntoh16(src->addr6.sin6_port));
+            sprintf(dst,"[%s]:%hu",buf,good_endian_ntoh16(src->addr6.sin6_port));
+        else
+            strcpy(dst,buf);
     }
     if (src->family == GOOD_IPV4)
     {
         if(src->addr4.sin_port)
-            sprintf(dst + strlen(dst), ":%hu", good_endian_ntoh16(src->addr4.sin_port));
+            sprintf(dst,"%s:%hu",buf,good_endian_ntoh16(src->addr4.sin_port));
+        else
+            strcpy(dst,buf);
     }
 
     return dst;
+}
+
+int good_sockaddr_where(const good_sockaddr_t *test,int where)
+{
+    int addr_num = 0;
+    int addr_max = 100;
+    good_ifaddrs_t *addrs = NULL;
+    good_ifaddrs_t *addr_p = NULL;
+    int match_num = 0;
+    int chk;
+
+    assert(test != NULL && (where ==1 || where ==2));
+
+    addrs = (good_ifaddrs_t *)good_heap_alloc(sizeof(good_ifaddrs_t)*addr_max);
+    if(!addrs)
+        GOOD_ERRNO_AND_RETURN1(errno,0);
+
+    addr_num = good_ifname_fetch(addrs,addr_max,1);
+
+    for (int i = 0; i < addr_num; i++)
+    {
+        addr_p = addrs+i;// &addrs[i]
+
+        /*只比较同类型的地址。*/
+        if(addr_p->addr.family != test->family)
+            continue;
+
+        if (addr_p->addr.family == GOOD_IPV6)
+            chk = memcmp(&addr_p->addr.addr6.sin6_addr, &test->addr6.sin6_addr, sizeof(struct in6_addr));
+        if (addr_p->addr.family == GOOD_IPV4)
+            chk = memcmp(&addr_p->addr.addr4.sin_addr, &test->addr4.sin_addr, sizeof(struct in_addr));
+
+        /*地址相同则计数。*/
+        if (chk == 0)
+            match_num += 1;
+    }
+
+    good_heap_freep((void**)&addrs);
+
+    if (where == 1)
+        return ((match_num > 0) ? 1 : 0);
+    if (where == 2)
+        return ((match_num <= 0) ? 1 : 0);
 }

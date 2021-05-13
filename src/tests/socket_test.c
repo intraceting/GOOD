@@ -75,9 +75,20 @@ void test_connect()
     //addr.addr4.sin_port = good_endian_hton16(8090);
 
     assert(good_sockaddr_from_string(&addr,"www.taobao.com:443",1)==0);
-    //assert(good_sockaddr_from_string(&addr,"192.168.100.4:8090")==0);
+  //  assert(good_sockaddr_from_string(&addr,"192.168.100.4:8090",0)==0);
+    //assert(good_sockaddr_from_string(&addr,"[www.taobao.com]:443",1)==0);
+    //assert(good_sockaddr_from_string(&addr,"[240e:cf:9000:1::3fb]:443",1)==0);
+   // assert(good_sockaddr_from_string(&addr,"[240e:cf:9000:1::3fb],443",1)==0);
 
-    int s = good_socket(GOOD_IPV4,0);
+
+    char buf[100]={0};
+    printf("%s\n",good_sockaddr_to_string(buf,&addr));
+
+    assert(good_sockaddr_where(&addr,1)==0);
+
+    assert(good_sockaddr_where(&addr,2)!=0);
+
+    int s = good_socket(addr.family,0);
 
   //  good_fflag_add(s,O_NONBLOCK);
     

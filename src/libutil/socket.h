@@ -119,7 +119,7 @@ int good_socket_ioctl(uint32_t cmd, void *args);
 /**
  * 查询网卡地址。
  * 
- * 格式化为十六进制字符串。
+ * 格式化为十六进制字符串。AABBCCDDEEFF
  * 
  * @return !NULL(0) 成功(网卡地址字符串的指针)，NULL(0) 失败。
  * 
@@ -213,6 +213,7 @@ int good_connect(int fd, good_sockaddr_t *addr, time_t timeout);
  * 
  * IPv4： Address:Port 
  * IPv6： Address,Port
+ * IPv6： [Address]:Port
  * 
  * @param try_lookup !0 尝式域名解析，0 禁用载名解析。
  * 
@@ -229,5 +230,14 @@ int good_sockaddr_from_string(good_sockaddr_t *dst,const char *src, int try_look
  * @return !NULL(0) 成功，NULL(0) 失败。
 */
 char *good_sockaddr_to_string(char dst[68],const good_sockaddr_t *src);
+
+/**
+ * 判断SOCKET地址位置。
+ * 
+ * @param where 1 是否在本地，2 是否在远程。
+ * 
+ * @return !0 是，0 否。
+*/
+int good_sockaddr_where(const good_sockaddr_t *test,int where);
 
 #endif //GOOD_UTIL_SOCKET_H

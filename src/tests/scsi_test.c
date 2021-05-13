@@ -162,10 +162,10 @@ void test_mt()
 
      printf("REMAINING CAPACITY:%lu\n",GOOD_PTR2U64(a->pptrs[GOOD_MT_ATTR_VALUE], 0));
      printf("MAXIMUM CAPACITY:%lu\n",GOOD_PTR2U64(b->pptrs[GOOD_MT_ATTR_VALUE], 0));
-     printf("MANUFACTURER:%s\n",c->pptrs[GOOD_MT_ATTR_VALUE], 0);
-     printf("SERIAL NUMBER:%s\n",d->pptrs[GOOD_MT_ATTR_VALUE], 0);
+     printf("MANUFACTURER:%s\n",c->pptrs[GOOD_MT_ATTR_VALUE]);
+     printf("SERIAL NUMBER:%s\n",d->pptrs[GOOD_MT_ATTR_VALUE]);
      printf("DENSITY:%s\n",good_mt_density2string(GOOD_PTR2U8(e->pptrs[GOOD_MT_ATTR_VALUE], 0)));
-     printf("BARCODE:%s\n",f->pptrs[GOOD_MT_ATTR_VALUE], 0);
+     printf("BARCODE:%s\n",f->pptrs[GOOD_MT_ATTR_VALUE]);
 
 
     size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), sizeof(uint16_t), 32+1};
