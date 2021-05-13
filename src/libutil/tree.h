@@ -198,7 +198,7 @@ good_tree_t *good_tree_alloc(good_allocator_t *alloc);
 /**
  * 创建节点，同时申请数据内存块。
 */
-good_tree_t *good_tree_alloc2(size_t *sizes,size_t numbers);
+good_tree_t *good_tree_alloc2(size_t *sizes,size_t numbers,int drag);
 
 /**
  * 创建节点，同时申请数据内存块。

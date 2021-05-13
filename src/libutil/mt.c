@@ -122,7 +122,7 @@ good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
     len = good_endian_ntoh16(GOOD_PTR2U16(buf, 7)); /*7,8*/
 
     size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), sizeof(uint16_t), len + 1};
-    alloc = good_allocator_alloc(sizes,5);
+    alloc = good_allocator_alloc(sizes,5,0);
     if(!alloc)
         return NULL;
 

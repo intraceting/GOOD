@@ -54,15 +54,16 @@ void good_allocator_atfree(good_allocator_t *alloc,
 /**
  * 申请多个内存块。
  * 
- * @param sizes 指定每个内存块的容量。NULL(0) 容量为0。
+ * @param sizes 每个内存块的大小。NULL(0) 容量为0。
  * @param numbers 数量。> 0 的整数。
+ * @param drag 拖拽式申请。0 忽略，!0 复制sizes[0]的大小。
 */
-good_allocator_t *good_allocator_alloc(size_t *sizes,size_t numbers);
+good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers, int drag);
 
 /**
  * 申请一个内存块。
  * 
- * @param size 容量。>= 0 的整数。
+ * @param size 内存块的大小。>= 0 的整数。
 */
 good_allocator_t *good_allocator_alloc2(size_t size);
 

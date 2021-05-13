@@ -73,7 +73,7 @@ void good_allocator_atfree(good_allocator_t *alloc,
     in_p->opaque = opaque;
 }
 
-good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers)
+good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers, int drag)
 {
     good_allocator_hdr *in_p = NULL;
     size_t need_size = 0;
@@ -94,7 +94,7 @@ good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers)
     if (sizes)
     {
         for (size_t i = 0; i < numbers; i++)
-            need_size += sizes[i];
+            need_size += (drag ? sizes[0] : sizes[i]);
     }
 
     /*
@@ -130,8 +130,8 @@ good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers)
             /*
              * 内存块容量可能为0，需要跳过。
             */
-            in_p->out.sizes[i] = sizes[i];
-            if (sizes[i] <= 0)
+            in_p->out.sizes[i] = (drag ? sizes[0] : sizes[i]);
+            if (sizes[i] <= 0 && drag == 0)
                 continue;
 
             /*
@@ -151,7 +151,7 @@ good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers)
 
 good_allocator_t *good_allocator_alloc2(size_t size)
 {
-    return good_allocator_alloc(&size, 1);
+    return good_allocator_alloc(&size, 1, 0);
 }
 
 good_allocator_t *good_allocator_refer(good_allocator_t *src)
@@ -208,7 +208,7 @@ good_allocator_t *good_allocator_clone(good_allocator_t *src)
     assert(src);
     assert(src->numbers > 0 && src->pptrs != NULL && src->sizes != NULL);
 
-    dst = good_allocator_alloc(src->sizes, src->numbers);
+    dst = good_allocator_alloc(src->sizes, src->numbers,0);
     if (!dst)
         GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);
 

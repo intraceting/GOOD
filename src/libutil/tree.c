@@ -251,10 +251,10 @@ good_tree_t *good_tree_alloc(good_allocator_t *alloc)
     return node;
 }
 
-good_tree_t *good_tree_alloc2(size_t *sizes, size_t numbers)
+good_tree_t *good_tree_alloc2(size_t *sizes, size_t numbers,int drag)
 {
     good_tree_t *node = good_tree_alloc(NULL);
-    good_allocator_t *alloc = good_allocator_alloc(sizes, numbers);
+    good_allocator_t *alloc = good_allocator_alloc(sizes, numbers,drag);
 
     if (!node || !alloc)
         goto final_error;
@@ -274,7 +274,7 @@ final_error:
 
 good_tree_t *good_tree_alloc3(size_t size)
 {
-    return good_tree_alloc2(&size,1);
+    return good_tree_alloc2(&size,1,0);
 }
 
 void good_tree_scan(good_tree_t *root,good_tree_iterator_t* it)

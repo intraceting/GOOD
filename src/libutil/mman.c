@@ -41,7 +41,7 @@ good_allocator_t* good_mmap(int fd,int rw,int shared)
     if(mmptr == MAP_FAILED)
         return NULL;
 
-    alloc = good_allocator_alloc(NULL,1);
+    alloc = good_allocator_alloc(NULL,1,0);
     if (alloc)
     {
         /*绑定内存和特定的释放函数，用于支持引用计数器。*/

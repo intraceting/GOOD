@@ -41,13 +41,13 @@ void good_mutex_init2(good_mutex_t* ctx,int shared)
     good_mutex_init(ctx);
 }
 
-int good_mutex_lock(good_mutex_t *ctx, int try)
+int good_mutex_lock(good_mutex_t *ctx, int nonblock)
 {
     int err = -1;
 
     assert(ctx);
 
-    if(try)
+    if(nonblock)
         err = pthread_mutex_lock(&ctx->mutex);
     else 
         err = pthread_mutex_trylock(&ctx->mutex);
@@ -59,7 +59,7 @@ int good_mutex_lock(good_mutex_t *ctx, int try)
         pthread_mutex_consistent(&ctx->mutex);
         pthread_mutex_unlock(&ctx->mutex);
         /*回调自己，重试。*/
-        err = good_mutex_lock(ctx,try);
+        err = good_mutex_lock(ctx,nonblock);
     }    
 
     return err;

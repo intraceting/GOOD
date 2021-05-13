@@ -91,7 +91,7 @@ void good_mtx_parse_element_status(good_tree_t *father, const uint8_t *element, 
     {
         /*申请节点。*/
         size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), 36+1, 32+1};
-        good_tree_t *one = good_tree_alloc2(sizes, 5);
+        good_tree_t *one = good_tree_alloc2(sizes, 5,0);
 
         /*如果节点申请失败提结束。*/
         if (one == NULL)

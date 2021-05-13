@@ -98,12 +98,12 @@ void good_mutex_init2(good_mutex_t *ctx, int shared);
 /**
  * 互斥量加锁。
  * 
- * @param try 0 直到成功或出错返回，!0 尝试一下即返回。
+ * @param nonblock 0 直到成功或出错返回，!0 尝试一下即返回。
  * 
  * @return 0 成功，!0 出错。
  * 
 */
-int good_mutex_lock(good_mutex_t *ctx, int try);
+int good_mutex_lock(good_mutex_t *ctx, int nonblock);
 
 /**
  * 互斥量解锁。

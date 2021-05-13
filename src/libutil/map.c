@@ -31,7 +31,7 @@ int good_map_init(good_map_t *map, size_t size)
     assert(map && size > 0);
 
     /* 创建树节点，用于表格。 */
-    map->table = good_tree_alloc2(NULL, size);
+    map->table = good_tree_alloc2(NULL, size,0);
 
     if (!map->table)
         GOOD_ERRNO_AND_RETURN1(ENOMEM, -1);
@@ -99,7 +99,7 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
     if (!node && vsize > 0)
     {
         size_t sizes[2] = {ksize, vsize};
-        node = good_tree_alloc2(sizes, 2);
+        node = good_tree_alloc2(sizes, 2,0);
 
         if (!node)
             GOOD_ERRNO_AND_RETURN1(ENOMEM, NULL);

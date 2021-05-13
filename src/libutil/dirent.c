@@ -46,7 +46,7 @@ void good_dirscan(good_tree_t *father,size_t depth,int onefs)
         if (good_strcmp(c_dir->d_name, ".", 1) == 0 || good_strcmp(c_dir->d_name, "..", 1) == 0)
             continue;
 
-        node = good_tree_alloc2(sizes,2);
+        node = good_tree_alloc2(sizes,2,0);
         if (!node)
             break;
 
