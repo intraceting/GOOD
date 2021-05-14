@@ -12,7 +12,7 @@
 #include "thread.h"
 
 /**
- * 
+ * 一个简单的池子。
 */
 typedef struct _good_pool
 {
@@ -20,12 +20,6 @@ typedef struct _good_pool
      * 互斥量和事件。
     */
     good_mutex_t mutex;
-
-    /**
-     * 内存块。
-     * 
-    */
-    good_allocator_t *alloc;
 
     /**
      * 索引表。

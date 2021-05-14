@@ -12,7 +12,6 @@ void good_pool_destroy(good_pool_t* pool)
 
     assert(pool->count == pool->queue->numbers);
 
-    good_allocator_unref(&pool->alloc);
     good_allocator_unref(&pool->table);
     good_allocator_unref(&pool->queue);
 
@@ -27,13 +26,11 @@ int good_pool_init(good_pool_t *pool, size_t size, size_t number)
 
     assert(pool != NULL && size > 0 && number > 0);
 
-    pool->alloc = good_allocator_alloc(&size,number,1);
     pool->table = good_allocator_alloc2(good_align(number / 8, 2)); //余数要补上1。
     pool->queue = good_allocator_alloc(&id_size,number,1);
 
-    if (!pool->alloc || !pool->table || !pool->queue)
+    if (!pool->table || !pool->queue)
     {
-        good_allocator_unref(&pool->alloc);
         good_allocator_unref(&pool->table);
         good_allocator_unref(&pool->queue);
 
