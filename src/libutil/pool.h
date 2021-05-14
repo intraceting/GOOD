@@ -64,9 +64,9 @@ typedef struct _good_pool
     size_t push_pos;
 
     /**
-     * 使能开关。
+     * 使能状态。
      * 
-     * !0 启用，0 禁用。
+     * 0 禁用，!0 启用。
      * 
      * @note 尽量不要直接修改。
     */
@@ -96,6 +96,8 @@ int good_pool_init(good_pool_t* pool,size_t size);
  * @param timeout 超时(毫秒)。>= 0 成功或时间过期后返回，< 0 成功或出错后返回。
  * 
  * @return > 0 成功(索引ID)，<= 0 失败。
+ * 
+ * @warning 使能状态为禁用时，返回失败。
 */
 ssize_t good_pool_pull(good_pool_t *pool, time_t timeout);
 
@@ -106,12 +108,12 @@ ssize_t good_pool_pull(good_pool_t *pool, time_t timeout);
  * 
  * @return  0 成功，-1 失败。
  * 
- * @warning 不受使能开关影响。
+ * @warning 不受使能状态影响。
 */
 int good_pool_push(good_pool_t *pool, ssize_t id);
 
 /** 
- * 设置使能开关状态。
+ * 设置使能状态。
  * 
  * @param enable !0 启用，0 禁用。
 */
