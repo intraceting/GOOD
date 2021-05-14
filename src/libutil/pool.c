@@ -99,6 +99,10 @@ int good_pool_push(good_pool_t *pool, ssize_t id)
     if (id <= 0 || id > pool->size)
         goto final;
 
+    /*不能超过池大小。*/
+    if (pool->count >= pool->size)
+        goto final;
+
     /*索引表格标记ID，防止重复反引用或错误的反引用。*/
     assert(good_bloom_mark(pool->table, good_align(pool->size / 8, 2), id - 1) == 0);
 

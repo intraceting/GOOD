@@ -118,9 +118,10 @@ void test4()
 
 
     assert(good_pool_push(&p,2)==0);
+  //  assert(good_pool_push(&p,1)==0);
     assert(good_pool_push(&p,1)==0);
     assert(good_pool_push(&p,3)==0);
- //   assert(good_pool_push(&p,3)==0);
+    //assert(good_pool_push(&p,3)==0);
     
 
     printf("\n---------------\n");
