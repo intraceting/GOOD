@@ -108,7 +108,7 @@ void traversal(good_tree_t *root)
 void test_dirscan()
 {
     size_t sizes[2] = {PATH_MAX,sizeof(struct stat)};
-    good_tree_t * t = good_tree_alloc2(sizes,2);
+    good_tree_t * t = good_tree_alloc2(sizes,2,0);
 
    strcpy(t->alloc->pptrs[GOOD_DIRENT_NAME],"/tmp/");
    good_dirscan(t,100,0);
@@ -386,7 +386,7 @@ void test_tar_write(const char* tarfile)
     t.buf = good_buffer_alloc2(512 * 1024);
 
     size_t sizes[2] = {PATH_MAX,sizeof(struct stat)};
-    good_tree_t * dir = good_tree_alloc2(sizes,2);
+    good_tree_t * dir = good_tree_alloc2(sizes,2,0);
 
    strcpy(dir->alloc->pptrs[GOOD_DIRENT_NAME],"/tmp/");
    good_dirscan(dir,100,0);

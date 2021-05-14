@@ -169,7 +169,7 @@ void test_mt()
 
 
     size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), sizeof(uint16_t), 32+1};
-    good_allocator_t *g = good_allocator_alloc(sizes,5);
+    good_allocator_t *g = good_allocator_alloc(sizes,5,0);
 
     GOOD_PTR2U16(g->pptrs[GOOD_MT_ATTR_ID],0) = 0x0806;
     GOOD_PTR2U16(g->pptrs[GOOD_MT_ATTR_FORMAT],0) = 1;

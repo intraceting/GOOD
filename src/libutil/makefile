@@ -54,7 +54,6 @@ OBJ_FILES = \
 	${OBJ_PATH}/allocator.o \
 	${OBJ_PATH}/mman.o \
 	${OBJ_PATH}/buffer.o \
-	${OBJ_PATH}/vector.o \
 	${OBJ_PATH}/pool.o \
 	${OBJ_PATH}/tree.o \
 	${OBJ_PATH}/map.o \

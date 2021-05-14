@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "libutil/buffer.h"
-#include "libutil/vector.h"
+#include "libutil/pool.h"
 
 void test1()
 {
@@ -100,21 +100,42 @@ void test3()
 
 void test4()
 {
-    good_vector_t* v = good_vector_alloc2(10,0);
-    good_vector_t* v2 = good_vector_copy(v);
-    good_vector_t* v3 = good_vector_clone(v);
+    good_pool_t p = {0};
 
-    good_vector_freep(&v);
-    good_vector_freep(&v2);
-    good_vector_freep(&v3);
+    good_pool_init(&p,100,3);
 
-    v = good_vector_alloc2(100,100);
-    v2 = good_vector_copy(v);
-    v3 = good_vector_clone(v);
+    printf("\n---------------\n");
 
-    good_vector_freep(&v);
-    good_vector_freep(&v2);
-    good_vector_freep(&v3);
+    for(int i = 0;i<12;i++)
+    {
+        ssize_t id = good_pool_refer(&p,1);
+        printf("%ld\n",id);
+    }
+
+    printf("\n---------------\n");
+
+    assert(good_pool_refer(&p, 1) == -1);
+
+
+    assert(good_pool_unref(&p,2)==0);
+    assert(good_pool_unref(&p,1)==0);
+    assert(good_pool_unref(&p,3)==0);
+ //   assert(good_pool_unref(&p,3)==0);
+    
+
+    printf("\n---------------\n");
+
+    for(int i = 0;i<p.queue->numbers;i++)
+    {
+        ssize_t id = good_pool_refer(&p,1);
+        printf("%ld\n",id);
+
+        assert(good_pool_unref(&p,id)==0);
+    }
+
+    printf("\n---------------\n");
+
+    good_pool_destroy(&p);
 }
 
 int main(int argc, char **argv)

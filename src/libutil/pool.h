@@ -24,49 +24,59 @@ typedef struct _good_pool
     /**
      * 内存块。
      * 
-     * @note 尽量不要直接修改。 
     */
     good_allocator_t *alloc;
 
     /**
-     * 忙碌的内存块索引。
+     * 索引表。
      * 
      * @note 尽量不要直接修改。
     */
-    good_allocator_t *busy_index;
+    good_allocator_t *table;
 
     /**
-     * 忙碌的内存块数量。
-    */
-    size_t busy_count;
-
-    /**
-     * 忙碌的内存块游标。
-    */
-    size_t busy_cursor;
-
-    /**
-     * 空闲的内存块索引。
+     * 索引队列。
      * 
      * @note 尽量不要直接修改。
     */
-    good_allocator_t *idle_index;
+    good_allocator_t *queue;
 
     /**
-     * 空闲的内存块数量。
+     * 队列长度。
+     * 
+     * @note 尽量不要直接修改。
     */
-    size_t idle_count;
+    size_t count;
 
     /**
-     * 空闲的内存块游标。
+     * 引用游标。
+     * 
+     * @note 尽量不要直接修改。
     */
-    size_t idle_cursor;
+    size_t refer_pos;
 
+    /**
+     * 反引用游标。
+     * 
+     * @note 尽量不要直接修改。
+    */
+    size_t unref_pos;
+
+    /**
+     * 使能开关。
+     * 
+     * !0 启用，0 禁用。
+     * 
+     * @note 尽量不要直接修改。
+    */
+    int enable;
 
 } good_pool_t;
 
 /**
  * 销毁。
+ * 
+ * @warning 所有内存块必须全部在池内才能被销毁。
 */
 void good_pool_destroy(good_pool_t* pool);
 
@@ -76,5 +86,30 @@ void good_pool_destroy(good_pool_t* pool);
  * @return 0 成功，!0 失败。
 */
 int good_pool_init(good_pool_t* pool,size_t size,size_t number);
+
+/**
+ * 引用。
+ * 
+ * @param peek 0 直到引用成功或出错返回，!0 无论引用成功与否都返回。
+ * 
+ * @return > 0 成功(内存块ID)，<= 0 失败。
+*/
+ssize_t good_pool_refer(good_pool_t *pool, int peek);
+
+/**
+ * 反引用。
+ * 
+ * @return  0 成功，-1 失败。
+ * 
+ * @warning 不受使能开关影响。
+*/
+int good_pool_unref(good_pool_t *pool, ssize_t id);
+
+/** 
+ * 设置使能开关状态。
+ * 
+ * @param enable !0 启用，0 禁用。
+*/
+void good_pool_enable(good_pool_t *pool,int enable);
 
 #endif //GOOD_UTIL_POOL_H

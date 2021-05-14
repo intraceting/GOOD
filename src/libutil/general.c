@@ -12,12 +12,8 @@ size_t good_align(size_t size, size_t align)
 {
     size_t padding = 0;
 
-    if (size > 0 && align > 1)
-    {
-        padding = size % align;
-
-        size += ((padding > 0) ? align - padding : 0);
-    }
+    if (align > 1)
+        size +=  align - (size % align);
 
     return size;
 }
