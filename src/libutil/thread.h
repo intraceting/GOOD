@@ -117,7 +117,7 @@ int good_mutex_unlock(good_mutex_t *ctx);
  * 
  * @param timeout 超时(毫秒)。>= 0 有事件或时间过期，< 0 直到有事件或出错。
  * 
- * @return 0 成功；!0 出错。
+ * @return 0 成功；!0 出错(errno)。
 */
 int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
 
