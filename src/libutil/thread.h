@@ -128,7 +128,7 @@ int good_mutex_wait(good_mutex_t *ctx, time_t timeout);
  * 
  * @return 0 成功；!0 出错。
 */
-int good_mutex_notice(good_mutex_t *ctx, int broadcast);
+int good_mutex_signal(good_mutex_t *ctx, int broadcast);
 
 /*------------------------------------------------------------------------------------------------*/
 

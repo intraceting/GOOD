@@ -102,35 +102,35 @@ void test4()
 {
     good_pool_t p = {0};
 
-    good_pool_init(&p,100,3);
+    good_pool_init(&p,3);
 
     printf("\n---------------\n");
 
-    for(int i = 0;i<12;i++)
+    for(int i = 0;i<3;i++)
     {
-        ssize_t id = good_pool_refer(&p,1);
+        ssize_t id = good_pool_pull(&p,1000);
         printf("%ld\n",id);
     }
 
     printf("\n---------------\n");
 
-    assert(good_pool_refer(&p, 1) == -1);
+    assert(good_pool_pull(&p, 1) == -1);
 
 
-    assert(good_pool_unref(&p,2)==0);
-    assert(good_pool_unref(&p,1)==0);
-    assert(good_pool_unref(&p,3)==0);
- //   assert(good_pool_unref(&p,3)==0);
+    assert(good_pool_push(&p,2)==0);
+    assert(good_pool_push(&p,1)==0);
+    assert(good_pool_push(&p,3)==0);
+ //   assert(good_pool_push(&p,3)==0);
     
 
     printf("\n---------------\n");
 
-    for(int i = 0;i<p.queue->numbers;i++)
+    for(int i = 0;i<p.size;i++)
     {
-        ssize_t id = good_pool_refer(&p,1);
+        ssize_t id = good_pool_pull(&p,1);
         printf("%ld\n",id);
 
-        assert(good_pool_unref(&p,id)==0);
+        assert(good_pool_push(&p,id)==0);
     }
 
     printf("\n---------------\n");

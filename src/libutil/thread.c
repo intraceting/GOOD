@@ -76,7 +76,6 @@ int good_mutex_unlock(good_mutex_t* ctx)
     return err;
 }
 
-
 int good_mutex_wait(good_mutex_t* ctx,time_t timeout)
 {
     int err = -1;
@@ -86,7 +85,7 @@ int good_mutex_wait(good_mutex_t* ctx,time_t timeout)
 
     assert(ctx);
 
-    if(timeout>=0)
+    if (timeout >= 0)
     {
         err = pthread_condattr_getclock(&ctx->condattr, &condclock);
         if (err != 0)
@@ -97,23 +96,23 @@ int good_mutex_wait(good_mutex_t* ctx,time_t timeout)
         else if (condclock == CLOCK_REALTIME)
             clock_gettime(CLOCK_REALTIME, &sys_ts);
         else
-            GOOD_ERRNO_AND_RETURN1(EINVAL,err=-1);
+            GOOD_ERRNO_AND_RETURN1(EINVAL, err = -1);
 
         out_ts.tv_sec = sys_ts.tv_sec + (timeout / 1000);
         out_ts.tv_nsec = sys_ts.tv_nsec + (timeout % 1000) * 1000000;
 
-        err = pthread_cond_timedwait(&ctx->cond,&ctx->mutex,&out_ts);
+        err = pthread_cond_timedwait(&ctx->cond, &ctx->mutex, &out_ts);
     }
     else
     {
-        err = pthread_cond_wait(&ctx->cond,&ctx->mutex);
+        err = pthread_cond_wait(&ctx->cond, &ctx->mutex);
     }
-    
+
     return err;
 }
 
 
-int good_mutex_notice(good_mutex_t* ctx,int broadcast)
+int good_mutex_signal(good_mutex_t* ctx,int broadcast)
 {
     int err = -1;
 

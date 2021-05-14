@@ -22,18 +22,25 @@ typedef struct _good_pool
     good_mutex_t mutex;
 
     /**
+     * 大小。
+     * 
+     * @note 尽量不要直接修改。
+    */
+    size_t size;
+
+    /**
      * 索引表。
      * 
      * @note 尽量不要直接修改。
     */
-    good_allocator_t *table;
+    uint8_t *table;
 
     /**
      * 索引队列。
      * 
      * @note 尽量不要直接修改。
     */
-    good_allocator_t *queue;
+    ssize_t *queue;
 
     /**
      * 队列长度。
@@ -43,18 +50,18 @@ typedef struct _good_pool
     size_t count;
 
     /**
-     * 引用游标。
+     * 拉取游标。
      * 
      * @note 尽量不要直接修改。
     */
-    size_t refer_pos;
+    size_t pull_pos;
 
     /**
-     * 反引用游标。
+     * 推送游标。
      * 
      * @note 尽量不要直接修改。
     */
-    size_t unref_pos;
+    size_t push_pos;
 
     /**
      * 使能开关。
@@ -75,23 +82,25 @@ typedef struct _good_pool
 void good_pool_destroy(good_pool_t* pool);
 
 /**
- * 初始化。
+ * 初始化一个空的池子。
+ * 
+ * @param size 大小。
  * 
  * @return 0 成功，!0 失败。
 */
-int good_pool_init(good_pool_t* pool,size_t size,size_t number);
+int good_pool_init(good_pool_t* pool,size_t size);
 
 /**
- * 引用。
+ * 拉取一个ID。
  * 
- * @param peek 0 直到引用成功或出错返回，!0 无论引用成功与否都返回。
+ * @param timeout 超时(毫秒)。>= 0 成功或时间过期后返回，< 0 成功或出错后返回。
  * 
  * @return > 0 成功(索引ID)，<= 0 失败。
 */
-ssize_t good_pool_refer(good_pool_t *pool, int peek);
+ssize_t good_pool_pull(good_pool_t *pool, time_t timeout);
 
 /**
- * 反引用。
+ * 推送一个ID。
  * 
  * @param id 索引ID。
  * 
@@ -99,7 +108,7 @@ ssize_t good_pool_refer(good_pool_t *pool, int peek);
  * 
  * @warning 不受使能开关影响。
 */
-int good_pool_unref(good_pool_t *pool, ssize_t id);
+int good_pool_push(good_pool_t *pool, ssize_t id);
 
 /** 
  * 设置使能开关状态。

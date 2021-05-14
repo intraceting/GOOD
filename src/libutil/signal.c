@@ -21,7 +21,7 @@ void good_sigwaitinfo(good_signal_t *sig, time_t timeout)
 
     while (1)
     {
-        if(timeout>=0)
+        if (timeout >= 0)
         {
             tout.tv_sec = timeout / 1000;
             tout.tv_nsec = (timeout % 1000) * 1000000;
