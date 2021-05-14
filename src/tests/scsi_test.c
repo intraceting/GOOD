@@ -123,7 +123,7 @@ void test_mtx()
 
 void test_mt()
 {
-    int fd = good_open("/dev/st0",1,0,0);
+    int fd = good_open("/dev/st1",1,0,0);
 
     good_scsi_io_stat stat = {0};
 
