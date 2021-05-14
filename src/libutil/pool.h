@@ -86,12 +86,14 @@ int good_pool_init(good_pool_t* pool,size_t size,size_t number);
  * 
  * @param peek 0 直到引用成功或出错返回，!0 无论引用成功与否都返回。
  * 
- * @return > 0 成功(内存块ID)，<= 0 失败。
+ * @return > 0 成功(索引ID)，<= 0 失败。
 */
 ssize_t good_pool_refer(good_pool_t *pool, int peek);
 
 /**
  * 反引用。
+ * 
+ * @param id 索引ID。
  * 
  * @return  0 成功，-1 失败。
  * 
