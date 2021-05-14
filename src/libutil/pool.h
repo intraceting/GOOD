@@ -22,14 +22,14 @@ typedef struct _good_pool
     good_mutex_t mutex;
 
     /**
-     * 大小。
+     * 类型。
      * 
      * @note 尽量不要直接修改。
     */
-    size_t size;
+    size_t type;
 
     /**
-     * 索引表。
+     * 数据表。
      * 
      * @note 尽量不要直接修改。
     */

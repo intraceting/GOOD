@@ -96,11 +96,11 @@ int good_pool_push(good_pool_t *pool, ssize_t id)
     assert(good_mutex_lock(&pool->mutex, 0) == 0);
 
     /*ID不能超过池的范围。*/
-    if (id <= 0 || id > pool->size)
+    if (!(id > 0 && id <= pool->size))
         goto final;
 
     /*不能超过池大小。*/
-    if (pool->count >= pool->size)
+    if (!(pool->count < pool->size))
         goto final;
 
     /*索引表格标记ID，防止重复反引用或错误的反引用。*/
