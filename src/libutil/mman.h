@@ -21,6 +21,8 @@ good_allocator_t* good_mmap(int fd,int rw,int shared);
 /**
  * 映射文件到内存页面。
  * 
+ * @param name 文件名(或全路径)的指针。
+ * 
  * @return NULL(0) 失败，!NULL(0) 成功。
  *  
 */
