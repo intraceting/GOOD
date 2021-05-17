@@ -19,3 +19,8 @@ libutil-clean:
 tests-clean:
 	make -C $(MAKEFILE_PWD)/tests/ clean
 
+
+help: libutil-help
+
+libutil-help:
+	make -C $(MAKEFILE_PWD)/libutil/ help

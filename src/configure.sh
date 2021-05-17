@@ -73,8 +73,17 @@ HOST_PLATFORM=$(uname -m)
 TARGET_PLATFORM=$(uname -m)
 BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
 PKG_PATH=${BUILD_PATH}/pkgconfig/
+
 #
-while getopts "b:p:?" ARGKEY 
+function PrintUsage()
+{
+    echo "usage: [ < -p ARGS > < -b ARGS > < -c ARGS > ]"
+    echo "  -p 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
+    echo "  -b 编译路径。默认：${BUILD_PATH}"
+}
+
+#
+while getopts "p:b:?" ARGKEY 
 do
     case $ARGKEY in
     b)
@@ -84,7 +93,7 @@ do
         TARGET_PLATFORM="$OPTARG"
     ;;
     \?)
-        echo "usage: [ -b BUILD-PATH ] [ -p PLATFORM ]"
+        PrintUsage
         exit 22
     ;;
     esac
@@ -148,7 +157,7 @@ echo "Cflags: ${PKG_FLAGS}" >> ${LIBUTIL_DEPEND_PC}
 echo "Libs: ${PKG_LIBS}" >> ${LIBUTIL_DEPEND_PC}
 
 #
-PKG_FLAGS="${PKG_FLAGS} -I${SHELL_PWD}"
+PKG_FLAGS=" -I${SHELL_PWD} ${PKG_FLAGS}"
 PKG_LIBS=" -lgood_util ${PKG_LIBS}"
 PKG_LIBS=" -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ ${PKG_LIBS}"
 

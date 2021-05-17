@@ -1,6 +1,6 @@
 #
-MAKEFILE_FILE := $(abspath $(lastword $(MAKEFILE_LIST)))
-MAKEFILE_PWD := $(dir $(MAKEFILE_FILE))
+MAKEFILE_FILE = $(abspath $(lastword $(MAKEFILE_LIST)))
+MAKEFILE_PWD = $(dir $(MAKEFILE_FILE))
 
 #
 PROJECT_NAME = libutil
@@ -8,7 +8,6 @@ PROJECT_VERSION ?= devel
 BUILD_TYPE ?= release
 BUILD_PATH ?= ${MAKEFILE_PWD}/../build/
 INSTALL_PATH ?= /usr/local/
-
 
 #
 # Common definitions
@@ -113,3 +112,13 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/*.h
 #
 	rm -f ${INSTALL_PATH_LIB}/libgood_util.so
+#
+help:
+#
+	$(info  `MAKEFILE_PWD = ${MAKEFILE_PWD}')
+#
+	$(info  `PROJECT_NAME ?= ${PROJECT_NAME}')
+	$(info  `PROJECT_VERSION ?= ${PROJECT_VERSION}')
+	$(info  `BUILD_TYPE ?= ${BUILD_TYPE}'						[release|debug])
+	$(info  `BUILD_PATH ?= ${BUILD_PATH}')
+	$(info  `INSTALL_PATH ?= ${INSTALL_PATH}')
