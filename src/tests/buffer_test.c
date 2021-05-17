@@ -102,36 +102,38 @@ void test4()
 {
     good_pool_t p = {0};
 
-    good_pool_init(&p,3);
+    good_pool_init(&p,sizeof(size_t),3);
 
     printf("\n---------------\n");
 
+    size_t id = -1;
     for(int i = 0;i<3;i++)
     {
-        ssize_t id = good_pool_pull(&p,1000);
+        assert(good_pool_pull(&p,&id,sizeof(id))<=0);
         printf("%ld\n",id);
     }
 
     printf("\n---------------\n");
 
-    assert(good_pool_pull(&p, 1) == -1);
+    assert(good_pool_pull(&p,&id,sizeof(id)) == -1);
 
-
-    assert(good_pool_push(&p,2)==0);
-   // assert(good_pool_push(&p,1)==0);
-    assert(good_pool_push(&p,1)==0);
-    assert(good_pool_push(&p,3)==0);
-    assert(good_pool_push(&p,4)==0);
+    id = 2;
+    assert(good_pool_push(&p,&id,sizeof(id))>0);
+    id = 1;
+    assert(good_pool_push(&p,&id,sizeof(id))>0);
+    id = 3;
+    assert(good_pool_push(&p,&id,sizeof(id))>0);
+ //   assert(good_pool_push(&p,&id,sizeof(id))>0);
     
 
     printf("\n---------------\n");
 
-    for(int i = 0;i<p.size;i++)
+    for(int i = 0;i<p.table->numbers;i++)
     {
-        ssize_t id = good_pool_pull(&p,1);
+         assert(good_pool_pull(&p,&id,sizeof(id))>0);
         printf("%ld\n",id);
 
-        assert(good_pool_push(&p,id)==0);
+        assert(good_pool_push(&p,&id,sizeof(id))>0);
     }
 
     printf("\n---------------\n");

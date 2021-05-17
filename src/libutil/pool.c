@@ -6,139 +6,73 @@
  */
 #include "pool.h"
 
-void good_pool_destroy(good_pool_t* pool)
+void good_pool_destroy(good_pool_t *pool)
 {
     assert(pool != NULL);
 
-    good_heap_freep((void**)&pool->table);
-    good_heap_freep((void**)&pool->queue);
+    good_allocator_unref(&pool->table);
 
-    good_mutex_destroy(&pool->mutex);
-
-    memset(pool,0,sizeof(*pool));
+    memset(pool, 0, sizeof(*pool));
 }
 
-int good_pool_init(good_pool_t *pool,size_t size)
+int good_pool_init(good_pool_t *pool, size_t size, size_t number)
 {
-    assert(pool != NULL && size > 0);
+    assert(pool != NULL && size > 0 && number > 0);
 
-    pool->table = (uint8_t*)good_heap_alloc(good_align(size / 8, 2)); //余数要补上1。
-    pool->queue = (ssize_t*)good_heap_alloc(size*sizeof(ssize_t));
-
-    if (!pool->table || !pool->queue)
-    {
-        good_heap_freep((void**)&pool->table);
-        good_heap_freep((void**)&pool->queue);
-
+    pool->table = good_allocator_alloc(&size, number, 1);
+    if (!pool->table)
         return -1;
-    }
 
-    good_mutex_init2(&pool->mutex,0);
-
-    pool->size = size;
     pool->count = 0;
     pool->pull_pos = 0;
     pool->push_pos = 0;
-    pool->enable = 1;
 
     return 0;
 }
 
-ssize_t good_pool_pull(good_pool_t* pool, time_t timeout)
+ssize_t good_pool_pull(good_pool_t *pool, void *buf, size_t size)
 {
-    ssize_t id = -1;
+    ssize_t len = -1;
     int chk;
 
-    assert(pool != NULL);
+    assert(pool != NULL && buf > 0 && size > 0);
 
-    assert(good_mutex_lock(&pool->mutex,0)==0);
-
-    while (pool->enable)
+    /*池不能是空的。*/
+    if (pool->count > 0)
     {
-        if (pool->count <= 0)
-        {
-            chk = good_mutex_wait(&pool->mutex, timeout);
-            if (chk != 0)
-                break;
-        }
-
-        if (pool->count <= 0)
-            continue;
-
-        /*从队列取出一个ID。*/
-        id = pool->queue[pool->pull_pos];
-        pool->queue[pool->pull_pos] = -1;//用-1覆盖。
+        /*按游标位置从数据表中读取数据。*/
+        len = GOOD_MIN(pool->table->sizes[pool->pull_pos], size);
+        memcpy(buf, pool->table->pptrs[pool->pull_pos], len);
 
         /*队列长度减去1。*/
         pool->count -= 1;
 
-        /*索引表清除ID，防止重复引用或错误的引用。*/
-        assert(good_bloom_unset(pool->table, good_align(pool->size / 8, 2), id - 1) == 0);
-
         /*滚动游标。*/
-        pool->pull_pos = (pool->pull_pos + 1) % pool->size;
-
-        /*退出循环。*/
-        break;
+        pool->pull_pos = (pool->pull_pos + 1) % pool->table->numbers;
     }
 
-    assert(good_mutex_unlock(&pool->mutex)==0);
-
-    return id;
+    return len;
 }
 
-int good_pool_push(good_pool_t *pool, ssize_t id)
+ssize_t good_pool_push(good_pool_t *pool, const void *buf, size_t size)
 {
-    int chk = -1;
+    ssize_t len = -1;
 
-    assert(pool != NULL);
+    assert(pool != NULL && buf > 0 && size > 0);
 
-    assert(good_mutex_lock(&pool->mutex, 0) == 0);
+    /*池不能是满的。*/
+    if (pool->count < pool->table->numbers)
+    {
+        /*按游标位置向数据表中写入数据。*/
+        len = GOOD_MIN(pool->table->sizes[pool->push_pos], size);
+        memcpy(pool->table->pptrs[pool->push_pos], buf, len);
 
-    /*ID不能超过池的范围。*/
-    if (!(id > 0 && id <= pool->size))
-        goto final;
+        /*队列长度加1。*/
+        pool->count += 1;
 
-    /*不能超过池大小。*/
-    if (!(pool->count < pool->size))
-        goto final;
+        /*滚动游标。*/
+        pool->push_pos = (pool->push_pos + 1) % pool->table->numbers;
+    }
 
-    /*索引表格标记ID，防止重复反引用或错误的反引用。*/
-    assert(good_bloom_mark(pool->table, good_align(pool->size / 8, 2), id - 1) == 0);
-
-    /*向队列添加一个ID。*/
-    pool->queue[pool->push_pos] = id;
-
-    /*队列长度加1。*/
-    pool->count += 1;
-
-    /*滚动游标。*/
-    pool->push_pos = (pool->push_pos + 1) % pool->size;
-
-    /*可能有等待的，通知一下。*/
-    good_mutex_signal(&pool->mutex,1);
-
-    /*No error.*/
-    chk = 0;
-
-final:
-
-    assert(good_mutex_unlock(&pool->mutex) == 0);
-
-    return chk;
-}
-
-void good_pool_enable(good_pool_t *pool,int enable)
-{
-    assert(pool != NULL);
-
-    assert(good_mutex_lock(&pool->mutex, 0) == 0);
-
-    /**/
-    pool->enable = (enable ? 1 : 0);
-
-    /*可能有等待的，通知一下。*/
-    good_mutex_signal(&pool->mutex,1);
-
-    assert(good_mutex_unlock(&pool->mutex) == 0);
+    return len;
 }

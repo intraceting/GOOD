@@ -17,30 +17,11 @@
 typedef struct _good_pool
 {
     /**
-     * 互斥量和事件。
-    */
-    good_mutex_t mutex;
-
-    /**
-     * 类型。
+     * 池子。
      * 
      * @note 尽量不要直接修改。
     */
-    size_t type;
-
-    /**
-     * 数据表。
-     * 
-     * @note 尽量不要直接修改。
-    */
-    uint8_t *table;
-
-    /**
-     * 索引队列。
-     * 
-     * @note 尽量不要直接修改。
-    */
-    ssize_t *queue;
+    good_allocator_t *table;
 
     /**
      * 队列长度。
@@ -63,15 +44,6 @@ typedef struct _good_pool
     */
     size_t push_pos;
 
-    /**
-     * 使能状态。
-     * 
-     * 0 禁用，!0 启用。
-     * 
-     * @note 尽量不要直接修改。
-    */
-    int enable;
-
 } good_pool_t;
 
 /**
@@ -79,44 +51,32 @@ typedef struct _good_pool
  * 
  * @warning 所有内存块必须全部在池内才能被销毁。
 */
-void good_pool_destroy(good_pool_t* pool);
+void good_pool_destroy(good_pool_t *pool);
 
 /**
- * 初始化一个空的池子。
+ * 初始化。
  * 
  * @param size 大小。
+ * @param number 数量。
  * 
  * @return 0 成功，!0 失败。
 */
-int good_pool_init(good_pool_t* pool,size_t size);
+int good_pool_init(good_pool_t *pool, size_t size, size_t number);
 
 /**
- * 拉取一个ID。
+ * 拉取数据。
  * 
- * @param timeout 超时(毫秒)。>= 0 成功或时间过期后返回，< 0 成功或出错后返回。
+ * @return >= 0 成功(读取数据长度)，< 0 失败(空了)。
  * 
- * @return > 0 成功(索引ID)，<= 0 失败。
- * 
- * @warning 使能状态为禁用时，返回失败。
 */
-ssize_t good_pool_pull(good_pool_t *pool, time_t timeout);
+ssize_t good_pool_pull(good_pool_t *pool, void *buf, size_t size);
 
 /**
- * 推送一个ID。
+ * 推送数据。
  * 
- * @param id 索引ID。
+ * @return >= 0 成功(写入数据长度)，< 失败(满了)。
  * 
- * @return  0 成功，-1 失败。
- * 
- * @warning 不受使能状态影响。
 */
-int good_pool_push(good_pool_t *pool, ssize_t id);
-
-/** 
- * 设置使能状态。
- * 
- * @param enable !0 启用，0 禁用。
-*/
-void good_pool_enable(good_pool_t *pool,int enable);
+ssize_t good_pool_push(good_pool_t *pool, const void *buf, size_t size);
 
 #endif //GOOD_UTIL_POOL_H
