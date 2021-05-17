@@ -33,14 +33,13 @@ int good_pool_init(good_pool_t *pool, size_t size, size_t number)
 ssize_t good_pool_pull(good_pool_t *pool, void *buf, size_t size)
 {
     ssize_t len = -1;
-    int chk;
 
     assert(pool != NULL && buf > 0 && size > 0);
 
     /*池不能是空的。*/
     if (pool->count > 0)
     {
-        /*按游标位置从数据表中读取数据。*/
+        /*按游标位置从池子中读取数据。*/
         len = GOOD_MIN(pool->table->sizes[pool->pull_pos], size);
         memcpy(buf, pool->table->pptrs[pool->pull_pos], len);
 
@@ -63,7 +62,7 @@ ssize_t good_pool_push(good_pool_t *pool, const void *buf, size_t size)
     /*池不能是满的。*/
     if (pool->count < pool->table->numbers)
     {
-        /*按游标位置向数据表中写入数据。*/
+        /*按游标位置向池子中写入数据。*/
         len = GOOD_MIN(pool->table->sizes[pool->push_pos], size);
         memcpy(pool->table->pptrs[pool->push_pos], buf, len);
 
