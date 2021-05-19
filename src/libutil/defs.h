@@ -63,6 +63,18 @@
 #include <net/if.h>
 
 /**
+ * 主版本号。
+ * 
+*/
+#define GOOD_UTIL_VERSION_MAJOR 1
+
+/** 
+ * 副版本号。
+ * 
+*/
+#define GOOD_UTIL_VERSION_MINOR 0
+
+/**
  * 转换指针类型。
  * 
  * @note 支持针地址偏移(Bytes)。
@@ -82,6 +94,7 @@
 #define GOOD_PTR2U64PTR(PTR, OF) GOOD_PTR2PTR(uint64_t, PTR, OF)
 #define GOOD_PTR2SIZEPTR(PTR, OF) GOOD_PTR2PTR(ssize_t, PTR, OF)
 #define GOOD_PTR2USIZEPTR(PTR, OF) GOOD_PTR2PTR(size_t, PTR, OF)
+
 /**
  * 转换指针对象。
  * 

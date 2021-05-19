@@ -29,6 +29,11 @@ function copyToDir()
 ##
 SHELL_PWD=$(cd `dirname $0`; pwd)
 DATE_TIME=$(date +"%Y.%m.%d.%H%M%S")
+
+#
+VERSION_MAJOR="1"
+VERSION_MINOR="0"
+
 #
 HOST_PLATFORM=$(uname -m)
 TARGET_PLATFORM=${HOST_PLATFORM}
@@ -40,7 +45,7 @@ DEPEND_FUNC="Nothing"
 #
 function PrintUsage()
 {
-    echo "usage: [ < -b ARGS > < -p ARGS >  < -c ARGS > ]"
+    echo "usage: [ < -t ARGS > < -b ARGS > < -p ARGS > < -d ARGS > ]"
     echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
     echo "  -b 编译路径。默认：${BUILD_PATH}"
     echo "  -p 发行路径。默认：${PACKAGE_PATH}"
@@ -70,6 +75,14 @@ do
 done
 
 #
+echo "SHELL_PWD=${SHELL_PWD}"
+echo "DATE_TIME=${DATE_TIME}"
+
+#
+echo "VERSION_MAJOR=${VERSION_MAJOR}"
+echo "VERSION_MINOR=${VERSION_MINOR}"
+
+#
 echo "HOST_PLATFORM=${HOST_PLATFORM}"
 echo "TARGET_PLATFORM=${TARGET_PLATFORM}"
 echo "BUILD_PATH=${BUILD_PATH}"
@@ -78,8 +91,31 @@ echo "DEPEND_FUNC=${DEPEND_FUNC}"
 
 #
 export PKG_CONFIG_PATH=${PKG_PATH}
+
 #
 TMP_PATH=/tmp/good-publish/good/
 
 #
 ${SHELL_PWD}/src/configure.sh ${DEPEND_FUNC}
+checkReturnCode
+
+#
+make -C ${SHELL_PWD}/src/  "VERSION_MAJOR=${VERSION_MAJOR}" "VERSION_MINOR=${VERSION_MINOR}"
+checkReturnCode
+
+#
+make -C ${SHELL_PWD}/src/ install "INSTALL_PATH=${TMP_PATH}"
+checkReturnCode
+
+#
+mkdir -p ${PACKAGE_PATH}
+checkReturnCode
+
+#
+tar -czv -f "${PACKAGE_PATH}/good-${VERSION_MAJOR}.${VERSION_MINOR}-${TARGET_PLATFORM}.tar.gz" -C "${TMP_PATH}/../" "good"
+checkReturnCode
+
+#
+if [ ${TMP_PATH:0:4} == "/tmp" ];then
+rm -rf ${TMP_PATH}
+fi

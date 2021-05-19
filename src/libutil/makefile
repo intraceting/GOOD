@@ -3,11 +3,18 @@ MAKEFILE_FILE = $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKEFILE_PWD = $(dir $(MAKEFILE_FILE))
 
 #
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
+
+#
 PROJECT_NAME = libutil
-PROJECT_VERSION ?= devel
 BUILD_TYPE ?= release
 BUILD_PATH ?= ${MAKEFILE_PWD}/../build/
 INSTALL_PATH ?= /usr/local/
+
+#
+SONAME = libgood_util.so
+SOREALNAME = ${SONAME}.${VERSION_MAJOR}.${VERSION_MINOR}
 
 #
 # Common definitions
@@ -23,14 +30,17 @@ CCC_FLAGS = -fPIC -Wno-unused-result -MMD -MP -MF "$@.mdep"
 LINK_FLAGS = -Wl,--as-needed -Wl,-rpath="./"
 
 #
+LINK_FLAGS = -Wl,--soname,${SONAME}
+
+#
+CCC_FLAGS += -DBUILD_VERSION_MAJOR=${VERSION_MAJOR} -DBUILD_VERSION_MINOR=${VERSION_MINOR}
+
+#
 ifeq ($(BUILD_TYPE),debug)
 CCC_FLAGS += -g
 else 
 CCC_FLAGS += -s -O2
 endif
-
-#
-CCC_FLAGS += -DCWUTIL_VERSION_STR=\"${PROJECT_VERSION}\"
 
 #
 CCC_FLAGS += `pkg-config --cflags depend`
@@ -73,14 +83,13 @@ OBJ_FILES = \
 
 #
 all: ${PROJECT_NAME}
-#
-${PROJECT_NAME}: $(BUILD_PATH)/libgood_util.so
 
 #
-$(BUILD_PATH)/libgood_util.so: $(OBJ_FILES)
+${PROJECT_NAME}: $(OBJ_FILES)
 	mkdir -p $(BUILD_PATH)
 	rm -f $@
-	$(CCC) -o "$@" $^ $(LINK_FLAGS) -shared
+	$(CCC) -o $(BUILD_PATH)/${SOREALNAME} $^ $(LINK_FLAGS) -shared
+	ln -f -s ${SOREALNAME} $(BUILD_PATH)/${SONAME}
 
 #
 $(OBJ_PATH)/%.o: %.c
@@ -91,7 +100,8 @@ $(OBJ_PATH)/%.o: %.c
 #
 clean:
 	rm -rf $(OBJ_PATH)
-	rm -f $(BUILD_PATH)/libgood_util.so
+	rm -f $(BUILD_PATH)/${SOREALNAME}
+	rm -f $(BUILD_PATH)/${SONAME}
 
 #
 INSTALL_PATH_INC = ${INSTALL_PATH}/include/${PROJECT_NAME}/
@@ -102,7 +112,9 @@ INSTALL_PATH_BIN = ${INSTALL_PATH}/bin/
 install:
 #
 	mkdir -p ${INSTALL_PATH_LIB}
-	cp  $(BUILD_PATH)/libgood_util.so ${INSTALL_PATH_LIB}/
+	cp -f $(BUILD_PATH)/${SOREALNAME} ${INSTALL_PATH_LIB}/
+	ln -f -s ${SOREALNAME} ${INSTALL_PATH_LIB}/${SONAME}
+
 #
 	mkdir -p ${INSTALL_PATH_INC}/
 	cp  *.h ${INSTALL_PATH_INC}/
@@ -110,12 +122,17 @@ install:
 uninstall:
 #
 	rm -f ${INSTALL_PATH_INC}/*.h
+
 #
-	rm -f ${INSTALL_PATH_LIB}/libgood_util.so
+	rm -f ${INSTALL_PATH_LIB}/${SOREALNAME}
+	rm -f ${INSTALL_PATH_LIB}/${SONAME}
 #
 help:
 #
 	$(info  `MAKEFILE_PWD = ${MAKEFILE_PWD}')
+#
+	$(info  `VERSION_MAJOR = ${VERSION_MAJOR}')
+	$(info  `VERSION_MINOR = ${VERSION_MINOR}')
 #
 	$(info  `PROJECT_NAME = ${PROJECT_NAME}')
 	$(info  `PROJECT_VERSION ?= ${PROJECT_VERSION}')

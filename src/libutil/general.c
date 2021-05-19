@@ -8,6 +8,20 @@
 
 /*------------------------------------------------------------------------------------------------*/
 
+/*
+ * 检查内外版本号是否一致。
+*/
+#if GOOD_UTIL_VERSION_MAJOR != BUILD_VERSION_MAJOR
+#error "GOOD_UTIL_VERSION_MAJOR must be equal to BUILD_VERSION_MAJOR"
+#endif
+
+#if GOOD_UTIL_VERSION_MINOR != BUILD_VERSION_MINOR
+#error "GOOD_UTIL_VERSION_MINOR must be equal to BUILD_VERSION_MINOR"
+#endif
+
+
+/*------------------------------------------------------------------------------------------------*/
+
 size_t good_align(size_t size, size_t align)
 {
     size_t padding = 0;
