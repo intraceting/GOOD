@@ -1,6 +1,7 @@
 # GOOD
 
-good, good, good.
+Not bad.
+---------------------
 
 ## libutil 工具包。
 
