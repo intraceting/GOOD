@@ -95,7 +95,7 @@ DEPEND_FUNC="xxxxxxxxxx"
 #
 function PrintUsage()
 {
-    echo "usage: [ < -p ARGS > < -b ARGS > < -c ARGS > ]"
+    echo "usage: [ < -b ARGS > < -t ARGS > < -d ARGS > ]"
     echo "  -b 编译路径。默认：${BUILD_PATH}"
     echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
     echo "  -d 依赖包。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"

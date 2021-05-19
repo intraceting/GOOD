@@ -35,9 +35,6 @@ CCC_FLAGS += -s -O2
 endif
 
 #
-CCC_FLAGS += -D_GNU_SOURCE
-
-#
 CCC_FLAGS += `pkg-config --cflags libutil`
 
 #

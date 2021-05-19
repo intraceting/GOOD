@@ -46,11 +46,12 @@ DEPEND_FUNC="Nothing"
 function PrintUsage()
 {
     echo "usage: [ < -t ARGS > < -b ARGS > < -p ARGS > < -d ARGS > ]"
-    echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
     echo "  -b 编译路径。默认：${BUILD_PATH}"
+    echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
     echo "  -p 发行路径。默认：${PACKAGE_PATH}"
     echo "  -d 依赖包。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
 }
+
 #
 while getopts "b:t:p:d:?" ARGKEY
 do
