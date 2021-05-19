@@ -98,7 +98,7 @@ function PrintUsage()
     echo "usage: [ < -p ARGS > < -b ARGS > < -c ARGS > ]"
     echo "  -b 编译路径。默认：${BUILD_PATH}"
     echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
-    echo "  -d 依赖包。关键字：have-unixodbc,have-sqlite,have-openssl"
+    echo "  -d 依赖包。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
 }
 
 #
@@ -140,12 +140,21 @@ DEPEND_PC=${PKG_PATH}/depend.pc
 LIBUTIL_PC=${PKG_PATH}/libutil.pc
 
 #
-DEPEND_PKG_FLAGS=" ${DEPEND_PKG_FLAGS} -fopenmp"
+
 DEPEND_PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_PKG_FLAGS}"
 
 #
-DEPEND_PKG_LIBS=" ${DEPEND_PKG_LIBS} -fopenmp"
+
 DEPEND_PKG_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_PKG_LIBS}"
+
+#
+if [ $(checkKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
+{
+    HAVE_OPENMP=1
+    DEPEND_PKG_FLAGS=" -DHAVE_OPENMP -fopenmp ${DEPEND_PKG_FLAGS}"
+    DEPEND_PKG_LIBS="  -fopenmp ${DEPEND_PKG_LIBS}"
+}
+fi
 
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
@@ -189,6 +198,7 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
 fi
 
 #
+echo "HAVE_OPENMP=${HAVE_OPENMP}"
 echo "HAVE_UNIXODBC=${HAVE_UNIXODBC}"
 echo "HAVE_SQLITE=${HAVE_SQLITE}"
 echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
