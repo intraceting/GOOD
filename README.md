@@ -8,15 +8,6 @@
 * GOOD is MIT-licensed.
 
 ## 编译发行
-```
-publish.sh
-```
 
-## 发行帮助
-```
-publish.sh -?
-```
-
-
-
-
+* $./publish.sh -?
+* $./publish.sh
