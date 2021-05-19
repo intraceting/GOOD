@@ -35,8 +35,6 @@ VERSION_MAJOR="1"
 VERSION_MINOR="0"
 
 #
-HOST_PLATFORM=$(uname -m)
-TARGET_PLATFORM=${HOST_PLATFORM}
 PACKAGE_PATH=${SHELL_PWD}/package/
 BUILD_PATH=${SHELL_PWD}/src/build/
 PKG_PATH=${BUILD_PATH}/pkgconfig/
@@ -45,11 +43,10 @@ DEPEND_FUNC="Nothing"
 #
 function PrintUsage()
 {
-    echo "usage: [ < -t ARGS > < -b ARGS > < -p ARGS > < -d ARGS > ]"
-    echo "  -b 编译路径。默认：${BUILD_PATH}"
-    echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
-    echo "  -p 发行路径。默认：${PACKAGE_PATH}"
-    echo "  -d 依赖包。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
+    echo "usage: [ < -b ARGS > < -p ARGS > < -d ARGS > ]"
+    echo -e "\n  -p 发行路径。默认：${PACKAGE_PATH}"
+    echo -e "\n  -b 编译路径。默认：${BUILD_PATH}"
+    echo -e "\n  -d 依赖组件。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
 }
 
 #
@@ -58,9 +55,6 @@ do
     case $ARGKEY in
     b)
         BUILD_PATH=$(realpath "${OPTARG}/")
-    ;;
-    t)
-        TARGET_PLATFORM="$OPTARG"
     ;;
     p)
         PACKAGE_PATH="$OPTARG"
@@ -84,8 +78,6 @@ echo "VERSION_MAJOR=${VERSION_MAJOR}"
 echo "VERSION_MINOR=${VERSION_MINOR}"
 
 #
-echo "HOST_PLATFORM=${HOST_PLATFORM}"
-echo "TARGET_PLATFORM=${TARGET_PLATFORM}"
 echo "BUILD_PATH=${BUILD_PATH}"
 echo "PACKAGE_PATH=${PACKAGE_PATH}"
 echo "DEPEND_FUNC=${DEPEND_FUNC}"

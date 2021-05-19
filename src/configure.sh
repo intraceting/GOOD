@@ -86,19 +86,16 @@ SHELL_PWD=$(cd `dirname $0`; pwd)
 DATE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
 
 #
-HOST_PLATFORM=$(uname -m)
-TARGET_PLATFORM=$(uname -m)
 BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
 PKG_PATH=${BUILD_PATH}/pkgconfig/
-DEPEND_FUNC="xxxxxxxxxx"
+DEPEND_FUNC="Nothing"
 
 #
 function PrintUsage()
 {
-    echo "usage: [ < -b ARGS > < -t ARGS > < -d ARGS > ]"
-    echo "  -b 编译路径。默认：${BUILD_PATH}"
-    echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
-    echo "  -d 依赖包。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
+    echo "usage: [ < -b ARGS > < -d ARGS > ]"
+    echo -e "\n  -b 编译路径。默认：${BUILD_PATH}"
+    echo -e "\n  -d 依赖组件。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
 }
 
 #
@@ -127,8 +124,6 @@ exit 22
 fi 
 
 #
-echo "HOST_PLATFORM=${HOST_PLATFORM}"
-echo "TARGET_PLATFORM=${TARGET_PLATFORM}"
 echo "BUILD_PATH=${BUILD_PATH}"
 echo "PKG_PATH=${PKG_PATH}"
 
@@ -140,11 +135,9 @@ DEPEND_PC=${PKG_PATH}/depend.pc
 LIBUTIL_PC=${PKG_PATH}/libutil.pc
 
 #
-
 DEPEND_PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_PKG_FLAGS}"
 
 #
-
 DEPEND_PKG_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_PKG_LIBS}"
 
 #
@@ -205,7 +198,6 @@ echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
 
 #
 echo "Name: 3Party" > ${DEPEND_PC}
-echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${DEPEND_PC}
 echo "Version: ${DATE_TIME}" >> ${DEPEND_PC}
 echo "Cflags: ${DEPEND_PKG_FLAGS}" >> ${DEPEND_PC}
 echo "Libs: ${DEPEND_PKG_LIBS}" >> ${DEPEND_PC}
@@ -216,7 +208,6 @@ LIBUTIL_PKG_LIBS=" -lgood_util -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ $
 
 #
 echo "Name: libutil" > ${LIBUTIL_PC}
-echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBUTIL_PC}
 echo "Version: ${DATE_TIME}" >> ${LIBUTIL_PC}
 echo "Cflags: ${LIBUTIL_PKG_FLAGS}" >> ${LIBUTIL_PC}
 echo "Libs: ${LIBUTIL_PKG_LIBS}" >> ${LIBUTIL_PC}

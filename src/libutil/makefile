@@ -16,11 +16,10 @@ INSTALL_PATH ?= /usr/local/
 SONAME = libgood_util.so
 SOREALNAME = ${SONAME}.${VERSION_MAJOR}.${VERSION_MINOR}
 
-#
-# Common definitions
+#Compiler
 CCC = gcc
 
-# 
+#Standard
 CCC_STD = -std=c11
 
 #-Werror -Wall -Wextra
@@ -136,6 +135,8 @@ help:
 #
 	$(info  `PROJECT_NAME = ${PROJECT_NAME}')
 	$(info  `PROJECT_VERSION ?= ${PROJECT_VERSION}')
-	$(info  `BUILD_TYPE ?= ${BUILD_TYPE}'						[release|debug])
+	$(info  `BUILD_TYPE ?= ${BUILD_TYPE}'									[ release | debug ])
 	$(info  `BUILD_PATH ?= ${BUILD_PATH}')
 	$(info  `INSTALL_PATH ?= ${INSTALL_PATH}')
+
+
