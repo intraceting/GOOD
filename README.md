@@ -1,5 +1,5 @@
 
-GOOD: 用于C/C++语言在linux平台的扩展包。 
+GOOD: Linux C/C++ 应用程序开发催化剂。 
 
 Not bad.
 
