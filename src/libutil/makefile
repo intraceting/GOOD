@@ -33,10 +33,10 @@ endif
 CCC_FLAGS += -DCWUTIL_VERSION_STR=\"${PROJECT_VERSION}\"
 
 #
-CCC_FLAGS += `pkg-config --cflags ${PROJECT_NAME}-depend`
+CCC_FLAGS += `pkg-config --cflags depend`
 
 #
-LINK_FLAGS += `pkg-config --libs ${PROJECT_NAME}-depend`
+LINK_FLAGS += `pkg-config --libs depend`
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
@@ -117,7 +117,7 @@ help:
 #
 	$(info  `MAKEFILE_PWD = ${MAKEFILE_PWD}')
 #
-	$(info  `PROJECT_NAME ?= ${PROJECT_NAME}')
+	$(info  `PROJECT_NAME = ${PROJECT_NAME}')
 	$(info  `PROJECT_VERSION ?= ${PROJECT_VERSION}')
 	$(info  `BUILD_TYPE ?= ${BUILD_TYPE}'						[release|debug])
 	$(info  `BUILD_PATH ?= ${BUILD_PATH}')

@@ -1,4 +1,12 @@
 #!/bin/bash
+
+##
+#
+# This file is part of GOOD.
+#  
+# MIT License
+##
+
 #
 function CheckSystemName()
 # $1 System Name
@@ -64,6 +72,15 @@ function CheckHavePackage()
 	echo "${HAVE_NUM}"
 }
 
+#
+function checkKeyword()
+# $1 keywords
+# $2 word
+{
+	NUM=$(echo "$1" |grep -i "$2" | wc -l)
+    echo ${NUM}
+}
+
 ##
 SHELL_PWD=$(cd `dirname $0`; pwd)
 DATE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
@@ -73,24 +90,29 @@ HOST_PLATFORM=$(uname -m)
 TARGET_PLATFORM=$(uname -m)
 BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
 PKG_PATH=${BUILD_PATH}/pkgconfig/
+DEPEND_FUNC="xxxxxxxxxx"
 
 #
 function PrintUsage()
 {
     echo "usage: [ < -p ARGS > < -b ARGS > < -c ARGS > ]"
-    echo "  -p 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
     echo "  -b 编译路径。默认：${BUILD_PATH}"
+    echo "  -t 目标平台(x86_64 | aarch64)。默认：${TARGET_PLATFORM}"
+    echo "  -d 依赖包。关键字：have-unixodbc,have-sqlite,have-openssl"
 }
 
 #
-while getopts "p:b:?" ARGKEY 
+while getopts "b:t:d:?" ARGKEY 
 do
     case $ARGKEY in
     b)
         BUILD_PATH=$(realpath "${OPTARG}/")
     ;;
-    p)
+    t)
         TARGET_PLATFORM="$OPTARG"
+    ;;
+    d)
+        DEPEND_FUNC="$OPTARG"
     ;;
     \?)
         PrintUsage
@@ -114,34 +136,56 @@ echo "PKG_PATH=${PKG_PATH}"
 mkdir -p "${PKG_PATH}"
 
 #
-LIBUTIL_DEPEND_PC=${PKG_PATH}/libutil-depend.pc
+DEPEND_PC=${PKG_PATH}/depend.pc
 LIBUTIL_PC=${PKG_PATH}/libutil.pc
 
 #
-PKG_FLAGS=" ${PKG_FLAGS} -fopenmp"
-PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${PKG_FLAGS}"
-#
-PKG_LIBS=" ${PKG_LIBS} -fopenmp"
-PKG_LIBS="-ldl -pthread -lrt -lc -lm ${PKG_LIBS}"
+DEPEND_PKG_FLAGS=" ${DEPEND_PKG_FLAGS} -fopenmp"
+DEPEND_PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_PKG_FLAGS}"
 
 #
-HAVE_UNIXODBC=$(CheckHavePackage "unixodbc-dev|unixODBC-devel")
-if [ ${HAVE_UNIXODBC} -ge 1 ];then
-PKG_LIBS=" -lodbc ${PKG_LIBS}"
+DEPEND_PKG_LIBS=" ${DEPEND_PKG_LIBS} -fopenmp"
+DEPEND_PKG_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_PKG_LIBS}"
+
+#
+if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
+{
+    HAVE_UNIXODBC=$(CheckHavePackage "unixodbc-dev|unixODBC-devel")
+    if [ ${HAVE_UNIXODBC} -ge 1 ];then
+    {
+        DEPEND_PKG_FLAGS=" -DHAVE_UNIXODBC ${DEPEND_PKG_FLAGS}"
+        DEPEND_PKG_LIBS=" -lodbc ${DEPEND_PKG_LIBS}"
+    }
+    fi
+}
 fi
 
 #
-HAVE_SQLITE=$(CheckHavePackage "libsqlite3-dev|sqlite-devel")
-if [ ${HAVE_SQLITE} -ge 1 ];then
-PKG_FLAGS=" $(pkg-config --cflags sqlite3) ${PKG_FLAGS}"
-PKG_LIBS=" $(pkg-config --libs sqlite3) ${PKG_LIBS}"
+if [ $(checkKeyword ${DEPEND_FUNC} "have-sqlite") -eq 1 ];then
+{
+    HAVE_SQLITE=$(CheckHavePackage "libsqlite3-dev|sqlite-devel")
+    if [ ${HAVE_SQLITE} -ge 1 ];then
+    {
+        DEPEND_PKG_FLAGS=" -DHAVE_SQLITE ${DEPEND_PKG_FLAGS}"
+        DEPEND_PKG_FLAGS=" $(pkg-config --cflags sqlite3) ${DEPEND_PKG_FLAGS}"
+        DEPEND_PKG_LIBS=" $(pkg-config --libs sqlite3) ${DEPEND_PKG_LIBS}"
+    }
+    fi
+}
 fi
 
 #
-HAVE_OPENSSL=$(CheckHavePackage "libssl-dev|openssl-devel")
-if [ ${HAVE_OPENSSL} -ge 1 ];then
-PKG_FLAGS=" $(pkg-config --cflags openssl) ${PKG_FLAGS}"
-PKG_LIBS=" $(pkg-config --libs openssl) ${PKG_LIBS}"
+if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
+{
+    HAVE_OPENSSL=$(CheckHavePackage "libssl-dev|openssl-devel")
+    if [ ${HAVE_OPENSSL} -ge 1 ];then
+    {
+        DEPEND_PKG_FLAGS=" -DHAVE_OPENSSL ${DEPEND_PKG_FLAGS}"
+        DEPEND_PKG_FLAGS=" $(pkg-config --cflags openssl) ${DEPEND_PKG_FLAGS}"
+        DEPEND_PKG_LIBS=" $(pkg-config --libs openssl) ${DEPEND_PKG_LIBS}"
+    }
+    fi
+}
 fi
 
 #
@@ -150,20 +194,19 @@ echo "HAVE_SQLITE=${HAVE_SQLITE}"
 echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
 
 #
-echo "Name: libutil dependent item" > ${LIBUTIL_DEPEND_PC}
-echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBUTIL_DEPEND_PC}
-echo "Version: ${DATE_TIME}" >> ${LIBUTIL_DEPEND_PC}
-echo "Cflags: ${PKG_FLAGS}" >> ${LIBUTIL_DEPEND_PC}
-echo "Libs: ${PKG_LIBS}" >> ${LIBUTIL_DEPEND_PC}
+echo "Name: 3Party" > ${DEPEND_PC}
+echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${DEPEND_PC}
+echo "Version: ${DATE_TIME}" >> ${DEPEND_PC}
+echo "Cflags: ${DEPEND_PKG_FLAGS}" >> ${DEPEND_PC}
+echo "Libs: ${DEPEND_PKG_LIBS}" >> ${DEPEND_PC}
 
 #
-PKG_FLAGS=" -I${SHELL_PWD} ${PKG_FLAGS}"
-PKG_LIBS=" -lgood_util ${PKG_LIBS}"
-PKG_LIBS=" -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ ${PKG_LIBS}"
+LIBUTIL_PKG_FLAGS=" -I${SHELL_PWD} ${DEPEND_PKG_FLAGS}"
+LIBUTIL_PKG_LIBS=" -lgood_util -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ ${DEPEND_PKG_LIBS}"
 
 #
 echo "Name: libutil" > ${LIBUTIL_PC}
 echo "Description: HOST_PLATFORM=${HOST_PLATFORM} TARGET_PLATFORM=${TARGET_PLATFORM}" >> ${LIBUTIL_PC}
 echo "Version: ${DATE_TIME}" >> ${LIBUTIL_PC}
-echo "Cflags: ${PKG_FLAGS}" >> ${LIBUTIL_PC}
-echo "Libs: ${PKG_LIBS}" >> ${LIBUTIL_PC}
+echo "Cflags: ${LIBUTIL_PKG_FLAGS}" >> ${LIBUTIL_PC}
+echo "Libs: ${LIBUTIL_PKG_LIBS}" >> ${LIBUTIL_PC}
