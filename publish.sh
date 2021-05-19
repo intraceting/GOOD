@@ -37,7 +37,6 @@ VERSION_MINOR="0"
 
 #
 HOST_PLATFORM=$(uname -m)
-TARGET_PLATFORM=${HOST_PLATFORM}
 PACKAGE_PATH=${SHELL_PWD}/package/
 BUILD_PATH=${SHELL_PWD}/src/build/
 DEPEND_FUNC="Nothing"
@@ -92,6 +91,7 @@ echo "VERSION_MAJOR=${VERSION_MAJOR}"
 echo "VERSION_MINOR=${VERSION_MINOR}"
 
 #
+echo "HOST_PLATFORM=${HOST_PLATFORM}"
 echo "BUILD_PATH=${BUILD_PATH}"
 echo "PACKAGE_PATH=${PACKAGE_PATH}"
 echo "DEPEND_FUNC=${DEPEND_FUNC}"
@@ -119,7 +119,7 @@ mkdir -p ${PACKAGE_PATH}
 checkReturnCode
 
 #
-tar -czv -f "${PACKAGE_PATH}/good-${VERSION_MAJOR}.${VERSION_MINOR}-${TARGET_PLATFORM}.tar.gz" -C "${TMP_PATH}/../" "good"
+tar -czv -f "${PACKAGE_PATH}/good-${VERSION_MAJOR}.${VERSION_MINOR}-${HOST_PLATFORM}.tar.gz" -C "${TMP_PATH}/../" "good"
 checkReturnCode
 
 #
