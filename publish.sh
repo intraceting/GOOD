@@ -15,6 +15,7 @@ function checkReturnCode()
         exit $rc
     fi
 }
+
 ##
 # Functions
 function copyToDir()
@@ -37,7 +38,6 @@ VERSION_MINOR="0"
 #
 PACKAGE_PATH=${SHELL_PWD}/package/
 BUILD_PATH=${SHELL_PWD}/src/build/
-PKG_PATH=${BUILD_PATH}/pkgconfig/
 DEPEND_FUNC="Nothing"
 
 #
@@ -57,7 +57,7 @@ do
         BUILD_PATH=$(realpath "${OPTARG}/")
     ;;
     p)
-        PACKAGE_PATH="$OPTARG"
+        PACKAGE_PATH=$(realpath "${OPTARG}/")
     ;;
     d)
         DEPEND_FUNC="$OPTARG"
@@ -68,6 +68,18 @@ do
     ;;
     esac
 done
+
+#
+if [ ! -d ${BUILD_PATH} ];then
+echo "'${BUILD_PATH}' must be an existing directory."
+exit 22
+fi 
+
+#
+if [ ! -d ${PACKAGE_PATH} ];then
+echo "'${PACKAGE_PATH}' must be an existing directory."
+exit 22
+fi 
 
 #
 echo "SHELL_PWD=${SHELL_PWD}"
@@ -83,18 +95,18 @@ echo "PACKAGE_PATH=${PACKAGE_PATH}"
 echo "DEPEND_FUNC=${DEPEND_FUNC}"
 
 #
-export PKG_CONFIG_PATH=${PKG_PATH}
+export PKG_CONFIG_PATH="${BUILD_PATH}/pkgconfig/"
+
+#
+${SHELL_PWD}/src/configure.sh -b ${BUILD_PATH} -d ${DEPEND_FUNC}
+checkReturnCode
+
+#
+make -C ${SHELL_PWD}/src/ "VERSION_MAJOR=${VERSION_MAJOR}" "VERSION_MINOR=${VERSION_MINOR}" "BUILD_PATH=${BUILD_PATH}"
+checkReturnCode
 
 #
 TMP_PATH=/tmp/good-publish/good/
-
-#
-${SHELL_PWD}/src/configure.sh ${DEPEND_FUNC}
-checkReturnCode
-
-#
-make -C ${SHELL_PWD}/src/  "VERSION_MAJOR=${VERSION_MAJOR}" "VERSION_MINOR=${VERSION_MINOR}"
-checkReturnCode
 
 #
 make -C ${SHELL_PWD}/src/ install "INSTALL_PATH=${TMP_PATH}"

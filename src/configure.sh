@@ -7,6 +7,15 @@
 # MIT License
 ##
 
+# Functions
+function checkReturnCode()
+{
+    rc=$?
+    if [ $rc != 0 ];then
+        exit $rc
+    fi
+}
+
 #
 function CheckSystemName()
 # $1 System Name
@@ -87,7 +96,6 @@ DATE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
 
 #
 BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
-PKG_PATH=${BUILD_PATH}/pkgconfig/
 DEPEND_FUNC="Nothing"
 
 #
@@ -105,9 +113,6 @@ do
     b)
         BUILD_PATH=$(realpath "${OPTARG}/")
     ;;
-    t)
-        TARGET_PLATFORM="$OPTARG"
-    ;;
     d)
         DEPEND_FUNC="$OPTARG"
     ;;
@@ -117,6 +122,7 @@ do
     ;;
     esac
 done
+
 #
 if [ ! -d ${BUILD_PATH} ];then
 echo "'${BUILD_PATH}' must be an existing directory."
@@ -124,11 +130,15 @@ exit 22
 fi 
 
 #
-echo "BUILD_PATH=${BUILD_PATH}"
-echo "PKG_PATH=${PKG_PATH}"
+PKG_PATH="${BUILD_PATH}/pkgconfig/"
 
 #
 mkdir -p "${PKG_PATH}"
+checkReturnCode
+
+#
+echo "BUILD_PATH=${BUILD_PATH}"
+echo "PKG_PATH=${PKG_PATH}"
 
 #
 DEPEND_PC=${PKG_PATH}/depend.pc
@@ -198,6 +208,7 @@ echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
 
 #
 echo "Name: 3Party" > ${DEPEND_PC}
+echo "Description: " >> ${DEPEND_PC}
 echo "Version: ${DATE_TIME}" >> ${DEPEND_PC}
 echo "Cflags: ${DEPEND_PKG_FLAGS}" >> ${DEPEND_PC}
 echo "Libs: ${DEPEND_PKG_LIBS}" >> ${DEPEND_PC}
@@ -208,6 +219,7 @@ LIBUTIL_PKG_LIBS=" -lgood_util -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ $
 
 #
 echo "Name: libutil" > ${LIBUTIL_PC}
+echo "Description: " >> ${LIBUTIL_PC}
 echo "Version: ${DATE_TIME}" >> ${LIBUTIL_PC}
 echo "Cflags: ${LIBUTIL_PKG_FLAGS}" >> ${LIBUTIL_PC}
 echo "Libs: ${LIBUTIL_PKG_LIBS}" >> ${LIBUTIL_PC}
