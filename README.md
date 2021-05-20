@@ -1,7 +1,7 @@
 
 # GOOD
 
-* Linux C/C++ 应用程序开发催化剂。 
+* Linux C 应用程序开发催化剂。 
 
 ## License
 
