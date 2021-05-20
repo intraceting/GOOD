@@ -25,8 +25,8 @@ void good_getargs(good_tree_t *opt, int argc, char *argv[],
  * 
  * 注释行将被忽略。
  * 
- * @param delim 分割符。
- * @param note 注释字符，可以为'\0'。
+ * @param delim 分割字符。
+ * @param note 注释字符。
  * @param argv0 命令字符串的指针，可以为NULL(0)。
  * 
 */
