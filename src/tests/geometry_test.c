@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/geometry.h"
+#include "goodutil/geometry.h"
 
 
 void test1()

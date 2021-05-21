@@ -1,14 +1,16 @@
 #!/bin/bash
-
-##
 #
 # This file is part of GOOD.
 #  
 # MIT License
 ##
 
+#
+LC_ALL=C
+export LC_ALL
+
 # Functions
-function checkReturnCode()
+checkReturnCode()
 {
     rc=$?
     if [ $rc != 0 ];then
@@ -17,13 +19,12 @@ function checkReturnCode()
 }
 
 #
-function CheckSystemName()
+CheckSystemName()
 # $1 System Name
 {
 	SYS_NAME=$1
 #	lsb_release -is | grep -iE "${SYS_NAME}" |wc -l
-	if [ -s /etc/redhat-release ]
-	then
+	if [ -s /etc/redhat-release ];then
 		cat /etc/redhat-release | grep -iE "${SYS_NAME}" |wc -l
 	else
 		cat /etc/issue | grep -iE "${SYS_NAME}" |wc -l
@@ -31,13 +32,11 @@ function CheckSystemName()
 }
 
 #
-function CheckPackageKitName()
+CheckPackageKitName()
 {
-	if [ $(CheckSystemName "Ubuntu|Debian") -ge 1 ]
-	then
+	if [ $(CheckSystemName "Ubuntu|Debian") -ge 1 ];then
 		echo "DEB"
-	elif [ $(CheckSystemName "CentOS|Red Hat|RedHat|Amazon|Oracle") -ge 1 ]
-	then
+	elif [ $(CheckSystemName "CentOS|Red Hat|RedHat|Amazon|Oracle") -ge 1 ];then
 		echo "RPM"
 	else
 		echo ""
@@ -45,44 +44,25 @@ function CheckPackageKitName()
 }
 
 #
-function CheckHavePackage()
-# $1 name(aaaa|bbbb|ccccc|ddddd)
+CheckHavePackage()
+# $1 KIT_NAME
+# $2 DEB_NAME
+# $3 RPM_NAME
 {
-	#
-	SYS_CONF=$(CheckPackageKitName)
-	#用“|”分割包名字
-	OLD_IFS="$IFS"
-	IFS="|"
-	DEP_NAMES=($1)
-	IFS="$OLD_IFS"
-	#
-	DEP_HAVE=""
-    HAVE_NUM=0
-	#
-	for DEP_NAME in ${DEP_NAMES[@]}
-	do
-		#
-		if [ ${SYS_CONF} == "RPM" ]
-		then 
-			DEP_HAVE=$(rpm -qa |grep ${DEP_NAME} | wc -l )
-		elif [ ${SYS_CONF} == "DEB" ]
-		then
-			DEP_HAVE=$(dpkg -l |grep ${DEP_NAME} | wc -l )
-		else
-			exit 22;
-		fi
-		# 
-		if [ ${DEP_HAVE} -ge 1 ]
-		then
-			HAVE_NUM=$(expr ${HAVE_NUM} + 1)
-		fi
-	done
+    #
+    HAVE_NUM="0"
+    #
+	if [ "DEB" == "$1" ];then 
+		HAVE_NUM=$(dpkg -l |grep $2 | wc -l)
+	elif [ "RPM" == "$1" ];then
+		HAVE_NUM=$(rpm -qa |grep $3 | wc -l)
+    fi 
 	#
 	echo "${HAVE_NUM}"
 }
 
 #
-function checkKeyword()
+checkKeyword()
 # $1 keywords
 # $2 word
 {
@@ -90,31 +70,44 @@ function checkKeyword()
     echo ${NUM}
 }
 
-##
+#
 SHELL_PWD=$(cd `dirname $0`; pwd)
 DATE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
+KIT_NAME=$(CheckPackageKitName)
 
 #
 BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
-DEPEND_FUNC="Nothing"
+MAKE_CONF=${BUILD_PATH}/makefile.conf
 
 #
-function PrintUsage()
+DEPEND_FUNC="Nothing"
+BUILD_TYPE="release"
+INSTALL_PREFIX="/usr/local/good/"
+
+#
+PrintUsage()
 {
-    echo "usage: [ < -b ARGS > < -d ARGS > ]"
-    echo -e "\n  -b 编译路径。默认：${BUILD_PATH}"
-    echo -e "\n  -d 依赖组件。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
+    echo "usage: [ OPTIONS ]"
+    echo -e "\n\t-d < KEY,KEY,... >"
+    echo -e "\t\t依赖项目。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
+    echo -e "\n\t-g"
+    echo -e "\t\t生成调试符号。默认：关闭。"
+    echo -e "\n\t-i < PATH >"
+    echo -e "\t\t安装路径。默认：${INSTALL_PREFIX}"
 }
 
 #
-while getopts "b:t:d:?" ARGKEY 
+while getopts "d:gi:?" ARGKEY 
 do
     case $ARGKEY in
-    b)
-        BUILD_PATH=$(realpath "${OPTARG}/")
-    ;;
     d)
         DEPEND_FUNC="$OPTARG"
+    ;;
+    g)
+        BUILD_TYPE="debug"
+    ;;
+    i)
+        INSTALL_PREFIX=$(realpath "${OPTARG}/")
     ;;
     \?)
         PrintUsage
@@ -130,43 +123,31 @@ exit 22
 fi 
 
 #
-PKG_PATH="${BUILD_PATH}/pkgconfig/"
-
-#
-mkdir -p "${PKG_PATH}"
-checkReturnCode
-
-#
 echo "BUILD_PATH=${BUILD_PATH}"
-echo "PKG_PATH=${PKG_PATH}"
 
 #
-DEPEND_PC=${PKG_PATH}/depend.pc
-LIBUTIL_PC=${PKG_PATH}/libutil.pc
+DEPEND_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_FLAGS}"
 
 #
-DEPEND_PKG_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_PKG_FLAGS}"
-
-#
-DEPEND_PKG_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_PKG_LIBS}"
+DEPEND_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_LIBS}"
 
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
 {
     HAVE_OPENMP=1
-    DEPEND_PKG_FLAGS=" -DHAVE_OPENMP -fopenmp ${DEPEND_PKG_FLAGS}"
-    DEPEND_PKG_LIBS="  -fopenmp ${DEPEND_PKG_LIBS}"
+    DEPEND_FLAGS=" -DHAVE_OPENMP -fopenmp ${DEPEND_FLAGS}"
+    DEPEND_LIBS="  -fopenmp ${DEPEND_LIBS}"
 }
 fi
 
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
 {
-    HAVE_UNIXODBC=$(CheckHavePackage "unixodbc-dev|unixODBC-devel")
+    HAVE_UNIXODBC=$(CheckHavePackage ${KIT_NAME} unixodbc-dev unixODBC-devel)
     if [ ${HAVE_UNIXODBC} -ge 1 ];then
     {
-        DEPEND_PKG_FLAGS=" -DHAVE_UNIXODBC ${DEPEND_PKG_FLAGS}"
-        DEPEND_PKG_LIBS=" -lodbc ${DEPEND_PKG_LIBS}"
+        DEPEND_FLAGS=" -DHAVE_UNIXODBC ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" -lodbc ${DEPEND_LIBS}"
     }
     fi
 }
@@ -175,12 +156,12 @@ fi
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-sqlite") -eq 1 ];then
 {
-    HAVE_SQLITE=$(CheckHavePackage "libsqlite3-dev|sqlite-devel")
+    HAVE_SQLITE=$(CheckHavePackage ${KIT_NAME} libsqlite3-dev sqlite-devel)
     if [ ${HAVE_SQLITE} -ge 1 ];then
     {
-        DEPEND_PKG_FLAGS=" -DHAVE_SQLITE ${DEPEND_PKG_FLAGS}"
-        DEPEND_PKG_FLAGS=" $(pkg-config --cflags sqlite3) ${DEPEND_PKG_FLAGS}"
-        DEPEND_PKG_LIBS=" $(pkg-config --libs sqlite3) ${DEPEND_PKG_LIBS}"
+        DEPEND_FLAGS=" -DHAVE_SQLITE ${DEPEND_FLAGS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags sqlite3) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs sqlite3) ${DEPEND_LIBS}"
     }
     fi
 }
@@ -189,12 +170,12 @@ fi
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
 {
-    HAVE_OPENSSL=$(CheckHavePackage "libssl-dev|openssl-devel")
+    HAVE_OPENSSL=$(CheckHavePackage ${KIT_NAME} libssl-dev openssl-devel)
     if [ ${HAVE_OPENSSL} -ge 1 ];then
     {
-        DEPEND_PKG_FLAGS=" -DHAVE_OPENSSL ${DEPEND_PKG_FLAGS}"
-        DEPEND_PKG_FLAGS=" $(pkg-config --cflags openssl) ${DEPEND_PKG_FLAGS}"
-        DEPEND_PKG_LIBS=" $(pkg-config --libs openssl) ${DEPEND_PKG_LIBS}"
+        DEPEND_FLAGS=" -DHAVE_OPENSSL ${DEPEND_FLAGS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags openssl) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs openssl) ${DEPEND_LIBS}"
     }
     fi
 }
@@ -205,21 +186,20 @@ echo "HAVE_OPENMP=${HAVE_OPENMP}"
 echo "HAVE_UNIXODBC=${HAVE_UNIXODBC}"
 echo "HAVE_SQLITE=${HAVE_SQLITE}"
 echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
+echo "BUILD_TYPE=${BUILD_TYPE}"
+echo "INSTALL_PREFIX=${INSTALL_PREFIX}"
+
+
 
 #
-echo "Name: 3Party" > ${DEPEND_PC}
-echo "Description: " >> ${DEPEND_PC}
-echo "Version: ${DATE_TIME}" >> ${DEPEND_PC}
-echo "Cflags: ${DEPEND_PKG_FLAGS}" >> ${DEPEND_PC}
-echo "Libs: ${DEPEND_PKG_LIBS}" >> ${DEPEND_PC}
+echo "#" > ${MAKE_CONF}
+echo "# GOOD is good!" >> ${MAKE_CONF}
+echo "#" >> ${MAKE_CONF}
+echo "" >> ${MAKE_CONF}
 
 #
-LIBUTIL_PKG_FLAGS=" -I${SHELL_PWD} ${DEPEND_PKG_FLAGS}"
-LIBUTIL_PKG_LIBS=" -lgood_util -L${BUILD_PATH}/ -Wl,-rpath-link=${BUILD_PATH}/ ${DEPEND_PKG_LIBS}"
-
-#
-echo "Name: libutil" > ${LIBUTIL_PC}
-echo "Description: " >> ${LIBUTIL_PC}
-echo "Version: ${DATE_TIME}" >> ${LIBUTIL_PC}
-echo "Cflags: ${LIBUTIL_PKG_FLAGS}" >> ${LIBUTIL_PC}
-echo "Libs: ${LIBUTIL_PKG_LIBS}" >> ${LIBUTIL_PC}
+echo "BUILD_PATH=${BUILD_PATH}" >> ${MAKE_CONF}
+echo "DEPEND_FLAGS=${DEPEND_FLAGS}" >> ${MAKE_CONF}
+echo "DEPEND_LIBS=${DEPEND_LIBS}" >> ${MAKE_CONF}
+echo "BUILD_TYPE=${BUILD_TYPE}" >> ${MAKE_CONF}
+echo "INSTALL_PREFIX=${INSTALL_PREFIX}" >> ${MAKE_CONF}

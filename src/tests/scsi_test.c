@@ -8,10 +8,10 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/general.h"
-#include "libutil/scsi.h"
-#include "libutil/mtx.h"
-#include "libutil/mt.h"
+#include "goodutil/general.h"
+#include "goodutil/scsi.h"
+#include "goodutil/mtx.h"
+#include "goodutil/mt.h"
 
 void test_get_sn()
 {

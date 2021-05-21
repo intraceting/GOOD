@@ -9,8 +9,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
-#include "libutil/map.h"
-#include "libutil/buffer.h"
+#include "goodutil/map.h"
+#include "goodutil/buffer.h"
 
 
 int dump_tree(size_t deep, good_tree_t *node, void *opaque)

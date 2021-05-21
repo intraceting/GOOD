@@ -8,8 +8,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/general.h"
-#include "libutil/base64.h"
+#include "goodutil/general.h"
+#include "goodutil/base64.h"
 
 void test_bloom()
 {

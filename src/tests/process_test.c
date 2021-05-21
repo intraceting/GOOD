@@ -8,8 +8,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/general.h"
-#include "libutil/signal.h"
+#include "goodutil/general.h"
+#include "goodutil/signal.h"
 
 static int lock_fd = -1;
 static char lock_file[] = {"/tmp/test_process.lock"};

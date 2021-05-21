@@ -6,8 +6,3 @@
 ## License
 
 * GOOD is MIT-licensed.
-
-## Build
-
-* $./publish.sh -?
-* $./publish.sh

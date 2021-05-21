@@ -1,21 +1,21 @@
 #
-MAKEFILE_FILE := $(abspath $(lastword $(MAKEFILE_LIST)))
-MAKEFILE_PWD := $(dir $(MAKEFILE_FILE))
+MAKE_CONF ?= $(abspath $(CURDIR)/../build/makefile.conf)
 
 #
 PROJECT_NAME = tests
-PROJECT_VERSION ?= devel
-BUILD_TYPE ?= release
-BUILD_PATH ?= ${MAKEFILE_PWD}/../build/
+
+#加载配置项。
+include ${MAKE_CONF}
 
 #
-INSTALL_PATH ?= /usr/local/
-INSTALL_PATH_INC ?= ${INSTALL_PATH}/include/
-INSTALL_PATH_LIB ?= ${INSTALL_PATH}/lib/
-INSTALL_PATH_BIN ?= ${INSTALL_PATH}/bin/
+ifeq (${BUILD_PATH},)
+BUILD_PATH = $(abspath $(CURDIR)/../build/)
+else ifeq (${BUILD_PATH},"")
+BUILD_PATH = $(abspath $(CURDIR)/../build/)
+endif
 
 #
-# Common definitions
+#Compiler
 CCC = gcc
 
 # 
@@ -35,10 +35,10 @@ CCC_FLAGS += -s -O2
 endif
 
 #
-CCC_FLAGS += `pkg-config --cflags libutil`
+CCC_FLAGS += -I$(abspath $(CURDIR)/../) ${DEPEND_FLAGS}
 
 #
-LINK_FLAGS += `pkg-config --libs libutil`
+LINK_FLAGS += -lgoodutil -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
@@ -62,6 +62,7 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/option_test.exe \
 	$(BUILD_PATH)/scsi_test.exe
 
+#
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
 	mkdir -p $(BUILD_PATH)
 	rm -f $@

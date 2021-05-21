@@ -8,8 +8,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/tree.h"
-#include "libutil/buffer.h"
+#include "goodutil/tree.h"
+#include "goodutil/buffer.h"
 
 int dump(size_t deep, good_tree_t *node, void *opaque)
 {

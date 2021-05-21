@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/general.h"
+#include "goodutil/general.h"
 
 
 int main(int argc, char **argv)

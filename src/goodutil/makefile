@@ -1,20 +1,27 @@
 #
-MAKEFILE_FILE = $(abspath $(lastword $(MAKEFILE_LIST)))
-MAKEFILE_PWD = $(dir $(MAKEFILE_FILE))
+MAKE_CONF ?= $(abspath $(CURDIR)/../build/makefile.conf)
+
+#
+PROJECT_NAME = goodutil
 
 #
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
 
 #
-PROJECT_NAME = libutil
-BUILD_TYPE ?= release
-BUILD_PATH ?= ${MAKEFILE_PWD}/../build/
-INSTALL_PATH ?= /usr/local/
+SONAME = lib${PROJECT_NAME}.so
+SOREALNAME = ${SONAME}.${VERSION_MAJOR}.${VERSION_MINOR}
+PKGNAME = ${PROJECT_NAME}.pc
+
+#加载配置项。
+include ${MAKE_CONF}
 
 #
-SONAME = libgood_util.so
-SOREALNAME = ${SONAME}.${VERSION_MAJOR}.${VERSION_MINOR}
+ifeq (${BUILD_PATH},)
+BUILD_PATH = $(abspath $(CURDIR)/../build/)
+else ifeq (${BUILD_PATH},"")
+BUILD_PATH = $(abspath $(CURDIR)/../build/)
+endif
 
 #Compiler
 CCC = gcc
@@ -35,17 +42,17 @@ LINK_FLAGS = -Wl,--soname,${SONAME}
 CCC_FLAGS += -DBUILD_VERSION_MAJOR=${VERSION_MAJOR} -DBUILD_VERSION_MINOR=${VERSION_MINOR}
 
 #
-ifeq ($(BUILD_TYPE),debug)
+ifeq (${BUILD_TYPE},debug)
 CCC_FLAGS += -g
 else 
 CCC_FLAGS += -s -O2
 endif
 
 #
-CCC_FLAGS += `pkg-config --cflags depend`
+CCC_FLAGS += ${DEPEND_FLAGS}
 
 #
-LINK_FLAGS += `pkg-config --libs depend`
+LINK_FLAGS += ${DEPEND_LIBS}
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
@@ -103,9 +110,17 @@ clean:
 	rm -f $(BUILD_PATH)/${SONAME}
 
 #
-INSTALL_PATH_INC = ${INSTALL_PATH}/include/${PROJECT_NAME}/
-INSTALL_PATH_LIB = ${INSTALL_PATH}/lib/
-INSTALL_PATH_BIN = ${INSTALL_PATH}/bin/
+ifeq (${INSTALL_PREFIX},)
+INSTALL_PREFIX = /usr/local/good/
+else ifeq (${INSTALL_PREFIX},"")
+INSTALL_PREFIX = /usr/local/good/
+endif
+
+#
+INSTALL_PATH_INC = $(abspath ${INSTALL_PREFIX}/include/${PROJECT_NAME}/)
+INSTALL_PATH_LIB = $(abspath ${INSTALL_PREFIX}/lib/)
+INSTALL_PATH_BIN = $(abspath ${INSTALL_PREFIX}/bin/)
+INSTALL_PATH_PKG = $(abspath ${INSTALL_PREFIX}/pkgconfig/)
 
 #
 install:
@@ -117,6 +132,20 @@ install:
 #
 	mkdir -p ${INSTALL_PATH_INC}/
 	cp  *.h ${INSTALL_PATH_INC}/
+
+#
+	mkdir -p ${INSTALL_PATH_PKG}
+	echo "prefix=${INSTALL_PREFIX}" > ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "libdir=${INSTALL_PATH_LIB}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "incdir=${INSTALL_PATH_INC}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "Name: ${PROJECT_NAME}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "Description: This ${PROJECT_NAME} is part of GOOD. " >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "Version: ${VERSION_MAJOR}.${VERSION_MINOR}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "Cflags: -I\$${incdir}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "Libs: -l${PROJECT_NAME} -L\$${libdir}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "Libs.private: ${DEPEND_LIBS}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+
 #
 uninstall:
 #
@@ -125,18 +154,4 @@ uninstall:
 #
 	rm -f ${INSTALL_PATH_LIB}/${SOREALNAME}
 	rm -f ${INSTALL_PATH_LIB}/${SONAME}
-#
-help:
-#
-	$(info  `MAKEFILE_PWD = ${MAKEFILE_PWD}')
-#
-	$(info  `VERSION_MAJOR = ${VERSION_MAJOR}')
-	$(info  `VERSION_MINOR = ${VERSION_MINOR}')
-#
-	$(info  `PROJECT_NAME = ${PROJECT_NAME}')
-	$(info  `PROJECT_VERSION ?= ${PROJECT_VERSION}')
-	$(info  `BUILD_TYPE ?= ${BUILD_TYPE}'									[ release | debug ])
-	$(info  `BUILD_PATH ?= ${BUILD_PATH}')
-	$(info  `INSTALL_PATH ?= ${INSTALL_PATH}')
-
-
+	rm -f ${INSTALL_PATH_PKG}/${PKGNAME}

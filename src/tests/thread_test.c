@@ -7,10 +7,10 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
-#include "libutil/thread.h"
-#include "libutil/crc32.h"
-#include "libutil/clock.h"
-#include "libutil/signal.h"
+#include "goodutil/thread.h"
+#include "goodutil/crc32.h"
+#include "goodutil/clock.h"
+#include "goodutil/signal.h"
 
 void* specific_cb(void* args)
 {

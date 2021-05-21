@@ -1,46 +1,41 @@
 #
 MAKEFILE_FILE := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKEFILE_PWD := $(dir $(MAKEFILE_FILE))
+#
 
 #
-all: libutil tests
+all: goodutil tests
 
 #
-libutil: libutil-clean
-	make -C $(MAKEFILE_PWD)/libutil/
+goodutil: goodutil-clean
+	make -C $(MAKEFILE_PWD)/goodutil/
 
 #
 tests: tests-clean
 	make -C $(MAKEFILE_PWD)/tests/
 
 #
-clean: libutil-clean tests-clean
+clean: goodutil-clean tests-clean
 
 #
-libutil-clean: 
-	make -C $(MAKEFILE_PWD)/libutil/ clean
+goodutil-clean: 
+	make -C $(MAKEFILE_PWD)/goodutil/ clean
 
 #
 tests-clean:
 	make -C $(MAKEFILE_PWD)/tests/ clean
 
 #
-install: libutil-install
+install: goodutil-install
 
 #
-libutil-install: 
-	make -C $(MAKEFILE_PWD)/libutil/ install
+goodutil-install: 
+	make -C $(MAKEFILE_PWD)/goodutil/ install
 
 #
-uninstall: libutil-uninstall
+uninstall: goodutil-uninstall
 
 #
-libutil-uninstall: 
-	make -C $(MAKEFILE_PWD)/libutil/ uninstall
+goodutil-uninstall: 
+	make -C $(MAKEFILE_PWD)/goodutil/ uninstall
 
-#
-help: libutil-help
-
-#
-libutil-help:
-	make -C $(MAKEFILE_PWD)/libutil/ help

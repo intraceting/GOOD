@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/log.h"
+#include "goodutil/log.h"
 
 void agent(void *opaque,int level,const char* fmt,va_list args)
 {

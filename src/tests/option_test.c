@@ -8,8 +8,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/option.h"
-#include "libutil/getargs.h"
+#include "goodutil/option.h"
+#include "goodutil/getargs.h"
 
 
 int dump2(size_t deep, good_tree_t *node, void *opaque)

@@ -9,12 +9,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <limits.h>
-#include "libutil/dirent.h"
-#include "libutil/mman.h"
-#include "libutil/notify.h"
-#include "libutil/iconv.h"
-#include "libutil/tar.h"
-#include "libutil/termios.h"
+#include "goodutil/dirent.h"
+#include "goodutil/mman.h"
+#include "goodutil/notify.h"
+#include "goodutil/iconv.h"
+#include "goodutil/tar.h"
+#include "goodutil/termios.h"
 
 void test_dir()
 {

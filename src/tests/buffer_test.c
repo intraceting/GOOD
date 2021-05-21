@@ -8,8 +8,8 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/buffer.h"
-#include "libutil/pool.h"
+#include "goodutil/buffer.h"
+#include "goodutil/pool.h"
 
 void test1()
 {

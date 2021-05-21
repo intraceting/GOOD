@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "libutil/socket.h"
+#include "goodutil/socket.h"
 
 void test_gethostbyname()
 {
