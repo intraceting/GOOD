@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_SCSI_H
-#define GOOD_UTIL_SCSI_H
+#ifndef GOODUTIL_SCSI_H
+#define GOODUTIL_SCSI_H
 
 #include "general.h"
 
@@ -154,4 +154,4 @@ int good_scsi_inquiry_serial(int fd, uint8_t *type, char serial[255],
 
 
 
-#endif //GOOD_UTIL_SCSI_H
+#endif //GOODUTIL_SCSI_H

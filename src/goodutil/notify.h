@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_NOTIFY_H
-#define GOOD_UTIL_NOTIFY_H
+#ifndef GOODUTIL_NOTIFY_H
+#define GOODUTIL_NOTIFY_H
 
 #include "general.h"
 #include "buffer.h"
@@ -70,4 +70,4 @@ int good_notify_remove(int fd,int wd);
 int good_notify_watch(int fd,good_notify_event_t *event,time_t timeout);
 
 
-#endif //GOOD_UTIL_NOTIFY_H
+#endif //GOODUTIL_NOTIFY_H

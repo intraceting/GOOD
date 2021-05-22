@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_BASE64_H
-#define GOOD_UTIL_BASE64_H
+#ifndef GOODUTIL_BASE64_H
+#define GOODUTIL_BASE64_H
 
 #include "general.h"
 
@@ -27,4 +27,4 @@ ssize_t good_base64_encode(const uint8_t *src,size_t slen,char* dst,size_t dmaxl
 */
 ssize_t good_base64_decode(const char *src,size_t slen,uint8_t* dst,size_t dmaxlen);
 
-#endif //GOOD_UTIL_BASE64_H
+#endif //GOODUTIL_BASE64_H

@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_MAP_H
-#define GOOD_UTIL_MAP_H
+#ifndef GOODUTIL_MAP_H
+#define GOODUTIL_MAP_H
 
 #include "general.h"
 #include "tree.h"
@@ -129,4 +129,4 @@ void good_map_remove(good_map_t* map,const void* key,size_t ksize);
 */
 void good_map_scan(good_map_t *map);
 
-#endif //GOOD_UTIL_MAP_H
+#endif //GOODUTIL_MAP_H

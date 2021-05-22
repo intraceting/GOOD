@@ -80,6 +80,8 @@ BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
 MAKE_CONF=${BUILD_PATH}/makefile.conf
 
 #
+VERSION_MAJOR="1"
+VERSION_MINOR="0"
 DEPEND_FUNC="Nothing"
 BUILD_TYPE="release"
 INSTALL_PREFIX="/usr/local/good/"
@@ -94,12 +96,20 @@ PrintUsage()
     echo -e "\t\t生成调试符号。默认：关闭。"
     echo -e "\n\t-i < PATH >"
     echo -e "\t\t安装路径。默认：${INSTALL_PREFIX}"
+    echo -e "\n\t-V"
+    echo -e "\t\t主版本号。默认：1。"
+    echo -e "\n\t-v"
+    echo -e "\t\t副版本号。默认：0。"
 }
 
 #
-while getopts "d:gi:?" ARGKEY 
+while getopts "?d:gi:V:v:" ARGKEY 
 do
     case $ARGKEY in
+    \?)
+        PrintUsage
+        exit 22
+    ;;
     d)
         DEPEND_FUNC="$OPTARG"
     ;;
@@ -109,9 +119,11 @@ do
     i)
         INSTALL_PREFIX=$(realpath "${OPTARG}/")
     ;;
-    \?)
-        PrintUsage
-        exit 22
+    V)
+        VERSION_MAJOR=$(realpath "${OPTARG}/")
+    ;;
+    v)
+        VERSION_MINOR=$(realpath "${OPTARG}/")
     ;;
     esac
 done
@@ -124,6 +136,7 @@ fi
 
 #
 echo "BUILD_PATH=${BUILD_PATH}"
+echo "MAKE_CONF=${MAKE_CONF}"
 
 #
 DEPEND_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_FLAGS}"
@@ -182,14 +195,14 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
 fi
 
 #
+echo "VERSION_MAJOR=${VERSION_MAJOR}"
+echo "VERSION_MINOR=${VERSION_MINOR}"
 echo "HAVE_OPENMP=${HAVE_OPENMP}"
 echo "HAVE_UNIXODBC=${HAVE_UNIXODBC}"
 echo "HAVE_SQLITE=${HAVE_SQLITE}"
 echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
 echo "BUILD_TYPE=${BUILD_TYPE}"
 echo "INSTALL_PREFIX=${INSTALL_PREFIX}"
-
-
 
 #
 echo "#" > ${MAKE_CONF}
@@ -199,6 +212,8 @@ echo "" >> ${MAKE_CONF}
 
 #
 echo "BUILD_PATH=${BUILD_PATH}" >> ${MAKE_CONF}
+echo "VERSION_MAJOR=${VERSION_MAJOR}" >> ${MAKE_CONF}
+echo "VERSION_MINOR=${VERSION_MINOR}" >> ${MAKE_CONF}
 echo "DEPEND_FLAGS=${DEPEND_FLAGS}" >> ${MAKE_CONF}
 echo "DEPEND_LIBS=${DEPEND_LIBS}" >> ${MAKE_CONF}
 echo "BUILD_TYPE=${BUILD_TYPE}" >> ${MAKE_CONF}

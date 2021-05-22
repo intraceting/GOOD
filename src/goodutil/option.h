@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_OPTION_H
-#define GOOD_UTIL_OPTION_H
+#ifndef GOODUTIL_OPTION_H
+#define GOODUTIL_OPTION_H
 
 #include "general.h"
 #include "tree.h"
@@ -99,4 +99,4 @@ ssize_t good_option_fprintf(FILE *fp,good_tree_t *opt);
 */
 ssize_t good_option_snprintf(char* buf,size_t max,good_tree_t *opt);
 
-#endif //GOOD_UTIL_OPTION_H
+#endif //GOODUTIL_OPTION_H

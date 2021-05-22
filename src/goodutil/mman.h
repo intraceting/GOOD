@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_MMAN_H
-#define GOOD_UTIL_MMAN_H
+#ifndef GOODUTIL_MMAN_H
+#define GOODUTIL_MMAN_H
 
 #include "general.h"
 #include "allocator.h"
@@ -50,4 +50,4 @@ int good_msync(good_allocator_t* alloc,int async);
 void good_munmap(good_allocator_t** alloc);
 
 
-#endif //GOOD_UTIL_MMAN_H
+#endif //GOODUTIL_MMAN_H

@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_BUFFER_H
-#define GOOD_UTIL_BUFFER_H
+#ifndef GOODUTIL_BUFFER_H
+#define GOODUTIL_BUFFER_H
 
 #include "general.h"
 #include "allocator.h"
@@ -167,4 +167,4 @@ ssize_t good_buffer_export(good_buffer_t *buf,int fd);
 ssize_t good_buffer_export_atmost(good_buffer_t *buf,int fd,size_t howmuch);
 
 
-#endif //GOOD_UTIL_BUFFER_H
+#endif //GOODUTIL_BUFFER_H

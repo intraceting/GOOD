@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_SIGNAL_H
-#define GOOD_UTIL_SIGNAL_H
+#ifndef GOODUTIL_SIGNAL_H
+#define GOODUTIL_SIGNAL_H
 
 #include "general.h"
 #include "thread.h"
@@ -40,4 +40,4 @@ typedef struct _good_signal
 */
 void good_sigwaitinfo(good_signal_t *sig, time_t timeout);
 
-#endif //GOOD_UTIL_SIGNAL_H
+#endif //GOODUTIL_SIGNAL_H

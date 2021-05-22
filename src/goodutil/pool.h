@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_POOL_H
-#define GOOD_UTIL_POOL_H
+#ifndef GOODUTIL_POOL_H
+#define GOODUTIL_POOL_H
 
 #include "general.h"
 #include "allocator.h"
@@ -79,4 +79,4 @@ ssize_t good_pool_pull(good_pool_t *pool, void *buf, size_t size);
 */
 ssize_t good_pool_push(good_pool_t *pool, const void *buf, size_t size);
 
-#endif //GOOD_UTIL_POOL_H
+#endif //GOODUTIL_POOL_H

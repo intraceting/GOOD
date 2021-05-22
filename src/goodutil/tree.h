@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_TREE_H
-#define GOOD_UTIL_TREE_H
+#ifndef GOODUTIL_TREE_H
+#define GOODUTIL_TREE_H
 
 #include "general.h"
 #include "allocator.h"
@@ -266,4 +266,4 @@ ssize_t good_tree_vsnprintf(char *buf, size_t max, size_t depth, const good_tree
 void good_tree_sort(good_tree_t *father,good_tree_order_t *order);
 
 
-#endif //GOOD_UTIL_TREE_H
+#endif //GOODUTIL_TREE_H

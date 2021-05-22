@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_MT_H
-#define GOOD_UTIL_MT_H
+#ifndef GOODUTIL_MT_H
+#define GOODUTIL_MT_H
 
 #include "general.h"
 #include "allocator.h"
@@ -209,4 +209,4 @@ good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
 int good_mt_write_attribute(int fd, uint8_t part, const good_allocator_t *attr,
                             uint32_t timeout, good_scsi_io_stat *stat);
 
-#endif //GOOD_UTIL_MT_H
+#endif //GOODUTIL_MT_H

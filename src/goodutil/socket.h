@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_SOCKET_H
-#define GOOD_UTIL_SOCKET_H
+#ifndef GOODUTIL_SOCKET_H
+#define GOODUTIL_SOCKET_H
 
 #include "general.h"
 
@@ -240,4 +240,4 @@ char *good_sockaddr_to_string(char dst[68],const good_sockaddr_t *src);
 */
 int good_sockaddr_where(const good_sockaddr_t *test,int where);
 
-#endif //GOOD_UTIL_SOCKET_H
+#endif //GOODUTIL_SOCKET_H

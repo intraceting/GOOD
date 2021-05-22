@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_EPOLL_H
-#define GOOD_UTIL_EPOLL_H
+#ifndef GOODUTIL_EPOLL_H
+#define GOODUTIL_EPOLL_H
 
 #include "general.h"
 
@@ -79,4 +79,4 @@ int good_epoll_drop(int efd, int fd);
 */
 int good_epoll_wait(int efd,good_epoll_event *events,int max,int timeout);
 
-#endif //GOOD_UTIL_EPOLL_H
+#endif //GOODUTIL_EPOLL_H

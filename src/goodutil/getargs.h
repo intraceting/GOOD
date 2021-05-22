@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_GETARGS_H
-#define GOOD_UTIL_GETARGS_H
+#ifndef GOODUTIL_GETARGS_H
+#define GOODUTIL_GETARGS_H
 
 #include "general.h"
 #include "option.h"
@@ -53,4 +53,4 @@ void good_getargs_file(good_tree_t *opt, const char *file, uint8_t delim, char n
 void good_getargs_text(good_tree_t *opt, const char *text, size_t len, uint8_t delim, char note,
                        const char *argv0, const char *prefix);
 
-#endif //GOOD_UTIL_GETARGS_H
+#endif //GOODUTIL_GETARGS_H

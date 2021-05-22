@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_MTX_H
-#define GOOD_UTIL_MTX_H
+#ifndef GOODUTIL_MTX_H
+#define GOODUTIL_MTX_H
 
 #include "general.h"
 #include "scsi.h"
@@ -146,4 +146,4 @@ void good_mtx_parse_element_status(good_tree_t *father,const uint8_t *element,ui
 int good_mtx_inquiry_element_status(good_tree_t *father,int fd,uint32_t timeout, good_scsi_io_stat *stat);
 
 
-#endif //GOOD_UTIL_MTX_H
+#endif //GOODUTIL_MTX_H

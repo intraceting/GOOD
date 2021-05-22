@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_TERMIOS_H
-#define GOOD_UTIL_TERMIOS_H
+#ifndef GOODUTIL_TERMIOS_H
+#define GOODUTIL_TERMIOS_H
 
 #include "general.h"
 
@@ -30,4 +30,4 @@ int good_tcattr_option(int fd, const struct termios *now, struct termios *old);
  */
 int good_tcattr_cbreak(int fd,struct termios *old);
 
-#endif //GOOD_UTIL_TERMIOS_H
+#endif //GOODUTIL_TERMIOS_H

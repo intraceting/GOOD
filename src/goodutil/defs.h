@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_DEFS_H
-#define GOOD_UTIL_DEFS_H
+#ifndef GOODUTIL_DEFS_H
+#define GOODUTIL_DEFS_H
 
 /**/
 #ifndef _GNU_SOURCE
@@ -66,13 +66,13 @@
  * 主版本号。
  * 
 */
-#define GOOD_UTIL_VERSION_MAJOR 1
+#define GOOD_VERSION_MAJOR 1
 
 /** 
  * 副版本号。
  * 
 */
-#define GOOD_UTIL_VERSION_MINOR 0
+#define GOOD_VERSION_MINOR 0
 
 /**
  * 转换指针类型。
@@ -170,4 +170,4 @@
 */
 #define GOOD_ARRAY_SIZE(V) (sizeof((V)) / sizeof((V)[0]))
 
-#endif //GOOD_UTIL_DEFS_H
+#endif //GOODUTIL_DEFS_H

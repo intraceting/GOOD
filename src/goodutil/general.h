@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_GENERAL_H
-#define GOOD_UTIL_GENERAL_H
+#ifndef GOODUTIL_GENERAL_H
+#define GOODUTIL_GENERAL_H
 
 #include "defs.h"
 #include "atomic.h"
@@ -480,4 +480,4 @@ int good_shm_unlink(const char* name);
 
 /*------------------------------------------------------------------------------------------------*/
 
-#endif //GOOD_UTIL_GENERAL_H
+#endif //GOODUTIL_GENERAL_H

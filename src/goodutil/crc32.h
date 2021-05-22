@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_CRC32_H
-#define GOOD_UTIL_CRC32_H
+#ifndef GOODUTIL_CRC32_H
+#define GOODUTIL_CRC32_H
 
 #include "general.h"
 
@@ -20,4 +20,4 @@
 uint32_t good_crc32_sum(const void *data,size_t size,uint32_t old);
 
 
-#endif //GOOD_UTIL_CRC32_H
+#endif //GOODUTIL_CRC32_H

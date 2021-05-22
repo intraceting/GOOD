@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_DIRENT_H
-#define GOOD_UTIL_DIRENT_H
+#ifndef GOODUTIL_DIRENT_H
+#define GOODUTIL_DIRENT_H
 
 #include "general.h"
 #include "tree.h"
@@ -42,4 +42,4 @@ enum _good_dirent_field
 */
 void good_dirscan(good_tree_t *father,size_t depth, int onefs);
 
-#endif //GOOD_UTIL_DIRENT_H
+#endif //GOODUTIL_DIRENT_H

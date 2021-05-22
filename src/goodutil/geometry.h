@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_GEOMETRY_H
-#define GOOD_UTIL_GEOMETRY_H
+#ifndef GOODUTIL_GEOMETRY_H
+#define GOODUTIL_GEOMETRY_H
 
 #include "general.h"
 
@@ -64,4 +64,4 @@ double good_geom_halfline_radian(const good_point_t *p1, const good_point_t *p2,
  */
 void good_geom_point_move(const good_point_t *p1,double radian,double dist,good_point_t *p2);
 
-#endif //GOOD_UTIL_GEOMETRY_H
+#endif //GOODUTIL_GEOMETRY_H

@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_ATOMIC_H
-#define GOOD_UTIL_ATOMIC_H
+#ifndef GOODUTIL_ATOMIC_H
+#define GOODUTIL_ATOMIC_H
 
 #include "defs.h"
 
@@ -53,4 +53,4 @@
 */
 #define good_atomic_fetch_and_add(ptr, val)   __sync_fetch_and_add(ptr, val) 
 
-#endif //GOOD_UTIL_ATOMIC_H
+#endif //GOODUTIL_ATOMIC_H

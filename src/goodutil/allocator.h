@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_ALLOCATOR_H
-#define GOOD_UTIL_ALLOCATOR_H
+#ifndef GOODUTIL_ALLOCATOR_H
+#define GOODUTIL_ALLOCATOR_H
 
 #include "general.h"
 
@@ -105,4 +105,4 @@ good_allocator_t *good_allocator_clone(good_allocator_t *src);
 good_allocator_t * good_allocator_privatize(good_allocator_t **dst);
 
 
-#endif //GOOD_UTIL_ALLOCATOR_H
+#endif //GOODUTIL_ALLOCATOR_H

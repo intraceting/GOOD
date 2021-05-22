@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_TAR_H
-#define GOOD_UTIL_TAR_H
+#ifndef GOODUTIL_TAR_H
+#define GOODUTIL_TAR_H
 
 #include "general.h"
 #include "blockio.h"
@@ -208,4 +208,4 @@ int good_tar_read_hdr(good_tar_t *tar, char name[PATH_MAX], struct stat *attr, c
 */
 int good_tar_write_hdr(good_tar_t *tar, const char *name, const struct stat *attr, const char *linkname);
 
-#endif //GOOD_UTIL_TAR_H
+#endif //GOODUTIL_TAR_H

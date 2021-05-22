@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_LOG_H
-#define GOOD_UTIL_LOG_H
+#ifndef GOODUTIL_LOG_H
+#define GOODUTIL_LOG_H
 
 #include "general.h"
 
@@ -54,4 +54,4 @@ void good_log_printf(int level,const char* fmt,...);
  */
 void good_log_vprintf(int level,const char* fmt,va_list args);
 
-#endif //GOOD_UTIL_LOG_H
+#endif //GOODUTIL_LOG_H

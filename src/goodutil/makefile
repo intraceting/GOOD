@@ -1,20 +1,32 @@
 #
+# This file is part of GOOD.
+#
+# MIT License
+#
+#
+
+#
 MAKE_CONF ?= $(abspath $(CURDIR)/../build/makefile.conf)
 
 #
 PROJECT_NAME = goodutil
 
-#
-VERSION_MAJOR = 1
-VERSION_MINOR = 0
-
-#
-SONAME = lib${PROJECT_NAME}.so
-SOREALNAME = ${SONAME}.${VERSION_MAJOR}.${VERSION_MINOR}
-PKGNAME = ${PROJECT_NAME}.pc
-
 #加载配置项。
 include ${MAKE_CONF}
+
+#
+ifeq (${VERSION_MAJOR},)
+VERSION_MAJOR = 1
+else ifeq (${VERSION_MAJOR},"")
+VERSION_MAJOR = 1
+endif
+
+#
+ifeq (${VERSION_MINOR},)
+VERSION_MINOR = 0
+else ifeq (${VERSION_MINOR},"")
+VERSION_MINOR = 0
+endif
 
 #
 ifeq (${BUILD_PATH},)
@@ -22,6 +34,19 @@ BUILD_PATH = $(abspath $(CURDIR)/../build/)
 else ifeq (${BUILD_PATH},"")
 BUILD_PATH = $(abspath $(CURDIR)/../build/)
 endif
+
+#
+ifeq (${INSTALL_PREFIX},)
+INSTALL_PREFIX = /usr/local/good/
+else ifeq (${INSTALL_PREFIX},"")
+INSTALL_PREFIX = /usr/local/good/
+endif
+
+#
+SONAME = lib${PROJECT_NAME}.so
+SOREALNAME = ${SONAME}.${VERSION_MAJOR}.${VERSION_MINOR}
+PKGNAME = ${PROJECT_NAME}.pc
+
 
 #Compiler
 CCC = gcc
@@ -110,13 +135,6 @@ clean:
 	rm -f $(BUILD_PATH)/${SONAME}
 
 #
-ifeq (${INSTALL_PREFIX},)
-INSTALL_PREFIX = /usr/local/good/
-else ifeq (${INSTALL_PREFIX},"")
-INSTALL_PREFIX = /usr/local/good/
-endif
-
-#
 INSTALL_PATH_INC = $(abspath ${INSTALL_PREFIX}/include/${PROJECT_NAME}/)
 INSTALL_PATH_LIB = $(abspath ${INSTALL_PREFIX}/lib/)
 INSTALL_PATH_BIN = $(abspath ${INSTALL_PREFIX}/bin/)
@@ -131,7 +149,35 @@ install:
 
 #
 	mkdir -p ${INSTALL_PATH_INC}/
-	cp  *.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/allocator.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/atomic.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/base64.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/blockio.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/buffer.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/clock.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/crc32.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/dirent.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/defs.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/epoll.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/general.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/geometry.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/getargs.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/iconv.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/log.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/map.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/mman.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/mt.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/mtx.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/notify.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/option.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/pool.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/scsi.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/signal.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/socket.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/tar.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/termios.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/thread.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/tree.h ${INSTALL_PATH_INC}/
 
 #
 	mkdir -p ${INSTALL_PATH_PKG}
@@ -149,7 +195,35 @@ install:
 #
 uninstall:
 #
-	rm -f ${INSTALL_PATH_INC}/*.h
+	rm -f ${INSTALL_PATH_INC}/allocator.h
+	rm -f ${INSTALL_PATH_INC}/atomic.h
+	rm -f ${INSTALL_PATH_INC}/base64.h
+	rm -f ${INSTALL_PATH_INC}/blockio.h
+	rm -f ${INSTALL_PATH_INC}/buffer.h
+	rm -f ${INSTALL_PATH_INC}/clock.h
+	rm -f ${INSTALL_PATH_INC}/crc32.h
+	rm -f ${INSTALL_PATH_INC}/defs.h
+	rm -f ${INSTALL_PATH_INC}/dirent.h
+	rm -f ${INSTALL_PATH_INC}/epoll.h
+	rm -f ${INSTALL_PATH_INC}/general.h
+	rm -f ${INSTALL_PATH_INC}/geometry.h
+	rm -f ${INSTALL_PATH_INC}/getargs.h
+	rm -f ${INSTALL_PATH_INC}/iconv.h
+	rm -f ${INSTALL_PATH_INC}/log.h
+	rm -f ${INSTALL_PATH_INC}/map.h
+	rm -f ${INSTALL_PATH_INC}/mman.h
+	rm -f ${INSTALL_PATH_INC}/mt.h
+	rm -f ${INSTALL_PATH_INC}/mtx.h
+	rm -f ${INSTALL_PATH_INC}/notify.h
+	rm -f ${INSTALL_PATH_INC}/option.h
+	rm -f ${INSTALL_PATH_INC}/pool.h
+	rm -f ${INSTALL_PATH_INC}/scsi.h
+	rm -f ${INSTALL_PATH_INC}/signal.h
+	rm -f ${INSTALL_PATH_INC}/socket.h
+	rm -f ${INSTALL_PATH_INC}/tar.h
+	rm -f ${INSTALL_PATH_INC}/termios.h
+	rm -f ${INSTALL_PATH_INC}/thread.h
+	rm -f ${INSTALL_PATH_INC}/tree.h
 
 #
 	rm -f ${INSTALL_PATH_LIB}/${SOREALNAME}

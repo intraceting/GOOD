@@ -1,4 +1,12 @@
 #
+# This file is part of GOOD.
+#
+# MIT License
+#
+#
+
+
+#
 MAKE_CONF ?= $(abspath $(CURDIR)/../build/makefile.conf)
 
 #

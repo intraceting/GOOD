@@ -404,9 +404,9 @@ again:
         attr->st_uid = good_tar_get_uid(&hdr);
 
         if (namelen <= 100)
-            strncpy(name, hdr.name, GOOD_MIN(strlen(hdr.name), sizeof(hdr.name)));
+            strncpy(name, hdr.name,sizeof(hdr.name));
         if (linknamelen <= 100)
-            strncpy(linkname, hdr.linkname, GOOD_MIN(strlen(hdr.linkname), sizeof(hdr.linkname)));
+            strncpy(linkname, hdr.linkname,sizeof(hdr.linkname));
     }
 
     return 0;

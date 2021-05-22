@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_CLOCK_H
-#define GOOD_UTIL_CLOCK_H
+#ifndef GOODUTIL_CLOCK_H
+#define GOODUTIL_CLOCK_H
 
 #include "general.h"
 #include "thread.h"
@@ -41,4 +41,4 @@ uint64_t good_clock_dot(uint64_t *step);
 */
 uint64_t good_clock_step(uint64_t *dot);
 
-#endif //GOOD_UTIL_CLOCK_H
+#endif //GOODUTIL_CLOCK_H

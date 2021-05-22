@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_BLOCKIO_H
-#define GOOD_UTIL_BLOCKIO_H
+#ifndef GOODUTIL_BLOCKIO_H
+#define GOODUTIL_BLOCKIO_H
 
 #include "general.h"
 #include "buffer.h"
@@ -39,4 +39,4 @@ ssize_t good_block_write(int fd, const void *data, size_t size,good_buffer_t *bu
 int good_block_write_trailer(int fd, uint8_t stuffing,good_buffer_t *buf);
 
 
-#endif //GOOD_UTIL_BLOCKIO_H
+#endif //GOODUTIL_BLOCKIO_H

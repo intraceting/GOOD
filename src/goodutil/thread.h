@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef GOOD_UTIL_THREAD_H
-#define GOOD_UTIL_THREAD_H
+#ifndef GOODUTIL_THREAD_H
+#define GOODUTIL_THREAD_H
 
 #include "general.h"
 
@@ -174,4 +174,4 @@ int good_thread_getname(char name[16]);
 /*------------------------------------------------------------------------------------------------*/
 
 
-#endif // GOOD_UTIL_THREAD_H
+#endif // GOODUTIL_THREAD_H
