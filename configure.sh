@@ -101,7 +101,7 @@ PrintUsage()
 }
 
 #
-while getopts "?d:gi:V:v:" ARGKEY 
+while getopts "?d:gi:" ARGKEY 
 do
     case $ARGKEY in
     \?)
@@ -117,14 +117,11 @@ do
     i)
         INSTALL_PREFIX=$(realpath "${OPTARG}/")
     ;;
-    V)
-        VERSION_MAJOR=$(realpath "${OPTARG}/")
-    ;;
-    v)
-        VERSION_MINOR=$(realpath "${OPTARG}/")
-    ;;
     esac
 done
+
+#
+mkdir -p ${BUILD_PATH}
 
 #
 if [ ! -d ${BUILD_PATH} ];then
