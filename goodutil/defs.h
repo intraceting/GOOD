@@ -62,6 +62,10 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 
+#ifdef HAVE_SQLITE
+#include <sqlite3.h>
+#endif //HAVE_SQLITE
+
 /**
  * 主版本号。
  * 
