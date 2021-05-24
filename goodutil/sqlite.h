@@ -130,33 +130,33 @@ sqlite3 *good_sqlite_open(const char *name);
 #define good_sqlite_memopen() good_sqlite_open(":memory:")
 
 /**
- * 执行SQL语句。
+ * 直接执行SQL语句。
  * 
  * @warning 查询不能用。
  * 
  * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
 */
-int good_sqlite_exec(sqlite3 *ctx, const char *sql);
+int good_sqlite_exec_direct(sqlite3 *ctx, const char *sql);
 
 /**
  * 启动事物。
 */
-#define good_sqlite_tran_begin(ctx) good_sqlite_exec(ctx, "begin;")
+#define good_sqlite_tran_begin(ctx) good_sqlite_exec_direct(ctx, "begin;")
 
 /**
  * 提交事物。
 */
-#define good_sqlite_tran_commit(ctx) good_sqlite_exec(ctx, "commit;")
+#define good_sqlite_tran_commit(ctx) good_sqlite_exec_direct(ctx, "commit;")
 
 /**
  * 回滚事物。
 */
-#define good_sqlite_tran_rollback(ctx) good_sqlite_exec(ctx, "rollback;")
+#define good_sqlite_tran_rollback(ctx) good_sqlite_exec_direct(ctx, "rollback;")
 
 /**
  * 回收空间。
 */
-#define good_sqlite_tran_vacuum(ctx) good_sqlite_exec(ctx, "vacuum;")
+#define good_sqlite_tran_vacuum(ctx) good_sqlite_exec_direct(ctx, "vacuum;")
 
 /** 
  * 设置页大小。
@@ -179,12 +179,27 @@ int good_sqlite_journal_mode(sqlite3 *ctx, int mode);
 */
 int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name);
 
-/** 
- * 在查询结果中移动游标到下一行。
+/**
+ * 准备SQL语句。
  * 
- * @return > 0 成功(有数据) , <= 0 失败(末尾或出错)。
+ * @return !NULL(0) 成功(数据集指针)，NULL(0) 失败。
 */
-int itting_sqlite_next(sqlite3_stmt *stmt);
+sqlite3_stmt* good_sqlite_prepare(sqlite3 *ctx,const char *sql);
+
+/** 
+ * 提交语句，或在数据集中移动游标到下一行。
+ * 
+ * @return > 0 有数据返回，= 0 无数返回(或末尾)。< 0 出错。
+*/
+int good_sqlite_step(sqlite3_stmt *stmt);
+
+/**
+ * 关闭数据集。
+ * 
+ * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
+*/
+int good_sqlite_finalize(sqlite3_stmt *stmt);
+
 
 #endif //_SQLITE3_H_
 

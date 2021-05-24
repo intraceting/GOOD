@@ -75,7 +75,7 @@ sqlite3* good_sqlite_open(const char *name)
     return ctx;
 }
 
-int good_sqlite_exec(sqlite3 *ctx,const char *sql)
+int good_sqlite_exec_direct(sqlite3 *ctx,const char *sql)
 {
     assert(ctx != NULL && sql != NULL);
 
@@ -92,7 +92,7 @@ int good_sqlite_pagesize(sqlite3 * ctx,int size)
 
     snprintf(sql, 100, "PRAGMA page_size = %d;", size);
 
-    return good_sqlite_exec(ctx,sql);
+    return good_sqlite_exec_direct(ctx,sql);
 }
 
 int good_sqlite_journal_mode(sqlite3 *ctx, int mode)
@@ -104,22 +104,22 @@ int good_sqlite_journal_mode(sqlite3 *ctx, int mode)
     switch (mode)
     {
     case GOOD_SQLITE_JOURNAL_OFF:
-        chk = good_sqlite_exec(ctx, "PRAGMA journal_mode = OFF;");
+        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = OFF;");
         break;
     case GOOD_SQLITE_JOURNAL_DELETE:
-        chk = good_sqlite_exec(ctx, "PRAGMA journal_mode = DELETE;");
+        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = DELETE;");
         break;
     case GOOD_SQLITE_JOURNAL_TRUNCATE:
-        chk = good_sqlite_exec(ctx, "PRAGMA journal_mode = TRUNCATE;");
+        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = TRUNCATE;");
         break;
     case GOOD_SQLITE_JOURNAL_PERSIST:
-        chk = good_sqlite_exec(ctx, "PRAGMA journal_mode = PERSIST;");
+        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = PERSIST;");
         break;
     case GOOD_SQLITE_JOURNAL_MEMORY:
-        chk = good_sqlite_exec(ctx, "PRAGMA journal_mode = MEMORY;");
+        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = MEMORY;");
         break;
     case GOOD_SQLITE_JOURNAL_WAL:
-        chk = good_sqlite_exec(ctx, "PRAGMA journal_mode = WAL;");
+        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = WAL;");
         break;
     default:
         chk = SQLITE_PERM;
@@ -149,7 +149,21 @@ int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name)
     return idx;
 }
 
-int itting_sqlite_next(sqlite3_stmt *stmt)
+sqlite3_stmt* good_sqlite_prepare(sqlite3 *ctx,const char *sql)
+{
+    sqlite3_stmt *stmt = NULL;
+    int chk;
+
+    assert(ctx != NULL && sql != NULL);
+
+    chk = sqlite3_prepare(ctx, sql, -1, &stmt, NULL);
+    if (SQLITE_OK != chk)
+        GOOD_ERRNO_AND_RETURN1(EINVAL,NULL);
+
+    return stmt;
+}
+
+int good_sqlite_step(sqlite3_stmt *stmt)
 {
     int chk;
 
@@ -164,4 +178,11 @@ int itting_sqlite_next(sqlite3_stmt *stmt)
         return -1;
 
     return -1;
+}
+
+int good_sqlite_finalize(sqlite3_stmt *stmt)
+{
+    assert(stmt != NULL);
+
+    return sqlite3_finalize(stmt);
 }
