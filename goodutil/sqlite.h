@@ -96,9 +96,9 @@ typedef struct _good_sqlite_backup_param
 } good_sqlite_backup_param;
 
 /**
- * 在线备份
+ * 备份。
  * 
- * @return SQLITE_DONE(101) 成功，!SQLITE_DONE(101) 失败。
+ * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
  * 
  */
 int good_sqlite_backup(good_sqlite_backup_param *param);
@@ -107,6 +107,7 @@ int good_sqlite_backup(good_sqlite_backup_param *param);
  * 关闭数据库句柄。
  * 
  * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
+ * 
 */
 int good_sqlite_close(sqlite3 *ctx);
 
@@ -121,6 +122,7 @@ int good_sqlite_busy_melt(void *opaque, int count);
  * @param name 数据库文件名的指针。
  * 
  * @return !NULL(0) 成功(句柄)，NULL(0) 失败。
+ * 
 */
 sqlite3 *good_sqlite_open(const char *name);
 
@@ -135,6 +137,7 @@ sqlite3 *good_sqlite_open(const char *name);
  * @warning 查询不能用。
  * 
  * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
+ * 
 */
 int good_sqlite_exec_direct(sqlite3 *ctx, const char *sql);
 
@@ -162,6 +165,7 @@ int good_sqlite_exec_direct(sqlite3 *ctx, const char *sql);
  * 设置页大小。
  * 
  * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
+ * 
 */
 int good_sqlite_pagesize(sqlite3 *ctx, int size);
 
@@ -169,6 +173,7 @@ int good_sqlite_pagesize(sqlite3 *ctx, int size);
  * 设置日志模式。
  * 
  * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
+ * 
 */
 int good_sqlite_journal_mode(sqlite3 *ctx, int mode);
 
@@ -176,6 +181,7 @@ int good_sqlite_journal_mode(sqlite3 *ctx, int mode);
  * 在查询结果中查找字段名的索引。
  * 
  * @return >= 0 成功(序号)，< 0 失败。
+ * 
 */
 int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name);
 
@@ -183,6 +189,7 @@ int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name);
  * 准备SQL语句。
  * 
  * @return !NULL(0) 成功(数据集指针)，NULL(0) 失败。
+ * 
 */
 sqlite3_stmt* good_sqlite_prepare(sqlite3 *ctx,const char *sql);
 
@@ -190,6 +197,7 @@ sqlite3_stmt* good_sqlite_prepare(sqlite3 *ctx,const char *sql);
  * 提交语句，或在数据集中移动游标到下一行。
  * 
  * @return > 0 有数据返回，= 0 无数返回(或末尾)。< 0 出错。
+ * 
 */
 int good_sqlite_step(sqlite3_stmt *stmt);
 
@@ -197,6 +205,7 @@ int good_sqlite_step(sqlite3_stmt *stmt);
  * 关闭数据集。
  * 
  * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
+ * 
 */
 int good_sqlite_finalize(sqlite3_stmt *stmt);
 

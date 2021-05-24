@@ -33,9 +33,10 @@ int good_sqlite_backup(good_sqlite_backup_param *param)
 
     } while (chk == SQLITE_OK || chk == SQLITE_BUSY || chk == SQLITE_LOCKED);
 
-    sqlite3_backup_finish(backup_ctx);
+    if(chk == SQLITE_DONE)
+        chk = sqlite3_backup_finish(backup_ctx);
 
-    return chk;
+    return ((chk == SQLITE_DONE) ? SQLITE_OK : chk);
 }
 
 int  good_sqlite_close(sqlite3 *ctx)

@@ -61,6 +61,35 @@ void test_select(sqlite3 *ctx)
     good_sqlite_finalize(stmt);
 }
 
+void backup_progress(int remaining, int total, void *opaque)
+{
+    printf("\r%10d/%d",total-remaining,total);
+}
+
+void test_backup(sqlite3 *ctx)
+{
+    sqlite3 * ctx2 = good_sqlite_open("/tmp/abc.sqlite");
+
+    good_sqlite_backup_param p = {0};
+
+    p.src = ctx;
+    p.src_name = "main";
+
+    p.dst = ctx2;
+    p.dst_name = "main";
+
+    p.step = 10;
+    p.sleep = 100;
+    p.progress_cb = backup_progress;
+
+
+    assert(good_sqlite_backup(&p)==SQLITE_OK);
+
+    printf("\n");
+
+    good_sqlite_close(ctx2);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -70,6 +99,8 @@ int main(int argc, char **argv)
     test_insert(ctx);
 
     test_select(ctx);
+
+    test_backup(ctx);
 
     good_sqlite_close(ctx);
 
