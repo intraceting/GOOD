@@ -110,7 +110,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/blockio.o \
 	${OBJ_PATH}/tar.o \
 	${OBJ_PATH}/termios.o \
-	${OBJ_PATH}/sqlite.o 
+	${OBJ_PATH}/sqlite.o \
+	${OBJ_PATH}/odbc.o
 
 
 #
@@ -165,6 +166,7 @@ install:
 	cp  -f $(CURDIR)/getargs.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/iconv.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/log.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/odbc.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/map.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/mman.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/mt.h ${INSTALL_PATH_INC}/
@@ -212,6 +214,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/getargs.h
 	rm -f ${INSTALL_PATH_INC}/iconv.h
 	rm -f ${INSTALL_PATH_INC}/log.h
+	rm -f ${INSTALL_PATH_INC}/odbc.h
 	rm -f ${INSTALL_PATH_INC}/map.h
 	rm -f ${INSTALL_PATH_INC}/mman.h
 	rm -f ${INSTALL_PATH_INC}/mt.h

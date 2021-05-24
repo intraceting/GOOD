@@ -39,6 +39,7 @@
 #include <netdb.h>
 #include <tar.h>
 #include <termios.h>
+#include <dlfcn.h>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -65,6 +66,11 @@
 #ifdef HAVE_SQLITE
 #include <sqlite3.h>
 #endif //HAVE_SQLITE
+
+#ifdef HAVE_UNIXODBC
+#include <sql.h>
+#include <sqlext.h>
+#endif //HAVE_UNIXODBC
 
 /**
  * 主版本号。

@@ -69,7 +69,8 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/socket_test.exe \
 	$(BUILD_PATH)/option_test.exe \
 	$(BUILD_PATH)/scsi_test.exe \
-	$(BUILD_PATH)/sqlite_test.exe
+	$(BUILD_PATH)/sqlite_test.exe \
+	$(BUILD_PATH)/odbc_test.exe 
 
 #
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
@@ -100,5 +101,6 @@ clean:
 	rm -f $(BUILD_PATH)/option_test.exe
 	rm -f $(BUILD_PATH)/scsi_test.exe
 	rm -f $(BUILD_PATH)/sqlite_test.exe
+	rm -f $(BUILD_PATH)/odbc_test.exe
 
 
