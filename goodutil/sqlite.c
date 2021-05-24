@@ -6,6 +6,8 @@
  */
 #include "sqlite.h"
 
+#ifdef _SQLITE3_H_
+
 int good_sqlite_backup(good_sqlite_backup_param *param)
 {
     sqlite3_backup *backup_ctx = NULL;
@@ -187,3 +189,5 @@ int good_sqlite_finalize(sqlite3_stmt *stmt)
 
     return sqlite3_finalize(stmt);
 }
+
+#endif //_SQLITE3_H_

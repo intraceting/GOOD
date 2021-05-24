@@ -10,6 +10,7 @@
 #include <string.h>
 #include "goodutil/sqlite.h"
 
+#ifdef _SQLITE3_H_
 
 void test_insert(sqlite3 *ctx)
 {
@@ -106,3 +107,14 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+#else
+
+int main(int argc, char **argv)
+{
+    
+ 
+    return 0;
+}
+
+#endif //_SQLITE3_H_
