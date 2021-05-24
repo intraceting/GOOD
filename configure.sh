@@ -155,7 +155,7 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
     if [ ${HAVE_UNIXODBC} -ge 1 ];then
     {
         DEPEND_FLAGS=" -DHAVE_UNIXODBC ${DEPEND_FLAGS}"
-        DEPEND_LIBS=" ${DEPEND_LIBS}"
+        DEPEND_LIBS=" -lodbc ${DEPEND_LIBS}"
     }
     fi
 }
