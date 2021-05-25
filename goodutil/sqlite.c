@@ -125,27 +125,6 @@ int good_sqlite_journal_mode(sqlite3 *ctx, int mode)
     return sqlite3_exec(ctx, sql, NULL, NULL, NULL);
 }
 
-int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name)
-{
-    int count;
-    const char *tmp;
-    int idx = -1;
-
-    assert(stmt != NULL && name != NULL);
-
-    count = sqlite3_column_count(stmt);
-
-    for (idx = count - 1; idx >= 0; idx--)
-    {
-        tmp = sqlite3_column_name(stmt, idx);
-
-        if (good_strcmp(name, tmp, 0) == 0)
-            break;
-    }
-
-    return idx;
-}
-
 sqlite3_stmt* good_sqlite_prepare(sqlite3 *ctx,const char *sql)
 {
     sqlite3_stmt *stmt = NULL;
@@ -199,6 +178,27 @@ int good_sqlite_exec_direct(sqlite3 *ctx,const char *sql)
      good_sqlite_finalize(stmt);
 
      return chk;
+}
+
+int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name)
+{
+    int count;
+    const char *tmp;
+    int idx = -1;
+
+    assert(stmt != NULL && name != NULL);
+
+    count = sqlite3_column_count(stmt);
+
+    for (idx = count - 1; idx >= 0; idx--)
+    {
+        tmp = sqlite3_column_name(stmt, idx);
+
+        if (good_strcmp(name, tmp, 0) == 0)
+            break;
+    }
+
+    return idx;
 }
 
 #endif //_SQLITE3_H_

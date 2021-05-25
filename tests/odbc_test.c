@@ -15,6 +15,8 @@
 
 void test_insert(good_odbc_t *o)
 {
+
+
     assert(good_odbc_tran_begin(o) == SQL_SUCCESS);
 
     time_t begin = time(NULL);
@@ -33,11 +35,15 @@ void test_insert(good_odbc_t *o)
 
 void test_select(good_odbc_t *o)
 {
+    assert(good_odbc_autocommit(o,1) == SQL_SUCCESS);
+
     SQLRETURN chk = good_odbc_prepare(o,"select * from LTR_TASK_TRACE where CAST(id AS SIGNED) > ?;");
+
+  //  SQLRETURN chk = good_odbc_prepare(o,"select * from LTR_TASK_TRACE;");
 
     assert(chk == SQL_SUCCESS);
 
-    size_t id = 100;
+    size_t id = 1000000000000;
 
     chk = SQLBindParameter(o->stmt, 1, SQL_PARAM_INPUT, SQL_C_SBIGINT, SQL_NUMERIC, 0, 0,
                                      (SQLPOINTER)&id, sizeof(size_t), NULL);
@@ -48,11 +54,33 @@ void test_select(good_odbc_t *o)
 
     assert(chk == SQL_SUCCESS || chk == SQL_NO_DATA);
 
+    chk = good_odbc_fetch_prev(o);
+
+    assert(chk == SQL_SUCCESS || chk == SQL_NO_DATA);
+
     while(chk == SQL_SUCCESS)
     {
-        
+        char id[100]={0};
+        char tid[100]={0};
+        char sid[100]={0};
+        char ctime[100]={0};
 
-        chk = good_odbc_fetch_next(o,0);
+        good_odbc_get_data(o,good_odbc_name2index(o,"id"),SQL_C_CHAR,id,100,NULL);
+
+        SQLCHAR state=0;
+        SQLINTEGER native =0;
+        char msg[100]={0};
+        SQLError(o->env,o->dbc,o->stmt,&state,&native,msg,100,NULL);
+
+        printf("state=%hhu,native=%d,msg=%s\n",state,native,msg);
+
+        good_odbc_get_data(o,good_odbc_name2index(o,"tid"),SQL_C_CHAR,tid,100,NULL);
+        good_odbc_get_data(o,good_odbc_name2index(o,"sid"),SQL_C_CHAR,sid,100,NULL);
+        good_odbc_get_data(o,good_odbc_name2index(o,"ctime"),SQL_C_CHAR,ctime,100,NULL);
+
+        printf("%s,%s,%s,%s\n",id,tid,sid,ctime);
+
+        chk = good_odbc_fetch_next(o);
     }
 
 }

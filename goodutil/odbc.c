@@ -20,19 +20,107 @@ SQLRETURN _good_odbc_check_return(SQLRETURN ret)
     return chk;
 }
 
+void _good_odbc_free_attr_destroy(good_allocator_t *alloc, void *opaque)
+{
+    /*只有这个单独申请的。*/
+    void *p = alloc->pptrs[6];
+
+    good_heap_freep(&p);
+}
+
+void good_odbc_free_attr(good_odbc_t *ctx)
+{
+    good_allocator_t *p;
+
+    if (ctx->attr)
+    {
+        for (size_t i = 0; i < ctx->attr->numbers; i++)
+        {
+            p = (good_allocator_t *)ctx->attr->pptrs[i];
+
+            good_allocator_unref((good_allocator_t**)&p);
+        }    
+
+        good_allocator_unref(&ctx->attr);
+    }
+}
+
+SQLRETURN good_odbc_alloc_attr(good_odbc_t *ctx)
+{
+    SQLSMALLINT columns;
+    good_allocator_t *p;
+    SQLRETURN chk;
+
+    assert(ctx != NULL);
+
+    /*同一份数据集只需创建一次。*/
+    if(ctx->attr != NULL)
+        return SQL_SUCCESS;
+
+    chk = SQLNumResultCols(ctx->stmt, &columns);
+    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+        goto final_error;
+
+    ctx->attr = good_allocator_alloc(NULL, columns, 0);
+    if (!ctx->attr)
+    {
+        chk = SQL_ERROR;
+        goto final_error;
+    }
+
+    size_t sizes[7] = {NAME_MAX, sizeof(SQLSMALLINT), sizeof(SQLSMALLINT), sizeof(SQLULEN), sizeof(SQLSMALLINT), sizeof(SQLSMALLINT),0};
+
+    for (size_t i = 0; i < ctx->attr->numbers; i++)
+    {
+        p = good_allocator_alloc(sizes, GOOD_ARRAY_SIZE(sizes), 0);
+        if (!p)
+        {
+            chk = SQL_ERROR;
+            goto final_error;
+        } 
+
+        ctx->attr->pptrs[i] = (uint8_t *)p;
+
+        chk = SQLDescribeCol(ctx->stmt, (SQLSMALLINT)(i + 1), p->pptrs[0], p->sizes[0],
+                             GOOD_PTR2PTR(SQLSMALLINT, p->pptrs[1], 0), GOOD_PTR2PTR(SQLSMALLINT, p->pptrs[2], 0),
+                             GOOD_PTR2PTR(SQLULEN, p->pptrs[3], 0), GOOD_PTR2PTR(SQLSMALLINT, p->pptrs[4], 0),
+                             GOOD_PTR2PTR(SQLSMALLINT, p->pptrs[5], 0));
+
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
+
+        /*申请字段值的缓存区。*/
+        p->pptrs[6] = good_heap_alloc(GOOD_PTR2OBJ(SQLULEN, p->pptrs[3], 0) + 1);
+        if (!p->pptrs[6])
+        {
+            chk = SQL_ERROR;
+            goto final_error;
+        }
+
+        /*记录可用长度。*/
+        p->sizes[6] = GOOD_PTR2OBJ(SQLULEN, p->pptrs[3], 0) + 1;
+
+        /*注册清理函数。*/
+        good_allocator_atfree(p, _good_odbc_free_attr_destroy, NULL);
+    }
+
+    return SQL_SUCCESS;
+
+final_error:
+
+    good_odbc_free_attr(ctx);
+
+    return chk;
+}
+
 SQLRETURN good_odbc_clear_stmt(good_odbc_t *ctx)
 {
     SQLRETURN chk;
 
     assert(ctx != NULL);
 
-    if (ctx->attr)
-    {
-        for (size_t i = 0; i < ctx->attr->numbers; i++)
-            good_allocator_unref((good_allocator_t**)&ctx->attr->pptrs[i]);
-
-        good_allocator_unref(&ctx->attr);
-    }
+    /*清理数据集属性。*/
+    good_odbc_free_attr(ctx);
 
     if (ctx->stmt)
     {
@@ -95,6 +183,8 @@ SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri)
 
     assert(ctx != NULL && uri != NULL);
 
+    memset(ctx,0,sizeof(*ctx));
+
     chk = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &ctx->env);
     if (_good_odbc_check_return(chk) != SQL_SUCCESS)
         goto final_error;
@@ -153,71 +243,6 @@ SQLRETURN good_odbc_tran_end(good_odbc_t *ctx, SQLSMALLINT type)
 final_error:
 
     return chk;
-}
-
-SQLSMALLINT good_odbc_name2index(good_odbc_t *ctx, const char *name)
-{
-    SQLSMALLINT columns;
-    good_allocator_t *p;
-    SQLSMALLINT index;
-    SQLRETURN chk;
-
-    assert(ctx != NULL && name != NULL);
-
-    /*可能要先获取数据集属性。*/
-    if (!ctx->attr)
-    {
-        chk = SQLNumResultCols(ctx->stmt, &columns);
-        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-            goto final_error;
-
-        ctx->attr = good_allocator_alloc(NULL, columns, 0);
-        if (!ctx->attr)
-            goto final_error;
-
-        size_t sizes[6] = {NAME_MAX, sizeof(SQLSMALLINT), sizeof(SQLSMALLINT), sizeof(SQLULEN), sizeof(SQLSMALLINT), sizeof(SQLSMALLINT)};
-
-        for (size_t i = 0; i < ctx->attr->numbers; i++)
-        {
-            p = good_allocator_alloc(sizes, GOOD_ARRAY_SIZE(sizes), 0);
-            if(!p)
-                goto final_error;
-
-            ctx->attr->pptrs[i] = (uint8_t*)p;
-
-            chk = SQLDescribeCol(ctx->stmt, (SQLSMALLINT)(i + 1), p->pptrs[0], p->sizes[0], (SQLSMALLINT*)p->pptrs[1],
-                                 (SQLSMALLINT*)p->pptrs[2], (SQLULEN*)p->pptrs[3], (SQLSMALLINT*)p->pptrs[4], (SQLSMALLINT*)p->pptrs[5]);
-
-            if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-                goto final_error;
-        }
-
-        /*回调自己。*/
-        index = good_odbc_name2index(ctx,name);
-    }
-    else
-    {
-        for (index = ctx->attr->numbers - 1; index >= 0; index--)
-        {
-            p = (good_allocator_t *)ctx->attr->pptrs[index];
-            if (!p)
-                goto final_error;
-
-            if (good_strcmp((char *)p->pptrs[0], name, 0) == 0)
-                break;
-        }
-    }
-
-    return index;
-
-final_error:
-
-    for (size_t i = 0; i < ctx->attr->numbers; i++)
-        good_allocator_unref((good_allocator_t**)&ctx->attr->pptrs[i]);
-
-    good_allocator_unref(&ctx->attr);
-
-    return -1;
 }
 
 SQLRETURN good_odbc_prepare(good_odbc_t *ctx, const char *sql)
@@ -316,6 +341,88 @@ SQLRETURN good_odbc_fetch(good_odbc_t *ctx, SQLSMALLINT direction, SQLLEN offset
 final_error:
 
     return chk;
+}
+
+SQLRETURN good_odbc_get_data(good_odbc_t *ctx, SQLSMALLINT column, SQLSMALLINT type,
+                             SQLPOINTER buf, SQLULEN max, SQLULEN *len)
+{
+    SQLLEN StrLen_or_Ind = 0;
+    SQLLEN real_len = 0;
+    good_allocator_t *p = NULL;
+    SQLRETURN chk;
+
+    assert(ctx != NULL && column >=0 && buf != NULL && max >0);
+
+    /*创建数据集属性。*/
+    chk = good_odbc_alloc_attr(ctx);
+    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+        goto final_error;
+
+    p = (good_allocator_t *)ctx->attr->pptrs[column];
+    if (!p)
+    {
+        chk = SQL_ERROR;
+        goto final_error;
+    }
+
+    /*清除无效的值。*/
+    memset(p->pptrs[6],0,p->sizes[6]);
+
+    chk = SQLGetData(ctx->stmt, (SQLUSMALLINT)(column + 1), type, p->pptrs[6], p->sizes[6], &StrLen_or_Ind);
+    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+        goto final_error;
+
+    if (StrLen_or_Ind > 0)
+        real_len = GOOD_MIN(StrLen_or_Ind, max);
+    else 
+        real_len = GOOD_MIN(p->sizes[3], max);
+
+    /*复制数据。*/
+    memcpy(buf,p->pptrs[6],real_len);
+
+    /*可能还需要返回长度。*/
+    if(len)
+        *len = real_len;
+
+    return SQL_SUCCESS;
+
+final_error:
+
+    return chk;
+}
+
+SQLSMALLINT good_odbc_name2index(good_odbc_t *ctx, const char *name)
+{
+    SQLSMALLINT columns;
+    good_allocator_t *p;
+    SQLSMALLINT index;
+    SQLRETURN chk;
+
+    assert(ctx != NULL && name != NULL);
+
+    /*创建数据集属性。*/
+    chk = good_odbc_alloc_attr(ctx);
+    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+        goto final_error;
+
+    for (index = ctx->attr->numbers - 1; index >= 0; index--)
+    {
+        p = (good_allocator_t *)ctx->attr->pptrs[index];
+        if (!p)
+        {
+            chk = SQL_ERROR;
+            goto final_error;
+        }
+
+        if (good_strcmp((char *)p->pptrs[0], name, 0) == 0)
+            break;
+    }
+
+    return index;
+
+final_error:
+
+    return -1;
 }
 
 #endif //__SQLEXT_H

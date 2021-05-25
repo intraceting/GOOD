@@ -168,14 +168,6 @@ int good_sqlite_pagesize(sqlite3 *ctx, int size);
 int good_sqlite_journal_mode(sqlite3 *ctx, int mode);
 
 /**
- * 在数据集中查找字段的索引。
- * 
- * @return >= 0 成功(索引)，< 0 失败(未找到)。
- * 
-*/
-int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name);
-
-/**
  * 准备SQL语句。
  * 
  * @return !NULL(0) 成功(数据集指针)，NULL(0) 失败。
@@ -209,6 +201,13 @@ int good_sqlite_finalize(sqlite3_stmt *stmt);
 */
 int good_sqlite_exec_direct(sqlite3 *ctx,const char *sql);
 
+/**
+ * 在数据集中查找字段的索引。
+ * 
+ * @return >= 0 成功(索引)，< 0 失败(未找到)。
+ * 
+*/
+int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name);
 
 
 #endif //_SQLITE3_H_

@@ -36,6 +36,18 @@ typedef struct _good_odbc
 } good_odbc_t;
 
 /**
+ * 释放数据集属性。
+*/
+void good_odbc_free_attr(good_odbc_t *ctx);
+
+/**
+ * 创建数据集属性。
+ * 
+ * @warning 同一份数据集只会创建一次。
+*/
+SQLRETURN good_odbc_alloc_attr(good_odbc_t *ctx);
+
+/**
  * 清理数据集。
 */
 SQLRETURN good_odbc_clear_stmt(good_odbc_t *ctx);
@@ -79,12 +91,6 @@ SQLRETURN good_odbc_tran_end(good_odbc_t *ctx, SQLSMALLINT type);
 */
 #define good_odbc_tran_rollback(ctx) good_odbc_tran_end(ctx, SQL_ROLLBACK)
 
-/**
- * 在数据集中查找字段的索引。
- * 
- * @return >= 0 成功(索引)，< 0 失败(未找到)。
-*/
-SQLSMALLINT good_odbc_name2index(good_odbc_t *ctx, const char *name);
 
 /**
  * 准备SQL语句。
@@ -120,14 +126,32 @@ SQLRETURN good_odbc_affect(good_odbc_t *ctx,SQLLEN *rows);
 SQLRETURN good_odbc_fetch(good_odbc_t *ctx, SQLSMALLINT direction, SQLLEN offset);
 
 /**
- * 在数据集中向上移动游标。
+ * 在数据集中移动游标到首行。
 */
-#define good_odbc_fetch_prev(ctx, offset) good_odbc_fetch(ctx, SQL_FETCH_PRIOR, offset)
+#define good_odbc_fetch_prev(ctx) good_odbc_fetch(ctx, SQL_FETCH_FIRST, 0)
 
 /**
  * 在数据集中向下移动游标。
 */
-#define good_odbc_fetch_next(ctx, offset) good_odbc_fetch(ctx, SQL_FETCH_NEXT, offset)
+#define good_odbc_fetch_next(ctx) good_odbc_fetch(ctx, SQL_FETCH_NEXT, 0)
+
+
+/** 
+ * 获取数据集中指定字段的值。
+ * 
+ * @param max 缓存区最大长度，值超过这个长度的则会被截断。
+ * @param len 字段值长度的指针，返回前填充，NULL(0)忽略。
+ * 
+*/
+SQLRETURN good_odbc_get_data(good_odbc_t *ctx, SQLSMALLINT column, SQLSMALLINT type,
+                             SQLPOINTER buf, SQLULEN max, SQLULEN *len);
+
+/**
+ * 在数据集中查找字段的索引。
+ * 
+ * @return >= 0 成功(索引)，< 0 失败(未找到)。
+*/
+SQLSMALLINT good_odbc_name2index(good_odbc_t *ctx, const char *name);
 
 #endif //__SQLEXT_H
 
