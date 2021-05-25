@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
+#include <locale.h>
 #include "goodutil/odbc.h"
 
 #ifdef __SQLEXT_H
@@ -24,7 +25,7 @@ void test_insert(good_odbc_t *o)
     for(time_t i = begin+1;i<begin+1000;i++)
     {
         char sql[200] = {0};
-        sprintf(sql,"insert into LTR_TASK_TRACE(ID,TID,SID) VALUES('%ld','haha','123');",i);
+        sprintf(sql,"insert into LTR_TASK_TRACE(ID,TID,SID) VALUES('%ld','我们','他们');",i);
         SQLRETURN chk = good_odbc_exec_direct(o,sql);
 
         assert(chk==SQL_SUCCESS);
@@ -43,7 +44,7 @@ void test_select(good_odbc_t *o)
 
     assert(chk == SQL_SUCCESS);
 
-    size_t id = 1000000000000;
+    size_t id = 1000;
 
     chk = SQLBindParameter(o->stmt, 1, SQL_PARAM_INPUT, SQL_C_SBIGINT, SQL_NUMERIC, 0, 0,
                                      (SQLPOINTER)&id, sizeof(size_t), NULL);
@@ -88,14 +89,22 @@ void test_select(good_odbc_t *o)
 
 int main(int argc, char **argv)
 {
+    setlocale(LC_ALL,"");
 
     good_odbc_t o = {0};
 
-    assert(good_odbc_connect(&o,argv[1]) == SQL_SUCCESS);
+    const char *tracefile = "/tmp/mysql-trace.log";
+
+    assert(good_odbc_connect(&o,argv[1],30,tracefile) == SQL_SUCCESS);
+
+
+    test_select(&o);
 
     test_insert(&o);
 
     test_select(&o);
+
+    good_odbc_finalize(&o);
 
 
     assert(good_odbc_disconnect(&o) == SQL_SUCCESS);

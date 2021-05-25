@@ -48,11 +48,6 @@ void good_odbc_free_attr(good_odbc_t *ctx);
 SQLRETURN good_odbc_alloc_attr(good_odbc_t *ctx);
 
 /**
- * 清理数据集。
-*/
-SQLRETURN good_odbc_clear_stmt(good_odbc_t *ctx);
-
-/**
  * 断开连接。
 */
 SQLRETURN good_odbc_disconnect(good_odbc_t *ctx);
@@ -60,9 +55,12 @@ SQLRETURN good_odbc_disconnect(good_odbc_t *ctx);
 /**
  * 连接数据库。
  * 
- * @note 默认：禁用自动提交。
+ * @warning 默认：禁用自动提交。
+ * 
+ * @param timeout 超时(秒)，仅登录时有效。
+ * @param tracefile 跟踪文件，NULL(0) 忽略。
 */
-SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri);
+SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri,time_t timeout,const char *tracefile);
 
 /**
  * 启用或禁用自动提交。
@@ -91,9 +89,10 @@ SQLRETURN good_odbc_tran_end(good_odbc_t *ctx, SQLSMALLINT type);
 */
 #define good_odbc_tran_rollback(ctx) good_odbc_tran_end(ctx, SQL_ROLLBACK)
 
-
 /**
  * 准备SQL语句。
+ * 
+ * @warning 默认：启用静态游标。
 */
 SQLRETURN good_odbc_prepare(good_odbc_t *ctx, const char *sql);
 
@@ -103,6 +102,13 @@ SQLRETURN good_odbc_prepare(good_odbc_t *ctx, const char *sql);
  * @return SQL_SUCCESS(0) 成功，SQL_NO_DATA(100) 无数据，< 0 失败。
 */
 SQLRETURN good_odbc_execute(good_odbc_t *ctx);
+
+/**
+ * 关闭数据集。
+ * 
+ * @note 在good_odbc_execute之前执行有意义，其它情况可以不必执行，数据集允许复用。
+*/
+SQLRETURN good_odbc_finalize(good_odbc_t *ctx);
 
 /**
  * 直接执行SQL语句。

@@ -113,7 +113,7 @@ final_error:
     return chk;
 }
 
-SQLRETURN good_odbc_clear_stmt(good_odbc_t *ctx)
+SQLRETURN good_odbc_disconnect(good_odbc_t *ctx)
 {
     SQLRETURN chk;
 
@@ -121,7 +121,7 @@ SQLRETURN good_odbc_clear_stmt(good_odbc_t *ctx)
 
     /*清理数据集属性。*/
     good_odbc_free_attr(ctx);
-
+    
     if (ctx->stmt)
     {
         chk = SQLFreeHandle(SQL_HANDLE_STMT, ctx->stmt);
@@ -130,23 +130,6 @@ SQLRETURN good_odbc_clear_stmt(good_odbc_t *ctx)
 
         ctx->stmt = NULL;
     }
-
-    return SQL_SUCCESS;
-
-final_error:
-
-    return chk;
-}
-
-SQLRETURN good_odbc_disconnect(good_odbc_t *ctx)
-{
-    SQLRETURN chk;
-
-    assert(ctx != NULL);
-
-    chk = good_odbc_clear_stmt(ctx);
-    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-        goto final_error;
 
     if (ctx->dbc)
     {
@@ -177,25 +160,44 @@ final_error:
     return chk;
 }
 
-SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri)
+SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri, time_t timeout, const char *tracefile)
 {
     SQLRETURN chk;
 
-    assert(ctx != NULL && uri != NULL);
+    assert(ctx != NULL && uri != NULL && timeout >= 0);
 
-    memset(ctx,0,sizeof(*ctx));
+    if (!ctx->env)
+    {
+        chk = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &ctx->env);
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
 
-    chk = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &ctx->env);
-    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-        goto final_error;
+        chk = SQLSetEnvAttr(ctx->env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
+    }
 
-    chk = SQLSetEnvAttr(ctx->env, SQL_ATTR_ODBC_VERSION, (void *)SQL_OV_ODBC3, 0);
-    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-        goto final_error;
+    if (!ctx->dbc)
+    {
+        chk = SQLAllocHandle(SQL_HANDLE_DBC, ctx->env, &ctx->dbc);
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
 
-    chk = SQLAllocHandle(SQL_HANDLE_DBC, ctx->env, &ctx->dbc);
-    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-        goto final_error;
+        chk = SQLSetConnectAttr(ctx->dbc, SQL_ATTR_LOGIN_TIMEOUT, (SQLPOINTER)timeout, 0);
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
+
+        if(tracefile)
+        {
+            chk = SQLSetConnectAttr(ctx->dbc, SQL_ATTR_TRACE, (SQLPOINTER)1, 0);
+            if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+                goto final_error;
+
+            chk = SQLSetConnectAttr(ctx->dbc, SQL_ATTR_TRACEFILE, tracefile, strlen(tracefile));
+            if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+                goto final_error;
+        }
+    }
 
     chk = SQLDriverConnect(ctx->dbc, (SQLHWND)NULL, (SQLCHAR *)uri, SQL_NTS, NULL, 0, NULL, SQL_DRIVER_NOPROMPT);
     if (_good_odbc_check_return(chk) != SQL_SUCCESS)
@@ -251,16 +253,19 @@ SQLRETURN good_odbc_prepare(good_odbc_t *ctx, const char *sql)
 
     assert(ctx != NULL && sql != NULL);
 
-    /*清理旧的数据集。*/
-    good_odbc_clear_stmt(ctx);
+    /*清理旧的数据集属性。*/
+    good_odbc_free_attr(ctx);
 
-    chk = SQLAllocHandle(SQL_HANDLE_STMT, ctx->dbc, &ctx->stmt);
-    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-        goto final_error;
+    if (!ctx->stmt)
+    {
+        chk = SQLAllocHandle(SQL_HANDLE_STMT, ctx->dbc, &ctx->stmt);
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
 
-    chk = SQLSetStmtAttr(ctx->stmt, SQL_ATTR_CURSOR_TYPE, (SQLPOINTER)SQL_CURSOR_STATIC, 0);
-    if (_good_odbc_check_return(chk) != SQL_SUCCESS)
-        goto final_error;
+        chk = SQLSetStmtAttr(ctx->stmt, SQL_ATTR_CURSOR_TYPE, (SQLPOINTER)SQL_CURSOR_STATIC, 0);
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
+    }
 
     chk = SQLPrepare(ctx->stmt, (SQLCHAR *)sql, SQL_NTS);
     if (_good_odbc_check_return(chk) != SQL_SUCCESS)
@@ -282,6 +287,31 @@ SQLRETURN good_odbc_execute(good_odbc_t *ctx)
     chk = SQLExecute(ctx->stmt);
     if (_good_odbc_check_return(chk) != SQL_SUCCESS)
         goto final_error;
+
+    return SQL_SUCCESS;
+
+final_error:
+
+    return chk;
+}
+
+SQLRETURN good_odbc_finalize(good_odbc_t *ctx)
+{
+    SQLRETURN chk;
+
+    assert(ctx != NULL);
+
+    /*清理数据集属性。*/
+    good_odbc_free_attr(ctx);
+    
+    if (ctx->stmt)
+    {
+        chk = SQLFreeHandle(SQL_HANDLE_STMT, ctx->stmt);
+        if (_good_odbc_check_return(chk) != SQL_SUCCESS)
+            goto final_error;
+
+        ctx->stmt = NULL;
+    }
 
     return SQL_SUCCESS;
 
