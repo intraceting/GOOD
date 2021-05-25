@@ -132,34 +132,24 @@ sqlite3 *good_sqlite_open(const char *name);
 #define good_sqlite_memopen() good_sqlite_open(":memory:")
 
 /**
- * 直接执行SQL语句。
- * 
- * @warning 查询不能用。
- * 
- * @return SQLITE_OK(0) 成功，!SQLITE_OK(0) 失败。
- * 
-*/
-int good_sqlite_exec_direct(sqlite3 *ctx, const char *sql);
-
-/**
  * 启动事物。
 */
-#define good_sqlite_tran_begin(ctx) good_sqlite_exec_direct(ctx, "begin;")
+#define good_sqlite_tran_begin(ctx) sqlite3_exec(ctx, "begin;", NULL, NULL, NULL)
 
 /**
  * 提交事物。
 */
-#define good_sqlite_tran_commit(ctx) good_sqlite_exec_direct(ctx, "commit;")
+#define good_sqlite_tran_commit(ctx) sqlite3_exec(ctx, "commit;", NULL, NULL, NULL)
 
 /**
  * 回滚事物。
 */
-#define good_sqlite_tran_rollback(ctx) good_sqlite_exec_direct(ctx, "rollback;")
+#define good_sqlite_tran_rollback(ctx) sqlite3_exec(ctx, "rollback;", NULL, NULL, NULL)
 
 /**
  * 回收空间。
 */
-#define good_sqlite_tran_vacuum(ctx) good_sqlite_exec_direct(ctx, "vacuum;")
+#define good_sqlite_tran_vacuum(ctx) sqlite3_exec(ctx, "vacuum;", NULL, NULL, NULL)
 
 /** 
  * 设置页大小。
@@ -178,9 +168,9 @@ int good_sqlite_pagesize(sqlite3 *ctx, int size);
 int good_sqlite_journal_mode(sqlite3 *ctx, int mode);
 
 /**
- * 在查询结果中查找字段名的索引。
+ * 在数据集中查找字段的索引。
  * 
- * @return >= 0 成功(序号)，< 0 失败。
+ * @return >= 0 成功(索引)，< 0 失败(未找到)。
  * 
 */
 int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name);
@@ -208,6 +198,17 @@ int good_sqlite_step(sqlite3_stmt *stmt);
  * 
 */
 int good_sqlite_finalize(sqlite3_stmt *stmt);
+
+/**
+ * 直接执行SQL语句。
+ * 
+ * @warning 不能用于返回数据集。
+ * 
+ * @return >= 0 成功。< 0 出错。
+ * 
+*/
+int good_sqlite_exec_direct(sqlite3 *ctx,const char *sql);
+
 
 
 #endif //_SQLITE3_H_

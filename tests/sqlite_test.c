@@ -30,9 +30,8 @@ void test_insert(sqlite3 *ctx)
     {
         char sql[200] = {0};
         sprintf(sql,"insert into COMPANY VALUES('%d','haha',123,'ertwertert');",i);
-        chk = good_sqlite_exec_direct(ctx,sql);
-
-        assert(chk==SQLITE_OK);
+        int more = good_sqlite_exec_direct(ctx,sql);
+        assert(more>=0);
     }
 
     chk = good_sqlite_tran_commit(ctx);

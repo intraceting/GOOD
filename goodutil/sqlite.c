@@ -78,13 +78,6 @@ sqlite3* good_sqlite_open(const char *name)
     return ctx;
 }
 
-int good_sqlite_exec_direct(sqlite3 *ctx,const char *sql)
-{
-    assert(ctx != NULL && sql != NULL);
-
-    return sqlite3_exec(ctx, sql, NULL, NULL, NULL);
-}
-
 int good_sqlite_pagesize(sqlite3 * ctx,int size)
 {
     char sql[100] = {0};
@@ -95,11 +88,12 @@ int good_sqlite_pagesize(sqlite3 * ctx,int size)
 
     snprintf(sql, 100, "PRAGMA page_size = %d;", size);
 
-    return good_sqlite_exec_direct(ctx,sql);
+    return sqlite3_exec(ctx, sql, NULL, NULL, NULL);
 }
 
 int good_sqlite_journal_mode(sqlite3 *ctx, int mode)
 {
+    const char *sql = "";
     int chk;
 
     assert(ctx != NULL && mode >= GOOD_SQLITE_JOURNAL_OFF && mode <= GOOD_SQLITE_JOURNAL_WAL);
@@ -107,28 +101,28 @@ int good_sqlite_journal_mode(sqlite3 *ctx, int mode)
     switch (mode)
     {
     case GOOD_SQLITE_JOURNAL_OFF:
-        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = OFF;");
+        sql = "PRAGMA journal_mode = OFF;";
         break;
     case GOOD_SQLITE_JOURNAL_DELETE:
-        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = DELETE;");
+        sql = "PRAGMA journal_mode = DELETE;";
         break;
     case GOOD_SQLITE_JOURNAL_TRUNCATE:
-        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = TRUNCATE;");
+        sql = "PRAGMA journal_mode = TRUNCATE;";
         break;
     case GOOD_SQLITE_JOURNAL_PERSIST:
-        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = PERSIST;");
+        sql = "PRAGMA journal_mode = PERSIST;";
         break;
     case GOOD_SQLITE_JOURNAL_MEMORY:
-        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = MEMORY;");
+        sql = "PRAGMA journal_mode = MEMORY;";
         break;
     case GOOD_SQLITE_JOURNAL_WAL:
-        chk = good_sqlite_exec_direct(ctx, "PRAGMA journal_mode = WAL;");
+        sql = "PRAGMA journal_mode = WAL;";
         break;
     default:
-        chk = SQLITE_PERM;
+        sql = "";
     }
 
-    return chk;
+    return sqlite3_exec(ctx, sql, NULL, NULL, NULL);
 }
 
 int good_sqlite_name2index(sqlite3_stmt *stmt, const char *name)
@@ -188,6 +182,23 @@ int good_sqlite_finalize(sqlite3_stmt *stmt)
     assert(stmt != NULL);
 
     return sqlite3_finalize(stmt);
+}
+
+int good_sqlite_exec_direct(sqlite3 *ctx,const char *sql)
+{
+    sqlite3_stmt *stmt;
+    int chk;
+
+    assert(ctx != NULL && sql != NULL);
+
+     stmt = good_sqlite_prepare(ctx,sql);
+     if(!stmt)
+        return -1;
+
+     chk = good_sqlite_step(stmt);
+     good_sqlite_finalize(stmt);
+
+     return chk;
 }
 
 #endif //_SQLITE3_H_
