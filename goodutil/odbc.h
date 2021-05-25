@@ -63,6 +63,25 @@ SQLRETURN good_odbc_disconnect(good_odbc_t *ctx);
 SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri,time_t timeout,const char *tracefile);
 
 /**
+ * 连接数据库。
+ * 
+ * @warning 默认：使用TCP连接。
+ * 
+ * @param product 产品名称的指针。支持：DB2/MYSQL/ORACLE/SQLSERVER/POSTGRESQL
+ * @param driver 驱动名称的指针。见：/etc/odbcinst.ini
+ * @param host 主机地址的指针。
+ * @param port 主机端口。
+ * @param db 数据库名称的指针。
+ * @param user 登录用名称的指针。
+ * @param pwd 登录密码的指针。
+ * 
+*/
+SQLRETURN good_odbc_connect2(good_odbc_t *ctx, const char *product, const char *driver,
+                             const char *host, uint16_t port, const char *db,
+                             const char *user, const char *pwd,
+                             time_t timeout, const char *tracefile);
+
+/**
  * 启用或禁用自动提交。
  * 
  * @param enable !0 启用，0 禁用。

@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <locale.h>
+#include "goodutil/getargs.h"
 #include "goodutil/odbc.h"
 
 #ifdef __SQLEXT_H
@@ -91,12 +92,26 @@ int main(int argc, char **argv)
 {
     setlocale(LC_ALL,"");
 
+    good_tree_t *t = good_tree_alloc(NULL);
+
+    good_getargs(t,argc,argv,"--");
+
     good_odbc_t o = {0};
 
     const char *tracefile = "/tmp/mysql-trace.log";
 
-    assert(good_odbc_connect(&o,argv[1],30,tracefile) == SQL_SUCCESS);
+ //   assert(good_odbc_connect(&o,argv[1],30,tracefile) == SQL_SUCCESS);
 
+    assert(good_odbc_connect2(&o,
+                              good_option_get(t, "--product", 0, ""),
+                              good_option_get(t, "--driver", 0, ""),
+                              good_option_get(t, "--host", 0, ""),
+                              good_option_get_int(t, "--port", 0, 1234),
+                              good_option_get(t, "--db", 0, ""),
+                              good_option_get(t, "--user", 0, ""),
+                              good_option_get(t, "--pwd", 0, ""),
+                              30, 
+                              tracefile) == SQL_SUCCESS);
 
     test_select(&o);
 
@@ -108,6 +123,8 @@ int main(int argc, char **argv)
 
 
     assert(good_odbc_disconnect(&o) == SQL_SUCCESS);
+
+    good_tree_free(&t);
 
     return 0;
 }

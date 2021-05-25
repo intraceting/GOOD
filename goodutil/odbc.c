@@ -193,7 +193,7 @@ SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri, time_t timeout, c
             if (_good_odbc_check_return(chk) != SQL_SUCCESS)
                 goto final_error;
 
-            chk = SQLSetConnectAttr(ctx->dbc, SQL_ATTR_TRACEFILE, tracefile, strlen(tracefile));
+            chk = SQLSetConnectAttr(ctx->dbc, SQL_ATTR_TRACEFILE, (SQLPOINTER)tracefile, strlen(tracefile));
             if (_good_odbc_check_return(chk) != SQL_SUCCESS)
                 goto final_error;
         }
@@ -208,6 +208,47 @@ SQLRETURN good_odbc_connect(good_odbc_t *ctx, const char *uri, time_t timeout, c
 final_error:
 
     return chk;
+}
+
+SQLRETURN good_odbc_connect2(good_odbc_t *ctx, const char *product, const char *driver,
+                             const char *host, uint16_t port, const char *db,
+                             const char *user, const char *pwd,
+                             time_t timeout, const char *tracefile)
+{
+    char uri[NAME_MAX]={0};
+
+    assert(product != NULL && driver != NULL && host != NULL && port > 0 &&
+           db != NULL && user != NULL && pwd != NULL);
+
+    if (good_strcmp(product, "db2", 0) == 0)
+    {
+        snprintf(uri, NAME_MAX, "DRIVER=%s;HOSTNAME=%s;PORT=%hu;DATABASE=%s;UID=%s;PWD=%s;PROTOCOL=TCPIP;CONNECTTYPE=1;",
+                 driver, host, port, db, user, pwd);
+    }
+    else if(good_strcmp(product,"oracle", 0) == 0)
+    {
+        snprintf(uri, NAME_MAX, "DRIVER={%s};DBQ=%s:%hu/%s;UID=%s;PWD=%s;",
+                 driver, host, port, db, user, pwd);
+    }
+    else if(good_strcmp(product,"mysql", 0) == 0)
+    {
+        /*CHARSET=UTF8;*/
+        snprintf(uri, NAME_MAX, "DRIVER=%s;SERVER=%s;TCP_PORT=%hu;DATABASE=%s;UID=%s;PWD=%s;",
+                driver, host, port, db, user, pwd);
+    }
+    else if(good_strcmp(product,"sqlserver", 0) == 0)
+    {
+        snprintf(uri, NAME_MAX, "Driver={%s};Server=%s;TCP_PORT=%hu;Database=%s;UID=%s;PWD=%s;",
+                driver, host, port, db, user, pwd);
+    }
+    else if(good_strcmp(product,"postgresql", 0) == 0)
+    {
+        /*CHARSET=UTF8;*/
+        snprintf(uri, NAME_MAX, "DRIVER=%s;SERVER=%s;TCP_PORT=%hu;DATABASE=%s;UID=%s;PWD=%s;",
+                driver, host, port, db, user, pwd);
+    }
+
+    return good_odbc_connect(ctx,uri,timeout,tracefile);
 }
 
 SQLRETURN good_odbc_autocommit(good_odbc_t *ctx, int enable)
