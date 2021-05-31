@@ -15,7 +15,7 @@
 
 void test_get_sn()
 {
-    int fd = good_open("/dev/sg10",0,0,0);
+    int fd = good_open("/dev/st0",0,0,0);
 
     good_scsi_io_stat stat = {0};
     
