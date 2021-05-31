@@ -153,7 +153,7 @@ SQLRETURN good_odbc_fetch(good_odbc_t *ctx, SQLSMALLINT direction, SQLLEN offset
 /**
  * 在数据集中移动游标到首行。
 */
-#define good_odbc_fetch_prev(ctx) good_odbc_fetch(ctx, SQL_FETCH_FIRST, 0)
+#define good_odbc_fetch_first(ctx) good_odbc_fetch(ctx, SQL_FETCH_FIRST, 0)
 
 /**
  * 在数据集中向下移动游标。

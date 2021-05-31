@@ -56,7 +56,7 @@ void test_select(good_odbc_t *o)
 
     assert(chk == SQL_SUCCESS || chk == SQL_NO_DATA);
 
-    chk = good_odbc_fetch_prev(o);
+    chk = good_odbc_fetch_first(o);
 
     assert(chk == SQL_SUCCESS || chk == SQL_NO_DATA);
 
