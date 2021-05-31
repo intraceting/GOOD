@@ -70,7 +70,7 @@ static good_tree_t *_good_map_find(good_map_t *map, const void *key, size_t ksiz
         if (it)
         {
             /*存放桶的索引值。*/
-            *GOOD_PTR2PTR(uint64_t, it->alloc->pptrs[GOOD_MAP_BUCKET], 0) = bucket;
+            GOOD_PTR2OBJ(uint64_t, it->alloc->pptrs[GOOD_MAP_BUCKET], 0) = bucket;
 
             /* 桶加入到表格中。*/
             good_tree_insert2(map->table, it, 0);

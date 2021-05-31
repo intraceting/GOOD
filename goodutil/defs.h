@@ -72,6 +72,16 @@
 #include <sqlext.h>
 #endif //HAVE_UNIXODBC
 
+#ifdef HAVE_OPENSSL 
+#include <openssl/opensslconf.h>
+#include <openssl/err.h>
+#ifndef OPENSSL_NO_RSA
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif //OPENSSL_NO_RSA
+#endif //HAVE_OPENSSL
+
+
 /**
  * 主版本号。
  * 
@@ -179,5 +189,6 @@
  * 计算数组大小。
 */
 #define GOOD_ARRAY_SIZE(V) (sizeof((V)) / sizeof((V)[0]))
+
 
 #endif //GOODUTIL_DEFS_H

@@ -341,7 +341,7 @@ uint32_t good_hash_bkdr(const void* data,size_t size)
 
     for (size_t i = 0; i < size;i++)
     {
-        hash = (hash * seed) + (*GOOD_PTR2PTR(uint8_t,data,i));
+        hash = (hash * seed) + GOOD_PTR2OBJ(uint8_t,data,i);
     }
 
     return hash;
@@ -356,7 +356,7 @@ uint64_t good_hash_bkdr64(const void* data,size_t size)
 
     for (size_t i = 0; i < size;i++)
     {
-        hash = (hash * seed) + (*GOOD_PTR2PTR(uint8_t,data,i));
+        hash = (hash * seed) + GOOD_PTR2OBJ(uint8_t,data,i);
     }
 
     return hash; 

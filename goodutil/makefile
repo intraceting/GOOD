@@ -111,7 +111,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/tar.o \
 	${OBJ_PATH}/termios.o \
 	${OBJ_PATH}/sqlite.o \
-	${OBJ_PATH}/odbc.o
+	${OBJ_PATH}/odbc.o \
+	${OBJ_PATH}/rsa.o
 
 
 #
@@ -174,6 +175,7 @@ install:
 	cp  -f $(CURDIR)/notify.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/option.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/pool.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/rsa.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/scsi.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/signal.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/socket.h ${INSTALL_PATH_INC}/
@@ -222,6 +224,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/notify.h
 	rm -f ${INSTALL_PATH_INC}/option.h
 	rm -f ${INSTALL_PATH_INC}/pool.h
+	rm -f ${INSTALL_PATH_INC}/rsa.h
 	rm -f ${INSTALL_PATH_INC}/scsi.h
 	rm -f ${INSTALL_PATH_INC}/signal.h
 	rm -f ${INSTALL_PATH_INC}/socket.h

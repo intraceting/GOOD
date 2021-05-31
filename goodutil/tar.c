@@ -128,14 +128,14 @@ uint32_t good_tar_calc_checksum(good_tar_hdr *hdr)
 
     for (i = 0; i < 148; ++i)
     {
-        sum += *GOOD_PTR2PTR(uint8_t, hdr, i);
+        sum += GOOD_PTR2OBJ(uint8_t, hdr, i);
     }
 
     /*-----跳过checksum(8bytes)字段------*/
 
     for (i += 8; i < 512; ++i) //...........
     {
-        sum += *GOOD_PTR2PTR(uint8_t, hdr, i);
+        sum += GOOD_PTR2OBJ(uint8_t, hdr, i);
     }
 
     sum += 256;

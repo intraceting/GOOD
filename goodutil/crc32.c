@@ -43,7 +43,7 @@ uint32_t good_crc32_sum(const void *data,size_t size,uint32_t old)
 
     for (size_t i = 0; i < size; i++)
     {
-        sum = table[(sum ^ *GOOD_PTR2PTR(uint8_t, data,i)) & 0xFF] ^ (sum >> 8);
+        sum = table[(sum ^ GOOD_PTR2OBJ(uint8_t, data,i)) & 0xFF] ^ (sum >> 8);
     }
 
     return ~sum;
