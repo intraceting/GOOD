@@ -74,7 +74,7 @@ size_t good_aes_set_key_iv(uint8_t *iv, const void *salt, size_t len, uint8_t pa
     return iv_bytes;
 }
 
-ssize_t good_aes_encrypt(void *dst, const void *src, size_t len, const good_aes_t *key)
+ssize_t good_aes_ecb_encrypt(void *dst, const void *src, size_t len, const good_aes_t *key)
 {
     size_t blocks;
     size_t fixlen;
@@ -102,4 +102,27 @@ ssize_t good_aes_encrypt(void *dst, const void *src, size_t len, const good_aes_
 final:
 
     return good_align(len, AES_BLOCK_SIZE);
+}
+
+int good_aes_ecb_decrypt(void *dst, const void *src, size_t len, const good_aes_t *key)
+{
+    size_t blocks;
+    size_t fixlen;
+
+    blocks = len / AES_BLOCK_SIZE;
+    fixlen = len % AES_BLOCK_SIZE;
+
+    if (fixlen != 0)
+        GOOD_ERRNO_AND_GOTO1(EINVAL, final_error);
+
+    for (size_t i = 0; i < blocks; i++)
+    {
+        AES_decrypt(GOOD_PTR2U8PTR(src, i * AES_BLOCK_SIZE), GOOD_PTR2I8PTR(dst, i * AES_BLOCK_SIZE), &key->key);
+    }
+
+    return 1;
+
+final_error:
+
+    return -1;
 }

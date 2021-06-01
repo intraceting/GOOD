@@ -111,7 +111,7 @@ ssize_t good_rsa_ecb_encrypt(void *dst, const void *src, size_t len, RSA *key, i
 /**
  * 解密，ECB模式。
  * 
- * @param dst 明文的指针，可用空间至少与长度的相等。
+ * @param dst 明文的指针，可用空间至少与密文长度的相等。
  * @param src 密文的指针。
  * @param len 长度。
  * @param key  

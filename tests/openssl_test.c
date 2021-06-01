@@ -11,6 +11,7 @@
 #include <locale.h>
 #include "goodutil/getargs.h"
 #include "goodutil/rsa.h"
+#include "goodutil/aes.h"
 
 #ifdef HEADER_RSA_H
 
@@ -97,6 +98,39 @@ void test_rsa(good_tree_t *opt)
 
 #endif //HEADER_RSA_H
 
+#ifdef HEADER_AES_H
+
+void test_aes(good_tree_t *opt)
+{
+    good_aes_t ek,dk;
+
+    assert(good_aes_set_key(&ek.key,"abcde",5,9,1)>0);
+    assert(good_aes_set_key(&dk.key,"abcde",5,9,0)>0);
+
+ char *buf1 = (char*) good_heap_alloc(1000);
+    char *buf2 = (char*) good_heap_alloc(2000);
+    char *buf3 = (char*) good_heap_alloc(2000);
+
+    memset(buf1,'a',1000);
+
+   ssize_t m= good_aes_ecb_encrypt(buf2,buf1,1000,&ek);
+
+   assert(m>0);
+
+   int chk = good_aes_ecb_decrypt(buf3,buf2,m,&dk);
+
+   assert(chk>0);
+
+    assert(memcmp(buf1,buf3,1000)==0);
+
+
+   good_heap_free(buf1);
+    good_heap_free(buf2);
+    good_heap_free(buf3);
+
+}
+
+#endif //HEADER_AES_H
 
 int main(int argc, char **argv)
 {
@@ -110,6 +144,12 @@ int main(int argc, char **argv)
     test_rsa(t);
     
 #endif //HEADER_RSA_H
+
+#ifdef HEADER_AES_H
+
+    test_aes(t);
+
+#endif //HEADER_AES_H
 
 
     good_tree_free(&t);

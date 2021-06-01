@@ -70,6 +70,17 @@ size_t good_aes_set_key_iv(uint8_t *iv, const void *salt, size_t len, uint8_t pa
 */
 ssize_t good_aes_ecb_encrypt(void *dst, const void *src, size_t len, const good_aes_t *key);
 
+/**
+ * 解密，ECB模式。
+ * 
+ * @param dst 明文的指针，可用空间至少与密文长度的相等。
+ * @param src 密文的指针。
+ * @param len 长度，必须为AES_BLOCK_SIZE的整数倍。
+ * 
+ * @return > 0 成功，<= 0 失败。
+*/
+int good_aes_ecb_decrypt(void *dst, const void *src, size_t len, const good_aes_t *key);
+
 
 #endif //HEADER_AES_H
 
