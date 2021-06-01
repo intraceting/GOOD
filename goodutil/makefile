@@ -43,11 +43,16 @@ INSTALL_PREFIX = /usr/local/good/
 endif
 
 #
+ARNAME = lib${PROJECT_NAME}.a
+ARREALNAME = ${ARNAME}.${VERSION_MAJOR}.${VERSION_MINOR}
+#
 SONAME = lib${PROJECT_NAME}.so
 SOREALNAME = ${SONAME}.${VERSION_MAJOR}.${VERSION_MINOR}
+#
 PKGNAME = ${PROJECT_NAME}.pc
 
-
+#Archive
+ARC = ar
 #Compiler
 CCC = gcc
 
@@ -121,10 +126,12 @@ all: ${PROJECT_NAME}
 #
 ${PROJECT_NAME}: $(OBJ_FILES)
 	mkdir -p $(BUILD_PATH)
-	rm -f $@
+	rm -f $(BUILD_PATH)/${SOREALNAME}
 	$(CCC) -o $(BUILD_PATH)/${SOREALNAME} $^ $(LINK_FLAGS) -shared
 	ln -f -s ${SOREALNAME} $(BUILD_PATH)/${SONAME}
-
+	rm -f $(BUILD_PATH)/${ARREALNAME}
+	$(ARC) rcs $(BUILD_PATH)/${ARREALNAME} $^
+	ln -f -s ${ARREALNAME} $(BUILD_PATH)/${ARNAME}
 #
 $(OBJ_PATH)/%.o: %.c
 	mkdir -p $(OBJ_PATH)

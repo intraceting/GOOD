@@ -47,6 +47,7 @@ CCC_FLAGS += -I$(abspath $(CURDIR)/../) ${DEPEND_FLAGS}
 
 #
 LINK_FLAGS += -lgoodutil -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
+#LINK_FLAGS += -l:libgoodutil.a -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
