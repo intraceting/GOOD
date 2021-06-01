@@ -129,7 +129,7 @@ int good_mtx_read_element_status(int fd, uint8_t type, uint16_t address, uint16_
                                  uint32_t timeout, good_scsi_io_stat *stat);
 
 /**
- * 分析设备无件状态，构造结构化数据。
+ * 分析设备元件状态，构造结构化数据。
  * 
  * @see good_mtx_read_element_status
 */

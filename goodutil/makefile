@@ -149,7 +149,7 @@ install:
 	mkdir -p ${INSTALL_PATH_LIB}
 	cp -f $(BUILD_PATH)/${SOREALNAME} ${INSTALL_PATH_LIB}/
 	ln -f -s ${SOREALNAME} ${INSTALL_PATH_LIB}/${SONAME}
-
+	
 #
 	mkdir -p ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/allocator.h ${INSTALL_PATH_INC}/
@@ -201,6 +201,10 @@ install:
 #
 uninstall:
 #
+	rm -f ${INSTALL_PATH_LIB}/${SOREALNAME}
+	rm -f ${INSTALL_PATH_LIB}/${SONAME}
+
+#
 	rm -f ${INSTALL_PATH_INC}/allocator.h
 	rm -f ${INSTALL_PATH_INC}/atomic.h
 	rm -f ${INSTALL_PATH_INC}/base64.h
@@ -235,6 +239,4 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/tree.h
 
 #
-	rm -f ${INSTALL_PATH_LIB}/${SOREALNAME}
-	rm -f ${INSTALL_PATH_LIB}/${SONAME}
 	rm -f ${INSTALL_PATH_PKG}/${PKGNAME}
