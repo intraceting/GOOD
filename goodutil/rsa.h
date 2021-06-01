@@ -111,7 +111,7 @@ ssize_t good_rsa_ecb_encrypt(void *dst, const void *src, size_t len, RSA *key, i
 /**
  * 解密，ECB模式。
  * 
- * @param dst 明文的指针。
+ * @param dst 明文的指针，可用空间至少与长度的相等。
  * @param src 密文的指针。
  * @param len 长度。
  * @param key  
@@ -119,9 +119,9 @@ ssize_t good_rsa_ecb_encrypt(void *dst, const void *src, size_t len, RSA *key, i
  * @param padding 见RSA_*_PADDING。
  * 
  * @return > 0 成功，<= 0 失败。
- * 
  */
-int good_rsa_ecb_decrypt(void *dst, const void *src, ssize_t len, RSA *key, int type, int padding);
+int good_rsa_ecb_decrypt(void *dst, const void *src, size_t len, RSA *key, int type, int padding);
+
 
 #endif //EADER_RSA_H
 

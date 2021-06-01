@@ -198,7 +198,7 @@ final_error:
     return ret;
 }
 
-int good_rsa_ecb_decrypt(void *dst, const void *src, ssize_t len, RSA *key, int type, int padding)
+int good_rsa_ecb_decrypt(void *dst, const void *src, size_t len, RSA *key, int type, int padding)
 {
     int key_size;
     size_t padding_size;

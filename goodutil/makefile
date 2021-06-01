@@ -53,6 +53,7 @@ PKGNAME = ${PROJECT_NAME}.pc
 
 #Archive
 ARC = ar
+
 #Compiler
 CCC = gcc
 
@@ -117,7 +118,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/termios.o \
 	${OBJ_PATH}/sqlite.o \
 	${OBJ_PATH}/odbc.o \
-	${OBJ_PATH}/rsa.o
+	${OBJ_PATH}/rsa.o \
+	${OBJ_PATH}/aes.o
 
 
 #
@@ -159,6 +161,7 @@ install:
 	
 #
 	mkdir -p ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/aes.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/allocator.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/atomic.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/base64.h ${INSTALL_PATH_INC}/
@@ -212,6 +215,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_LIB}/${SONAME}
 
 #
+	rm -f ${INSTALL_PATH_INC}/aes.h
 	rm -f ${INSTALL_PATH_INC}/allocator.h
 	rm -f ${INSTALL_PATH_INC}/atomic.h
 	rm -f ${INSTALL_PATH_INC}/base64.h
