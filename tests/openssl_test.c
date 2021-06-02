@@ -102,10 +102,17 @@ void test_rsa(good_tree_t *opt)
 
 void test_aes(good_tree_t *opt)
 {
-    good_aes_t ek,dk;
+    AES_KEY ek,dk;
+    AES_KEY ek2,dk2;
+    uint8_t iv[AES_BLOCK_SIZE * 4];
 
-    assert(good_aes_set_key(&ek.key,"abcde",5,9,1)>0);
-    assert(good_aes_set_key(&dk.key,"abcde",5,9,0)>0);
+    assert(good_aes_set_key(&ek,"abcde",5,9,1)>0);
+    assert(good_aes_set_key(&dk,"abcde",5,9,0)>0);
+
+    assert(good_aes_set_key(&ek2,"qwert",5,9,1)>0);
+    assert(good_aes_set_key(&dk2,"qwert",5,9,0)>0);
+
+    assert(good_aes_set_iv(iv,"12345789344wewqerwreqwer",20,9)>0);
 
  char *buf1 = (char*) good_heap_alloc(1000);
     char *buf2 = (char*) good_heap_alloc(2000);
@@ -122,6 +129,16 @@ void test_aes(good_tree_t *opt)
    assert(chk>0);
 
     assert(memcmp(buf1,buf3,1000)==0);
+
+    m= good_aes_ige_encrypt(buf2,buf1,16*16,&ek,iv);
+
+    assert(m>0);
+
+    chk = good_aes_ige_decrypt(buf3,buf2,m,&dk,iv);
+
+   assert(chk>0);
+
+    assert(memcmp(buf1,buf3,16*16)==0);
 
 
    good_heap_free(buf1);
