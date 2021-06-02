@@ -104,7 +104,7 @@ void test_aes(good_tree_t *opt)
 {
     AES_KEY ek,dk;
     AES_KEY ek2,dk2;
-    uint8_t iv[AES_BLOCK_SIZE * 4];
+    uint8_t iv[AES_BLOCK_SIZE * 4] = {0};
 
     assert(good_aes_set_key(&ek,"abcde",5,9,1)>0);
     assert(good_aes_set_key(&dk,"abcde",5,9,0)>0);
@@ -114,31 +114,19 @@ void test_aes(good_tree_t *opt)
 
     assert(good_aes_set_iv(iv,"12345789344wewqerwreqwer",20,9)>0);
 
- char *buf1 = (char*) good_heap_alloc(1000);
+    char *buf1 = (char*) good_heap_alloc(1000);
     char *buf2 = (char*) good_heap_alloc(2000);
     char *buf3 = (char*) good_heap_alloc(2000);
 
     memset(buf1,'a',1000);
 
-   ssize_t m= good_aes_ecb_encrypt(buf2,buf1,1000,&ek);
+    int len = AES_BLOCK_SIZE * 16;
+    AES_bi_ige_encrypt(buf1,buf2,len,&ek,&ek2,iv,AES_ENCRYPT);
 
-   assert(m>0);
+    AES_bi_ige_encrypt(buf2,buf3,len,&dk,&dk2,iv,AES_DECRYPT);
 
-   int chk = good_aes_ecb_decrypt(buf3,buf2,m,&dk);
 
-   assert(chk>0);
-
-    assert(memcmp(buf1,buf3,1000)==0);
-
-    m= good_aes_ige_encrypt(buf2,buf1,16*16,&ek,iv);
-
-    assert(m>0);
-
-    chk = good_aes_ige_decrypt(buf3,buf2,m,&dk,iv);
-
-   assert(chk>0);
-
-    assert(memcmp(buf1,buf3,16*16)==0);
+    assert(memcmp(buf1,buf3,len)==0);
 
 
    good_heap_free(buf1);
