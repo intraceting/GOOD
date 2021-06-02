@@ -14,6 +14,7 @@
 #include "goodutil/aes.h"
 #include "goodutil/ssl.h"
 #include "goodutil/socket.h"
+#include "goodutil/hmac.h"
 
 #ifdef HEADER_RSA_H
 
@@ -158,17 +159,17 @@ void test_ssl(good_tree_t *opt)
     SSL* s = good_ssl_alloc(ctx);
 
 
-    good_sockaddr_t addr={0};
-    assert(good_sockaddr_from_string(&addr,"www.taobao.com:443",1)==0);
+    // good_sockaddr_t addr={0};
+    // assert(good_sockaddr_from_string(&addr,"www.taobao.com:443",1)==0);
 
-    int c = good_socket(addr.family,0);
+    // int c = good_socket(addr.family,0);
     
-    assert(good_connect(c,&addr,10000)==0);
+    // assert(good_connect(c,&addr,10000)==0);
 
-    assert(good_ssl_handshake(c,s,0,10000)==0);
+    // assert(good_ssl_handshake(c,s,0,10000)==0);
 
 
-    good_closep(&c);
+    // good_closep(&c);
 
     good_ssl_freep(&s);
 
@@ -176,6 +177,50 @@ void test_ssl(good_tree_t *opt)
 }
 
 #endif //HEADER_SSL_H
+
+#ifdef HEADER_HMAC_H
+
+void test_hmac(good_tree_t *opt)
+{
+    HMAC_CTX hmac;
+
+    /*123456*/
+    assert(good_hmac_init(&hmac,"123456",6,GOOD_HMAC_SHA256)==0);
+
+    HMAC_Update(&hmac,"123456",6);
+
+    uint8_t buf[100]={0};
+    int len;
+
+    HMAC_Final(&hmac,buf,&len);
+
+    for(int i = 0;i<len;i++)
+        printf("%02x",buf[i]);
+    printf("\n");
+
+    HMAC_CTX_cleanup(&hmac);
+
+    HMAC_CTX hmac2;
+
+    /*123457*/
+    assert(good_hmac_init(&hmac2,"123457",6,GOOD_HMAC_SHA256)==0);
+
+    HMAC_Update(&hmac2,"123456",6);
+
+    uint8_t buf2[100]={0};
+    int len2;
+
+    HMAC_Final(&hmac2,buf2,&len2);
+
+    for(int i = 0;i<len2;i++)
+        printf("%02x",buf2[i]);
+    printf("\n");
+
+    HMAC_CTX_cleanup(&hmac2);
+
+}
+
+#endif //HEADER_HMAC_H
 
 int main(int argc, char **argv)
 {
@@ -201,6 +246,12 @@ int main(int argc, char **argv)
     test_ssl(t);
 
 #endif //HEADER_SSL_H
+
+#ifdef HEADER_HMAC_H
+
+    test_hmac(t);
+
+#endif //HEADER_HMAC_H
 
     good_tree_free(&t);
 

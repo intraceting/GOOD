@@ -120,7 +120,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/odbc.o \
 	${OBJ_PATH}/rsa.o \
 	${OBJ_PATH}/aes.o \
-	${OBJ_PATH}/ssl.o
+	${OBJ_PATH}/ssl.o \
+	${OBJ_PATH}/hmac.o
 
 
 #
@@ -176,6 +177,7 @@ install:
 	cp  -f $(CURDIR)/general.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/geometry.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/getargs.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/hmac.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/iconv.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/log.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/odbc.h ${INSTALL_PATH_INC}/
@@ -231,6 +233,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/general.h
 	rm -f ${INSTALL_PATH_INC}/geometry.h
 	rm -f ${INSTALL_PATH_INC}/getargs.h
+	rm -f ${INSTALL_PATH_INC}/hmac.h
 	rm -f ${INSTALL_PATH_INC}/iconv.h
 	rm -f ${INSTALL_PATH_INC}/log.h
 	rm -f ${INSTALL_PATH_INC}/odbc.h
