@@ -5,6 +5,11 @@
 #
 #
 
+#
+MAKE_CONF ?= $(abspath $(CURDIR)/build/makefile.conf)
+
+#加载配置项。
+include ${MAKE_CONF}
 
 #
 all: goodutil tests

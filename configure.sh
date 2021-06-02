@@ -72,7 +72,6 @@ checkKeyword()
 
 #
 SHELL_PWD=$(cd `dirname $0`; pwd)
-DATE_TIME=$(date +"%Y-%m-%dT%H:%M:%S")
 KIT_NAME=$(CheckPackageKitName)
 
 #
