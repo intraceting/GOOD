@@ -119,7 +119,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/sqlite.o \
 	${OBJ_PATH}/odbc.o \
 	${OBJ_PATH}/rsa.o \
-	${OBJ_PATH}/aes.o
+	${OBJ_PATH}/aes.o \
+	${OBJ_PATH}/ssl.o
 
 
 #
@@ -190,6 +191,7 @@ install:
 	cp  -f $(CURDIR)/signal.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/socket.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/sqlite.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/ssl.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/tar.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/termios.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/thread.h ${INSTALL_PATH_INC}/
@@ -244,6 +246,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/signal.h
 	rm -f ${INSTALL_PATH_INC}/socket.h
 	rm -f ${INSTALL_PATH_INC}/sqlite.h
+	rm -f ${INSTALL_PATH_INC}/ssl.h
 	rm -f ${INSTALL_PATH_INC}/tar.h
 	rm -f ${INSTALL_PATH_INC}/termios.h
 	rm -f ${INSTALL_PATH_INC}/thread.h

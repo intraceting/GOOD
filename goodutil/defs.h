@@ -75,13 +75,18 @@
 #ifdef HAVE_OPENSSL 
 #include <openssl/opensslconf.h>
 #include <openssl/err.h>
+
 #ifndef OPENSSL_NO_RSA
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #endif //OPENSSL_NO_RSA
+
 #ifndef OPENSSL_NO_AES
 #include <openssl/aes.h>
 #endif //OPENSSL_NO_AES
+
+#include <openssl/ssl.h>
+
 #endif //HAVE_OPENSSL
 
 

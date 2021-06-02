@@ -12,6 +12,8 @@
 #include "goodutil/getargs.h"
 #include "goodutil/rsa.h"
 #include "goodutil/aes.h"
+#include "goodutil/ssl.h"
+#include "goodutil/socket.h"
 
 #ifdef HEADER_RSA_H
 
@@ -137,6 +139,44 @@ void test_aes(good_tree_t *opt)
 
 #endif //HEADER_AES_H
 
+#ifdef HEADER_SSL_H
+
+void test_ssl(good_tree_t *opt)
+{
+   SSL_library_init();
+   OpenSSL_add_all_algorithms();
+   SSL_load_error_strings();  
+
+    SSL_CTX * ctx = good_ssl_ctx_alloc(11,0);
+
+    int chk = good_ssl_ctx_load_cert(ctx, NULL,
+                                     good_option_get(opt, "--rsa-key-prifile", 0, ""),
+                                     good_option_get(opt, "--rsa-key-pwd", 0, ""));
+
+    assert(chk == 0);
+
+    SSL* s = good_ssl_alloc(ctx);
+
+
+    good_sockaddr_t addr={0};
+    assert(good_sockaddr_from_string(&addr,"www.taobao.com:443",1)==0);
+
+    int c = good_socket(addr.family,0);
+    
+    assert(good_connect(c,&addr,10000)==0);
+
+    assert(good_ssl_handshake(c,s,0,10000)==0);
+
+
+    good_closep(&c);
+
+    good_ssl_freep(&s);
+
+    good_ssl_ctx_freep(&ctx);
+}
+
+#endif //HEADER_SSL_H
+
 int main(int argc, char **argv)
 {
 
@@ -156,6 +196,11 @@ int main(int argc, char **argv)
 
 #endif //HEADER_AES_H
 
+#ifdef HEADER_SSL_H
+
+    test_ssl(t);
+
+#endif //HEADER_SSL_H
 
     good_tree_free(&t);
 
