@@ -1113,3 +1113,12 @@ int good_shm_unlink(const char* name)
 }
 
 /*------------------------------------------------------------------------------------------------*/
+
+void good_openlog(const char *ident,int level,int copy2stderr)
+{
+    openlog(ident, LOG_CONS | LOG_PID | (copy2stderr ? LOG_PERROR : 0), LOG_USER);
+
+    setlogmask(LOG_UPTO(level));
+}
+
+/*------------------------------------------------------------------------------------------------*/

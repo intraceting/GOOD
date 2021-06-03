@@ -129,10 +129,9 @@ int good_strncmp(const char *s1, const char *s2,size_t len,int caseAb);
 /**
  * 字符串修剪。
  * 
- * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。
+ * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。isctype等函数在ctype.h文件中。
  * @param where 0 右端，1 左端，2 两端。
  * 
- * @see is*() functions. in ctype.h
 */
 char* good_strtrim(char* str,int (*isctype_cb)(int c),int where);
 
@@ -157,11 +156,10 @@ int good_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
 /**
  * 检测字符串中的字符类型。
  * 
- * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。
+ * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。isctype等函数在ctype.h文件中。
  * 
  * @return !0 通过，0 未通过。
  * 
- * @see is*() functions. in ctype.h
 */
 int good_strtype(const char* str,int (*isctype_cb)(int c));
 
@@ -479,5 +477,21 @@ int good_shm_open(const char* name,int rw, int create);
 int good_shm_unlink(const char* name);
 
 /*------------------------------------------------------------------------------------------------*/
+
+/**
+ * 日志初始化。
+ * 
+ * 只能执行一次。
+ * 
+ * @param ident NULL(0) 进程名做为标识，!NULL(0) 自定义标识。
+ * @param level 记录级别。LOG_*宏定义在syslog.h文件中。
+ * @param copy2stderr 0 仅记录，!0 复制到stderr。
+ * 
+ */
+void good_openlog(const char *ident,int level,int copy2stderr);
+
+
+/*------------------------------------------------------------------------------------------------*/
+
 
 #endif //GOODUTIL_GENERAL_H
