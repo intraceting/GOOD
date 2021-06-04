@@ -34,7 +34,7 @@ void good_ssl_ctx_freep(SSL_CTX **ctx);
 SSL_CTX* good_ssl_ctx_alloc(int version,int server);
 
 /**
- * 加载证书。
+ * 加载证书、私钥。
  * 
  * @param cert 证书文件的指针。
  * @param key 私钥文件的指针，NULL(0) 忽略。
