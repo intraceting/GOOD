@@ -31,9 +31,11 @@ static int _good_ssl_ctx_init(void *opaque)
 
     method[4] = (SSL_METHOD *)TLSv1_server_method();
     method[5] = (SSL_METHOD *)TLSv1_client_method();
-
+    
+#ifndef OPENSSL_NO_SSL3_METHOD
     method[6] = (SSL_METHOD *)SSLv3_server_method();
     method[7] = (SSL_METHOD *)SSLv3_client_method();
+#endif //OPENSSL_NO_SSL3_METHOD
 
     method[8] = (SSL_METHOD *)SSLv23_server_method();
     method[9] = (SSL_METHOD *)SSLv23_client_method();
