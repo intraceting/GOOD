@@ -5,9 +5,6 @@
 # MIT License
 ##
 
-#
-LC_ALL=C
-export LC_ALL
 
 # Functions
 checkReturnCode()
