@@ -30,7 +30,7 @@ CCC = gcc
 CCC_STD = -std=c11
 
 #-Werror -Wall -Wextra
-CCC_FLAGS = -fPIC -Wno-unused-result -MMD -MP -MF "$@.mdep"
+CCC_FLAGS = -fPIC -Wno-unused-result
 
 #
 LINK_FLAGS = -Wl,--as-needed -Wl,-rpath="./"
