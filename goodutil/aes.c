@@ -6,6 +6,8 @@
  */
 #include "aes.h"
 
+#ifdef HEADER_AES_H
+
 size_t good_aes_set_key(AES_KEY *key, const void *pwd, size_t len, uint8_t padding, int encrypt)
 {
     uint8_t key_buf[32] = {0};
@@ -73,3 +75,5 @@ size_t good_aes_set_iv(uint8_t *iv, const void *salt, size_t len, uint8_t paddin
 
     return iv_bytes;
 }
+
+#endif //HEADER_AES_H

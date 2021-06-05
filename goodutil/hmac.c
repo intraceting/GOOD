@@ -6,6 +6,8 @@
  */
 #include "hmac.h"
 
+#ifdef HEADER_HMAC_H
+
 int good_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
 {
     int chk;
@@ -59,3 +61,5 @@ int good_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
 
     return (chk == 1) ? 0 : -1;
 }
+
+#endif //HEADER_HMAC_H
