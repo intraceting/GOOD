@@ -112,12 +112,13 @@ RSA *good_openssl_rsa_create(int bits, unsigned long e)
 #ifndef OPENSSL_NO_DEPRECATED
     key = RSA_generate_key(bits, e, NULL, NULL);
     if (!key)
-        GOOD_ERRNO_AND_RETURN1(EPERM, NULL);
+        GOOD_ERRNO_AND_RETURN1(EINVAL, NULL);
 #else
     key = NULL;
 #endif
 
     return key;
+
 }
 
 RSA *good_openssl_rsa_from_fp(FILE *fp, int type, const char *pwd)
@@ -324,7 +325,9 @@ int good_openssl_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
     assert(type >= GOOD_OPENSSL_HMAC_MD2 && type <= GOOD_OPENSSL_HMAC_WHIRLPOOL);
 
     /*不可以省略。*/
+#if OPENSSL_VERSION_NUMBER <= 0x10100000L
     HMAC_CTX_init(hmac);
+#endif 
 
     if (0)
         assert(0);

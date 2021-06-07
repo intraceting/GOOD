@@ -27,7 +27,7 @@ void test_rsa(good_tree_t *opt)
     RSA *prikey = NULL;
     RSA *pubkey = NULL;
     int chk;
-#if 1
+#if 0
     prikey = good_openssl_rsa_from_file(
         good_option_get(opt, "--rsa-key-prifile", 0, ""),
         1,

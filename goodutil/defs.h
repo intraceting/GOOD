@@ -74,6 +74,7 @@
 
 #ifdef HAVE_OPENSSL 
 #include <openssl/opensslconf.h>
+#include <openssl/opensslv.h>
 #include <openssl/err.h>
 
 #ifndef OPENSSL_NO_RSA
