@@ -10,11 +10,9 @@
 #include <string.h>
 #include <locale.h>
 #include "goodutil/getargs.h"
-#include "goodutil/rsa.h"
-#include "goodutil/aes.h"
-#include "goodutil/ssl.h"
+#include "goodutil/openssl.h"
 #include "goodutil/socket.h"
-#include "goodutil/hmac.h"
+
 
 #ifdef HEADER_RSA_H
 
@@ -30,11 +28,11 @@ void test_rsa(good_tree_t *opt)
     RSA *pubkey = NULL;
     int chk;
 #if 1
-    prikey = good_rsa_from_file(
+    prikey = good_openssl_rsa_from_file(
         good_option_get(opt, "--rsa-key-prifile", 0, ""),
         1,
         good_option_get(opt, "--rsa-key-pwd", 0, ""));
-    pubkey = good_rsa_from_file(
+    pubkey = good_openssl_rsa_from_file(
         good_option_get(opt, "--rsa-key-pubfile", 0, ""),
         0,
         //good_option_get(opt, "--rsa-key-pwd", 0, ""));
@@ -43,9 +41,9 @@ void test_rsa(good_tree_t *opt)
     assert(prikey && pubkey);
 #else
 
-        key = good_rsa_create(2048,RSA_F4);
+        key = good_openssl_rsa_create(2048,RSA_F4);
 
-        int chk = good_rsa_to_file(
+        int chk = good_openssl_rsa_to_file(
             good_option_get(opt, "--rsa-key-prifile", 0, ""),
             key,
             1,
@@ -53,7 +51,7 @@ void test_rsa(good_tree_t *opt)
 
         assert(chk > 0);
 
-        chk = good_rsa_to_file(
+        chk = good_openssl_rsa_to_file(
             good_option_get(opt, "--rsa-key-pubfile", 0, ""),
             key,
             0,
@@ -69,7 +67,7 @@ void test_rsa(good_tree_t *opt)
 
     memset(buf1,'a',1000);
 
-    ssize_t m = good_rsa_ecb_encrypt(buf2,buf1,1000,pubkey,0,RSA_NO_PADDING);
+    ssize_t m = good_openssl_rsa_ecb_encrypt(buf2,buf1,1000,pubkey,0,RSA_NO_PADDING);
 
     int e = ERR_get_error();
     char szErrMsg[1024] = {0};
@@ -80,7 +78,7 @@ void test_rsa(good_tree_t *opt)
 
     assert(m>0);
 
-    chk = good_rsa_ecb_decrypt(buf3,buf2,m,prikey,1,RSA_NO_PADDING);
+    chk = good_openssl_rsa_ecb_decrypt(buf3,buf2,m,prikey,1,RSA_NO_PADDING);
 
     assert(chk >0);
 
@@ -109,13 +107,13 @@ void test_aes(good_tree_t *opt)
     AES_KEY ek2,dk2;
     uint8_t iv[AES_BLOCK_SIZE * 4] = {0};
 
-    assert(good_aes_set_key(&ek,"abcde",5,9,1)>0);
-    assert(good_aes_set_key(&dk,"abcde",5,9,0)>0);
+    assert(good_openssl_aes_set_key(&ek,"abcde",5,9,1)>0);
+    assert(good_openssl_aes_set_key(&dk,"abcde",5,9,0)>0);
 
-    assert(good_aes_set_key(&ek2,"qwert",5,9,1)>0);
-    assert(good_aes_set_key(&dk2,"qwert",5,9,0)>0);
+    assert(good_openssl_aes_set_key(&ek2,"qwert",5,9,1)>0);
+    assert(good_openssl_aes_set_key(&dk2,"qwert",5,9,0)>0);
 
-    assert(good_aes_set_iv(iv,"12345789344wewqerwreqwer",20,9)>0);
+    assert(good_openssl_aes_set_iv(iv,"12345789344wewqerwreqwer",20,9)>0);
 
     char *buf1 = (char*) good_heap_alloc(1000);
     char *buf2 = (char*) good_heap_alloc(2000);
@@ -148,15 +146,15 @@ void test_ssl(good_tree_t *opt)
    OpenSSL_add_all_algorithms();
    SSL_load_error_strings();  
 
-    SSL_CTX * ctx = good_ssl_ctx_alloc(11,0);
+    SSL_CTX * ctx = good_openssl_ctx_alloc(11,0);
 
-    int chk = good_ssl_ctx_load_cert(ctx, NULL,
+    int chk = good_openssl_ctx_load_cert(ctx, NULL,
                                      good_option_get(opt, "--rsa-key-prifile", 0, ""),
                                      good_option_get(opt, "--rsa-key-pwd", 0, ""));
 
     assert(chk == 0);
 
-    SSL* s = good_ssl_alloc(ctx);
+    SSL* s = good_openssl_ssl_alloc(ctx);
 
 
     // good_sockaddr_t addr={0};
@@ -166,14 +164,14 @@ void test_ssl(good_tree_t *opt)
     
     // assert(good_connect(c,&addr,10000)==0);
 
-    // assert(good_ssl_handshake(c,s,0,10000)==0);
+    // assert(good_openssl_ssl_handshake(c,s,0,10000)==0);
 
 
     // good_closep(&c);
 
-    good_ssl_freep(&s);
+    good_openssl_ssl_freep(&s);
 
-    good_ssl_ctx_freep(&ctx);
+    good_openssl_ctx_freep(&ctx);
 }
 
 #endif //HEADER_SSL_H
@@ -185,7 +183,7 @@ void test_hmac(good_tree_t *opt)
     HMAC_CTX hmac;
 
     /*123456*/
-    assert(good_hmac_init(&hmac,"123456",6,GOOD_HMAC_SHA256)==0);
+    assert(good_openssl_hmac_init(&hmac,"123456",6,GOOD_OPENSSL_HMAC_SHA256)==0);
 
     HMAC_Update(&hmac,"123456",6);
 
@@ -203,7 +201,7 @@ void test_hmac(good_tree_t *opt)
     HMAC_CTX hmac2;
 
     /*123457*/
-    assert(good_hmac_init(&hmac2,"123457",6,GOOD_HMAC_SHA256)==0);
+    assert(good_openssl_hmac_init(&hmac2,"123457",6,GOOD_OPENSSL_HMAC_SHA256)==0);
 
     HMAC_Update(&hmac2,"123456",6);
 

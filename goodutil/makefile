@@ -123,10 +123,7 @@ OBJ_FILES = \
 	${OBJ_PATH}/termios.o \
 	${OBJ_PATH}/sqlite.o \
 	${OBJ_PATH}/odbc.o \
-	${OBJ_PATH}/rsa.o \
-	${OBJ_PATH}/aes.o \
-	${OBJ_PATH}/ssl.o \
-	${OBJ_PATH}/hmac.o
+	${OBJ_PATH}/openssl.o 
 
 
 #
@@ -168,7 +165,6 @@ install:
 	
 #
 	mkdir -p ${INSTALL_PATH_INC}/
-	cp  -f $(CURDIR)/aes.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/allocator.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/atomic.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/base64.h ${INSTALL_PATH_INC}/
@@ -182,7 +178,6 @@ install:
 	cp  -f $(CURDIR)/general.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/geometry.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/getargs.h ${INSTALL_PATH_INC}/
-	cp  -f $(CURDIR)/hmac.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/iconv.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/odbc.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/map.h ${INSTALL_PATH_INC}/
@@ -192,12 +187,11 @@ install:
 	cp  -f $(CURDIR)/notify.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/option.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/pool.h ${INSTALL_PATH_INC}/
-	cp  -f $(CURDIR)/rsa.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/scsi.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/signal.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/socket.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/sqlite.h ${INSTALL_PATH_INC}/
-	cp  -f $(CURDIR)/ssl.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/openssl.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/tar.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/termios.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/thread.h ${INSTALL_PATH_INC}/
@@ -223,7 +217,6 @@ uninstall:
 	rm -f ${INSTALL_PATH_LIB}/${SONAME}
 
 #
-	rm -f ${INSTALL_PATH_INC}/aes.h
 	rm -f ${INSTALL_PATH_INC}/allocator.h
 	rm -f ${INSTALL_PATH_INC}/atomic.h
 	rm -f ${INSTALL_PATH_INC}/base64.h
@@ -237,7 +230,6 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/general.h
 	rm -f ${INSTALL_PATH_INC}/geometry.h
 	rm -f ${INSTALL_PATH_INC}/getargs.h
-	rm -f ${INSTALL_PATH_INC}/hmac.h
 	rm -f ${INSTALL_PATH_INC}/iconv.h
 	rm -f ${INSTALL_PATH_INC}/odbc.h
 	rm -f ${INSTALL_PATH_INC}/map.h
@@ -247,12 +239,11 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/notify.h
 	rm -f ${INSTALL_PATH_INC}/option.h
 	rm -f ${INSTALL_PATH_INC}/pool.h
-	rm -f ${INSTALL_PATH_INC}/rsa.h
 	rm -f ${INSTALL_PATH_INC}/scsi.h
 	rm -f ${INSTALL_PATH_INC}/signal.h
 	rm -f ${INSTALL_PATH_INC}/socket.h
 	rm -f ${INSTALL_PATH_INC}/sqlite.h
-	rm -f ${INSTALL_PATH_INC}/ssl.h
+	rm -f ${INSTALL_PATH_INC}/openssl.h
 	rm -f ${INSTALL_PATH_INC}/tar.h
 	rm -f ${INSTALL_PATH_INC}/termios.h
 	rm -f ${INSTALL_PATH_INC}/thread.h

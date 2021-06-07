@@ -85,7 +85,9 @@
 #include <openssl/aes.h>
 #endif //OPENSSL_NO_AES
 
+#ifndef OPENSSL_NO_HMAC
 #include <openssl/ssl.h>
+#endif //OPENSSL_NO_HMAC
 
 #ifndef OPENSSL_NO_HMAC
 #include <openssl/hmac.h>
