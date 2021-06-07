@@ -14,7 +14,6 @@
 #ifdef HEADER_AES_H
 
 /**
- *
  * 设置密钥
  * 
  * @param pwd 密钥的指针。
