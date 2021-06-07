@@ -43,7 +43,7 @@ void test_rsa(good_tree_t *opt)
 
         key = good_openssl_rsa_create(2048,RSA_F4);
 
-        int chk = good_openssl_rsa_to_file(
+        chk = good_openssl_rsa_to_file(
             good_option_get(opt, "--rsa-key-prifile", 0, ""),
             key,
             1,
@@ -145,8 +145,9 @@ void test_ssl(good_tree_t *opt)
    SSL_library_init();
    OpenSSL_add_all_algorithms();
    SSL_load_error_strings();  
+   const SSL_METHOD *method = TLSv1_2_client_method();
 
-    SSL_CTX * ctx = good_openssl_ctx_alloc(11,0);
+    SSL_CTX * ctx = SSL_CTX_new(method);
 
     int chk = good_openssl_ctx_load_cert(ctx, NULL,
                                      good_option_get(opt, "--rsa-key-prifile", 0, ""),
@@ -171,7 +172,7 @@ void test_ssl(good_tree_t *opt)
 
     good_openssl_ssl_freep(&s);
 
-    good_openssl_ctx_freep(&ctx);
+    SSL_CTX_free(ctx);
 }
 
 #endif //HEADER_SSL_H

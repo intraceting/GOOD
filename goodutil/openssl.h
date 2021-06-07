@@ -222,28 +222,6 @@ int good_openssl_hmac_init(HMAC_CTX *hmac,const void *key, int len,int type);
 #ifdef HEADER_SSL_H
 
 /**
- * 释放CTX句柄。
- * 
-*/
-void good_openssl_ctx_freep(SSL_CTX **ctx);
-
-/**
- * 创建CTX句柄。
- * 
- * TLSv1.0              = 10
- * TLSv1.1              = 11
- * TLSv1.2              = 12
- * SSLv2/SSLv3          = 23
- * SSLv3                = 30
- * 
- * @param version 版本号。
- * @param server !0 服务端环境，0 客户端环境。
- * 
- * @return !NULL(0) 成功(句柄)，NULL(0) 失败。
-*/
-SSL_CTX* good_openssl_ctx_alloc(int version,int server);
-
-/**
  * 加载证书、私钥。
  * 
  * @param cert 证书文件的指针。

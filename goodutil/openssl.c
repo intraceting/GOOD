@@ -381,63 +381,6 @@ int good_openssl_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
 
 #ifdef HEADER_SSL_H
 
-void good_openssl_ctx_freep(SSL_CTX **ctx)
-{
-    if (!ctx || !*ctx)
-        return;
-
-    SSL_CTX_free(*ctx);
-
-    /*Set to NULL(0).*/
-    *ctx = NULL;
-}
-
-static int _good_openssl_ctx_init(void *opaque)
-{
-    SSL_METHOD **method = (SSL_METHOD **)opaque;
-
-    method[0] = (SSL_METHOD *)TLSv1_2_server_method();
-    method[1] = (SSL_METHOD *)TLSv1_2_client_method();
-
-    method[2] = (SSL_METHOD *)TLSv1_1_server_method();
-    method[3] = (SSL_METHOD *)TLSv1_1_client_method();
-
-    method[4] = (SSL_METHOD *)TLSv1_server_method();
-    method[5] = (SSL_METHOD *)TLSv1_client_method();
-
-#ifndef OPENSSL_NO_SSL3_METHOD
-    method[6] = (SSL_METHOD *)SSLv3_server_method();
-    method[7] = (SSL_METHOD *)SSLv3_client_method();
-#endif //OPENSSL_NO_SSL3_METHOD
-
-    method[8] = (SSL_METHOD *)SSLv23_server_method();
-    method[9] = (SSL_METHOD *)SSLv23_client_method();
-
-    return 0;
-}
-
-SSL_CTX *good_openssl_ctx_alloc(int version, int server)
-{
-    static int init = 0;
-    static SSL_METHOD *method[10] = {0};
-    SSL_METHOD *p;
-
-    assert(good_once(&init, _good_openssl_ctx_init, &method) >= 0);
-
-    if (version == 12)
-        p = server ? method[0] : method[1];
-    else if (version == 11)
-        p = server ? method[2] : method[3];
-    else if (version == 10)
-        p = server ? method[4] : method[5];
-    else if (version == 30)
-        p = server ? method[6] : method[7];
-    else if (version == 23)
-        p = server ? method[8] : method[9];
-
-    return SSL_CTX_new(p);
-}
-
 int good_openssl_ctx_load_cert(SSL_CTX *ctx, const char *cert, const char *key, const char *pwd)
 {
     int chk;
