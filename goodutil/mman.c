@@ -8,11 +8,14 @@
 
 static void _good_munmap_cb(good_allocator_t *alloc, void *opaque)
 {
+    int chk;
+
     assert(alloc);
     assert(alloc->pptrs[0] != MAP_FAILED);
     assert(alloc->sizes[0] > 0);
 
-    assert(munmap(alloc->pptrs[0],alloc->sizes[0])==0);
+    chk = munmap(alloc->pptrs[0], alloc->sizes[0]);
+    assert(chk == 0);
 }
 
 good_allocator_t* good_mmap(int fd,int rw,int shared)

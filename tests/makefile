@@ -30,10 +30,10 @@ CCC = gcc
 CCC_STD = -std=c11
 
 #-Werror -Wall -Wextra
-CCC_FLAGS = -fPIC -Wno-unused-result
+CCC_FLAGS += -fPIC -Wno-unused-result
 
 #
-LINK_FLAGS = -Wl,--as-needed -Wl,-rpath="./"
+LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./"
 
 #
 ifeq ($(BUILD_TYPE),debug)
@@ -46,7 +46,7 @@ endif
 CCC_FLAGS += -I$(abspath $(CURDIR)/../) ${DEPEND_FLAGS}
 
 #
-LINK_FLAGS += -lgoodutil -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
+LINK_FLAGS += -lgoodswitch -lgoodutil -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
 #LINK_FLAGS += -l:libgoodutil.a -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
 
 #
@@ -78,7 +78,8 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/scsi_test.exe \
 	$(BUILD_PATH)/sqlite_test.exe \
 	$(BUILD_PATH)/odbc_test.exe \
-	$(BUILD_PATH)/openssl_test.exe
+	$(BUILD_PATH)/openssl_test.exe \
+	$(BUILD_PATH)/mux_test.exe
 
 #
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
@@ -111,5 +112,6 @@ clean:
 	rm -f $(BUILD_PATH)/sqlite_test.exe
 	rm -f $(BUILD_PATH)/odbc_test.exe
 	rm -f $(BUILD_PATH)/openssl_test.exe
+	rm -f $(BUILD_PATH)/mux_test.exe
 
 

@@ -34,12 +34,14 @@ uint32_t good_crc32_sum(const void *data,size_t size,uint32_t old)
 {
     static int init = 0;
     static uint32_t table[256] = {0};
+    int chk;
 
     uint32_t sum = ~old;
 
     assert(data != NULL && size > 0);
 
-    assert(good_once(&init, _good_crc32_init, table) >= 0);
+    chk = good_once(&init, _good_crc32_init, table);
+    assert(chk >= 0);
 
     for (size_t i = 0; i < size; i++)
     {

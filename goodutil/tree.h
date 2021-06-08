@@ -26,6 +26,11 @@ typedef struct _good_tree
     struct _good_tree *chain[5];
 
     /**
+     * 颜色。
+    */
+    int color;
+
+    /**
      * 数据。
      * 
      * 当节点被删除时，如果不为NULL(0)，自动调用good_allocator_unref()释放。
@@ -40,40 +45,49 @@ typedef struct _good_tree
 enum _good_tree_chain
 {
 
-    /**
-    * 父。
-    */
+    /** 父。*/
    GOOD_TREE_CHAIN_FATHER = 0,
 #define GOOD_TREE_CHAIN_FATHER          GOOD_TREE_CHAIN_FATHER
 
-    /**
-    * 兄长。
-    */
+    /** 兄长。*/
    GOOD_TREE_CHAIN_SIBLING_PREV = 1,
 #define GOOD_TREE_CHAIN_SIBLING_PREV    GOOD_TREE_CHAIN_SIBLING_PREV
 
-    /**
-    * 小弟。
-    */
+    /** 小弟。*/
    GOOD_TREE_CHAIN_SIBLING_NEXT = 2,
 #define GOOD_TREE_CHAIN_SIBLING_NEXT    GOOD_TREE_CHAIN_SIBLING_NEXT
 
-    /**
-    * 大娃。
-    */
+    /** 大娃。*/
    GOOD_TREE_CHAIN_CHILD_FIRST = 3,
 #define GOOD_TREE_CHAIN_CHILD_FIRST     GOOD_TREE_CHAIN_CHILD_FIRST
 
-    /**
-    * 么娃。
-    */
+    /** 么娃。*/
    GOOD_TREE_CHAIN_CHILD_LEAST = 4
 #define GOOD_TREE_CHAIN_CHILD_LEAST     GOOD_TREE_CHAIN_CHILD_LEAST
+
+};
+
+/**
+ * 树节点颜色。
+*/
+enum _good_tree_color
+{
+    /** 无。*/
+    GOOD_TREE_COLOR_NONE = 0,
+#define GOOD_TREE_COLOR_NONE    GOOD_TREE_COLOR_NONE
+
+    /** 红。*/
+    GOOD_TREE_COLOR_RED = 1,
+#define GOOD_TREE_COLOR_RED    GOOD_TREE_COLOR_RED
+
+    /** 黑。*/
+    GOOD_TREE_COLOR_BLACK = 2
+#define GOOD_TREE_COLOR_BLACK    GOOD_TREE_COLOR_BLACK
+
 };
 
 /**
  * 树节点迭代器。
- * 
 */
 typedef struct _good_tree_iterator
 {

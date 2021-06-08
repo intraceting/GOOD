@@ -131,7 +131,7 @@ good_allocator_t *good_allocator_alloc(size_t *sizes, size_t numbers, int drag)
              * 内存块容量可能为0，需要跳过。
             */
             in_p->out.sizes[i] = (drag ? sizes[0] : sizes[i]);
-            if (sizes[i] <= 0 && drag == 0)
+            if (drag == 0 && sizes[i] <= 0)
                 continue;
 
             /*
@@ -157,6 +157,7 @@ good_allocator_t *good_allocator_alloc2(size_t size)
 good_allocator_t *good_allocator_refer(good_allocator_t *src)
 {
     good_allocator_hdr *in_p = NULL;
+    int chk;
 
     assert(src);
 
@@ -164,7 +165,8 @@ good_allocator_t *good_allocator_refer(good_allocator_t *src)
 
     assert(in_p->magic == GOOD_ALLOCATOR_MAGIC);
 
-    assert(good_atomic_fetch_and_add(&in_p->refcount, 1) > 0);
+    chk = good_atomic_fetch_and_add(&in_p->refcount, 1);
+    assert(chk > 0);
 
     return src;
 }

@@ -61,13 +61,13 @@ CCC = gcc
 CCC_STD = -std=c11
 
 #-Werror -Wall -Wextra
-CCC_FLAGS = -fPIC -Wno-unused-result
+CCC_FLAGS += -fPIC -Wno-unused-result
 
 #
-LINK_FLAGS = -Wl,--as-needed -Wl,-rpath="./"
+LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./"
 
 #
-LINK_FLAGS = -Wl,--soname,${SONAME}
+LINK_FLAGS += -Wl,--soname,${SONAME}
 
 #
 CCC_FLAGS += -DBUILD_VERSION_MAJOR=${VERSION_MAJOR} -DBUILD_VERSION_MINOR=${VERSION_MINOR}
