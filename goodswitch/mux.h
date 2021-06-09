@@ -47,5 +47,15 @@ int good_mux_detach(good_mux_t *ctx,int fd);
 */
 int good_mux_attach(good_mux_t *ctx,int fd,time_t timeout);
 
+/**
+ * 注册事件。
+ * 
+ * @param concerned 关心的事件。
+ * @param completed 完成的事件。
+ * 
+ * @return 0 成功，!0 失败(或不存在)。
+*/
+int good_mux_mark(good_mux_t *ctx,int fd,uint32_t concerned,uint32_t completed);
+
 
 #endif //GOODSWITCH_MUX_H

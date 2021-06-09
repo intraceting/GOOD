@@ -10,16 +10,35 @@
 #include <string.h>
 #include "goodutil/general.h"
 #include "goodutil/getargs.h"
+#include "goodutil/clock.h"
 #include "goodswitch/mux.h"
 
 void test_server(good_tree_t *t)
 {
-    good_mux_t *m = good_mux_alloc();
+    good_clock_reset();
 
-    assert(good_mux_attach(m, 10000, 100) == 0);
+    good_mux_t *m = good_mux_alloc();
+#if 1
+
+    printf("attach begin:%lu\n",good_clock_dot(NULL));
+
+    for (int i = 0; i < 100000; i++)
+        assert(good_mux_attach(m, i, 100) == 0);
     //   assert(good_mux_attach(m,10000,100)==0);
 
-    assert(good_mux_detach(m, 10000) == 0);
+    printf("attach cast:%lu\n",good_clock_step(NULL));
+
+    getchar();
+    
+    printf("attach begin:%lu\n",good_clock_dot(NULL));
+
+    for (int i = 0; i < 100000; i++)
+        assert(good_mux_detach(m, i) == 0);
+
+    printf("detach cast:%lu\n",good_clock_step(NULL));
+#else
+
+#endif
 
     good_mux_free(&m);
 }

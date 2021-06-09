@@ -17,25 +17,25 @@ enum _good_epoll_event
     /**
      * 输入事件。
     */
-    GOOD_EPOLL_INPUT = 0x0001,
+    GOOD_EPOLL_INPUT = 0x00000001,
 #define GOOD_EPOLL_INPUT GOOD_EPOLL_INPUT
 
     /**
      * 带外(OOB)输入事件。
     */
-    GOOD_EPOLL_INOOB = 0x0002,
+    GOOD_EPOLL_INOOB = 0x00000002,
 #define GOOD_EPOLL_INOOB GOOD_EPOLL_INOOB
 
     /**
      * 输出事件。
     */
-    GOOD_EPOLL_OUTPUT = 0x0010,
+    GOOD_EPOLL_OUTPUT = 0x00000100,
 #define GOOD_EPOLL_OUTPUT GOOD_EPOLL_OUTPUT
 
     /**
      * 出错事件。
     */
-    GOOD_EPOLL_ERROR = 0x1000
+    GOOD_EPOLL_ERROR = 0x01000000
 #define GOOD_EPOLL_ERROR GOOD_EPOLL_ERROR
 };
 

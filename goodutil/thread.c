@@ -6,6 +6,8 @@
  */
 #include "thread.h"
 
+/*------------------------------------------------------------------------------------------------*/
+
 void good_mutex_destroy(good_mutex_t *ctx)
 {
     assert(ctx);
@@ -126,6 +128,8 @@ int good_mutex_signal(good_mutex_t* ctx,int broadcast)
     return err;
 }
 
+/*------------------------------------------------------------------------------------------------*/
+
 int good_thread_create(good_thread_t *ctx,int joinable)
 {
     int err = -1;
@@ -169,6 +173,8 @@ int good_thread_join(good_thread_t *ctx)
     return err;
 }
 
+/*------------------------------------------------------------------------------------------------*/
+
 int good_thread_setname(const char* fmt,...)
 {
     int err = -1;
@@ -196,3 +202,27 @@ int good_thread_getname(char name[16])
 
     return err; 
 }
+
+/*------------------------------------------------------------------------------------------------*/
+
+int good_thread_leader_test(pthread_t *tid)
+{
+    pthread_t self_tid = pthread_self();
+
+    if(good_atomic_compare_and_swap(tid, 0, self_tid))
+        return 0;
+
+    return -1;
+}
+
+int good_thread_leader_quit(pthread_t *tid)
+{
+    pthread_t self_tid = pthread_self();
+
+    if(good_atomic_compare_and_swap(tid, self_tid, 0))
+        return 0;
+
+    return -1;
+}
+
+/*------------------------------------------------------------------------------------------------*/
