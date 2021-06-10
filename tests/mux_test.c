@@ -18,7 +18,7 @@ void test_server(good_tree_t *t)
     good_clock_reset();
 
     good_mux_t *m = good_mux_alloc();
-#if 1
+#if 0
 
     printf("attach begin:%lu\n",good_clock_dot(NULL));
 
@@ -37,6 +37,34 @@ void test_server(good_tree_t *t)
 
     printf("detach cast:%lu\n",good_clock_step(NULL));
 #else
+
+    int l = good_socket(GOOD_IPV4,0);
+    good_sockaddr_t a={0};
+    good_sockaddr_from_string(&a,"localhost:12345",1);
+    bind(l,&a.addr,sizeof(a));
+    listen(l,SOMAXCONN);
+
+    assert(good_mux_attach(m, l, 0) == 0);
+    assert(good_mux_mark(m,l,GOOD_EPOLL_INPUT,0)==0);
+
+    while(1)
+    {
+        good_epoll_event e;
+        int chk = good_mux_wait(m, &e, 10000);
+        if (chk != 0)
+            break;
+
+        if(l == e.data.fd)
+        {
+            int c = accept(l,NULL,0);
+            
+        }
+        else
+        {
+
+        }
+        
+    }
 
 #endif
 

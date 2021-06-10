@@ -76,6 +76,10 @@ BUILD_PATH=$(realpath "${SHELL_PWD}/build/")
 MAKE_CONF=${BUILD_PATH}/makefile.conf
 
 #
+HOST_PLATFORM=$(uname -m)
+TARGET_PLATFORM=${HOST_PLATFORM}
+
+#
 VERSION_MAJOR="1"
 VERSION_MINOR="0"
 
@@ -184,6 +188,10 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
 fi
 
 #
+echo "HOST_PLATFORM=${HOST_PLATFORM}"
+echo "TARGET_PLATFORM=${TARGET_PLATFORM}"
+
+#
 echo "VERSION_MAJOR=${VERSION_MAJOR}"
 echo "VERSION_MINOR=${VERSION_MINOR}"
 
@@ -205,6 +213,8 @@ echo "" >> ${MAKE_CONF}
 
 #
 echo "BUILD_PATH = ${BUILD_PATH}" >> ${MAKE_CONF}
+echo "HOST_PLATFORM = ${HOST_PLATFORM}" >> ${MAKE_CONF}
+echo "TARGET_PLATFORM = ${TARGET_PLATFORM}" >> ${MAKE_CONF}
 echo "VERSION_MAJOR = ${VERSION_MAJOR}" >> ${MAKE_CONF}
 echo "VERSION_MINOR = ${VERSION_MINOR}" >> ${MAKE_CONF}
 echo "HAVE_OPENMP = ${HAVE_OPENMP}" >> ${MAKE_CONF}

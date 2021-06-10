@@ -42,6 +42,11 @@ else
 CCC_FLAGS += -s -O2
 endif
 
+#可能在交叉编译环中。
+ifneq ($(TARGET_PLATFORM),$(HOST_PLATFORM))
+    CCC = $(TARGET_PLATFORM)-linux-gnu-gcc
+endif
+
 #
 CCC_FLAGS += -I$(abspath $(CURDIR)/../) ${DEPEND_FLAGS}
 

@@ -77,6 +77,6 @@ int good_epoll_drop(int efd, int fd);
  * 
  * @return > 0 事件数量，<= 0 超时或出错。
 */
-int good_epoll_wait(int efd,good_epoll_event *events,int max,int timeout);
+int good_epoll_wait(int efd,good_epoll_event *events,int max,time_t timeout);
 
 #endif //GOODUTIL_EPOLL_H

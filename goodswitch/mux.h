@@ -57,5 +57,14 @@ int good_mux_attach(good_mux_t *ctx,int fd,time_t timeout);
 */
 int good_mux_mark(good_mux_t *ctx,int fd,uint32_t concerned,uint32_t completed);
 
+/**
+ * 等待事件。
+ * 
+ * @param timeout 超时(毫秒)。
+ * 
+ * @return 0 成功，!0 失败(或超时)。
+*/
+int good_mux_wait(good_mux_t *ctx,good_epoll_event *event,time_t timeout);
+
 
 #endif //GOODSWITCH_MUX_H

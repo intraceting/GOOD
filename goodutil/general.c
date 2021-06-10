@@ -854,7 +854,7 @@ int good_poll(int fd, int event,time_t timeout)
     if((event & 0x02))
         arr.events |= POLLOUT;
 
-    return poll(&arr, 1, timeout);
+    return poll(&arr, 1, (timeout >= INT32_MAX ? -1 : timeout));
 }
 
 ssize_t good_write(int fd, const void *data, size_t size)

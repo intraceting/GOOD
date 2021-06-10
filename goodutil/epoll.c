@@ -47,14 +47,14 @@ int good_epoll_drop(int efd, int fd)
     return epoll_ctl(efd,EPOLL_CTL_DEL,fd, NULL);
 }
 
-int good_epoll_wait(int efd,good_epoll_event* events,int max,int timeout)
+int good_epoll_wait(int efd,good_epoll_event* events,int max,time_t timeout)
 {
     int chk;
     uint32_t tmp;
     
     assert(efd >= 0 && events != NULL && max > 0);
 
-    chk = epoll_wait(efd,events,max,timeout);
+    chk = epoll_wait(efd, events, max, (timeout >= INT32_MAX ? -1 : timeout));
 
     /*转换事件。 */
     for (int i = 0; i < chk; i++)
