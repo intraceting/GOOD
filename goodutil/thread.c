@@ -22,22 +22,29 @@ void good_mutex_destroy(good_mutex_t *ctx)
 
 void good_mutex_init(good_mutex_t *ctx)
 {
+    int chk;
     assert(ctx);
 
-    pthread_cond_init(&ctx->cond, &ctx->condattr);
-    pthread_mutex_init(&ctx->mutex, &ctx->mutexattr);
+    chk = pthread_cond_init(&ctx->cond, &ctx->condattr);
+    assert(chk==0);
+    chk = pthread_mutex_init(&ctx->mutex, &ctx->mutexattr);
+    assert(chk==0);
 }
 
 void good_mutex_init2(good_mutex_t* ctx,int shared)
 {
+    int pshared;
+
     assert(ctx);
+
+    pshared = (shared?PTHREAD_PROCESS_SHARED:PTHREAD_PROCESS_PRIVATE);
 
     pthread_condattr_init(&ctx->condattr);
     pthread_condattr_setclock(&ctx->condattr, CLOCK_MONOTONIC);
-    pthread_condattr_setpshared(&ctx->condattr,(shared?PTHREAD_PROCESS_SHARED:PTHREAD_PROCESS_PRIVATE));
+    pthread_condattr_setpshared(&ctx->condattr,pshared);
 
     pthread_mutexattr_init(&ctx->mutexattr);
-    pthread_mutexattr_setpshared(&ctx->mutexattr,(shared?PTHREAD_PROCESS_SHARED:PTHREAD_PROCESS_PRIVATE));
+    pthread_mutexattr_setpshared(&ctx->mutexattr,pshared);
     pthread_mutexattr_setrobust(&ctx->mutexattr,PTHREAD_MUTEX_ROBUST);
 
     good_mutex_init(ctx);

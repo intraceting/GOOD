@@ -21,7 +21,7 @@ typedef struct _good_mux
     good_pool_t events;
 
     /** 主线程ID 。*/
-    pthread_t leader;
+    volatile pthread_t leader;
 
     /** 看门狗活动时间(毫秒)。*/
     time_t watchdog;
@@ -129,7 +129,7 @@ int good_mux_detach(good_mux_t *ctx,int fd)
 
     assert(ctx != NULL && fd >= 0);
 
-    good_mutex_lock(&ctx->mutex,0);
+    good_mutex_lock(&ctx->mutex,1);
 
     p = good_map_find(&ctx->nodes, &fd, sizeof(fd),0);
     if(!p)
@@ -166,7 +166,7 @@ int good_mux_attach(good_mux_t *ctx,int fd,time_t timeout)
 
     assert(ctx != NULL && fd >= 0);
 
-    good_mutex_lock(&ctx->mutex,0);
+    good_mutex_lock(&ctx->mutex,1);
 
     p = good_map_find(&ctx->nodes, &fd, sizeof(fd), sizeof(good_mux_node));
     if(!p)
@@ -236,7 +236,10 @@ static void _good_mux_disp(good_mux_t *ctx, good_mux_node *node, uint32_t event)
 
     /*有事件时再推送到活动队列。*/
     if (disp.events)
+    {
+        disp.data.fd = node->fd;
         good_pool_push(&ctx->events,&disp,sizeof(disp));
+    }   
 }
 
 int good_mux_mark(good_mux_t *ctx,int fd,uint32_t concerned,uint32_t completed)
@@ -250,7 +253,7 @@ int good_mux_mark(good_mux_t *ctx,int fd,uint32_t concerned,uint32_t completed)
     assert((concerned & ~(GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT)) == 0);
     assert((completed & ~(GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR)) == 0);
 
-    good_mutex_lock(&ctx->mutex,0);
+    good_mutex_lock(&ctx->mutex,1);
 
     p = good_map_find(&ctx->nodes, &fd, sizeof(fd),0);
     if(!p)
@@ -330,7 +333,7 @@ static int _good_mux_watchdog_cb(good_allocator_t *alloc, void *opaque)
     if (node->timeout <= 0)
         goto final;
 
-    /*当事件队列排队过长时，优先处理队列中的事件。*/
+    /*当事件队列排队过长时，中断看门狗检查，优先处理队列中的事件。*/
     if (ctx->events.count >= 20)
         return -1;
 
@@ -402,7 +405,6 @@ static uint64_t _good_mux_difference_timeout(uint64_t begin,uint64_t timeout)
 
 int good_mux_wait(good_mux_t *ctx,good_epoll_event *event,time_t timeout)
 {
-    good_epoll_event e;
     good_epoll_event w[20];
     uint64_t begin = good_time_clock2kind_with(CLOCK_MONOTONIC,3);
     uint64_t remaining = 0;
@@ -411,12 +413,12 @@ int good_mux_wait(good_mux_t *ctx,good_epoll_event *event,time_t timeout)
 
     assert(ctx != NULL && event != NULL);
     
-    good_mutex_lock(&ctx->mutex,0);
+    good_mutex_lock(&ctx->mutex,1);
 
 try_again:
 
     /*优先从事件队列中拉取。*/
-    chk = good_pool_pull(&ctx->events, &e, sizeof(e));
+    chk = good_pool_pull(&ctx->events, event, sizeof(*event));
     if (chk >= 0)
         goto final;
 
@@ -426,7 +428,7 @@ try_again:
         GOOD_ERRNO_AND_GOTO1(EINTR,final_error);
 
     /*多线程选主，只能有一个线程进入IO等待，其它线程等待事件通知。*/
-    if(good_thread_leader_test(&ctx->leader))
+    if(good_thread_leader_test(&ctx->leader)==0)
     {
         /*通过看门狗检测长期不活动的节点。*/
         _good_mux_watchdog(ctx);
@@ -441,7 +443,7 @@ try_again:
         count = good_epoll_wait(ctx->efd,w,GOOD_ARRAY_SIZE(w),GOOD_MIN(remaining,ctx->interval));
 
         /*加锁，禁其它接口被访问。*/
-        good_mutex_lock(&ctx->mutex,0);
+        good_mutex_lock(&ctx->mutex,1);
 
         /*处理活动事件。*/
         _good_mux_wait_disp(ctx,w,count);

@@ -27,7 +27,7 @@ typedef struct _good_allocator_hdr
     /**
     * 引用计数器。
     */
-    int refcount;
+    volatile int refcount;
 
     /**
     * 析构函数。
