@@ -290,7 +290,7 @@ static void _good_mux_mark(good_mux_t *ctx, good_mux_node *node, uint32_t want, 
 
 }
 
-static int _good_mux_mark_cb(good_allocator_t *alloc, void *opaque)
+static int _good_mux_mark_scan_cb(good_allocator_t *alloc, void *opaque)
 {
     good_mux_t *ctx = (good_mux_t *)opaque;
     good_mux_node *node = (good_mux_node *)alloc->pptrs[GOOD_MAP_VALUE];
@@ -329,7 +329,7 @@ int good_mux_mark(good_mux_t *ctx, int fd, uint32_t want, uint32_t done)
         ctx->broadcast_want = want;
 
         /*遍历。*/
-        ctx->node_map.dump_cb = _good_mux_mark_cb;
+        ctx->node_map.dump_cb = _good_mux_mark_scan_cb;
         ctx->node_map.opaque = ctx;
         good_map_scan(&ctx->node_map);
 
@@ -351,7 +351,7 @@ final:
     return chk;   
 }
 
-static int _good_mux_watchdog_cb(good_allocator_t *alloc, void *opaque)
+static int _good_mux_watchdog_scan_cb(good_allocator_t *alloc, void *opaque)
 {
     good_mux_t *ctx = (good_mux_t *)opaque;
     good_mux_node *node = (good_mux_node *)alloc->pptrs[GOOD_MAP_VALUE];
@@ -385,7 +385,7 @@ static void _good_mux_watchdog(good_mux_t *ctx)
     ctx->watchdog_active = current;
 
     /*遍历。*/
-    ctx->node_map.dump_cb = _good_mux_watchdog_cb;
+    ctx->node_map.dump_cb = _good_mux_watchdog_scan_cb;
     ctx->node_map.opaque = ctx;
     good_map_scan(&ctx->node_map);
 
