@@ -11,26 +11,29 @@
 */
 typedef struct _good_mux
 {
+    /** epoll句柄。 */
+    int efd;
+
     /** 互斥量。*/
     good_mutex_t mutex;
 
     /** 节点表。*/
-    good_map_t nodes;
+    good_map_t node_map;
 
     /** 事件池。*/
-    good_pool_t events;
+    good_pool_t event_pool;
 
-    /** 主线程ID 。*/
-    volatile pthread_t leader;
+    /** WAIT主线程ID。*/
+    volatile pthread_t wait_leader;
 
     /** 看门狗活动时间(毫秒)。*/
-    time_t watchdog;
+    time_t watchdog_active;
 
     /** 看门狗活动间隔(毫秒)。*/
-    time_t interval;
+    time_t watchdog_intvl;
 
-    /** epoll句柄。 */
-    int efd;
+    /** 广播事件。*/
+    uint32_t broadcast_want;
     
 } good_mux_t;
 
@@ -79,8 +82,8 @@ void good_mux_free(good_mux_t **ctx)
     ctx_p = *ctx;
 
     good_closep(&ctx_p->efd);
-    good_pool_destroy(&ctx_p->events);
-    good_map_destroy(&ctx_p->nodes);
+    good_pool_destroy(&ctx_p->event_pool);
+    good_map_destroy(&ctx_p->node_map);
     good_mutex_destroy(&ctx_p->mutex);
 
     /*free.*/
@@ -104,12 +107,12 @@ good_mux_t *good_mux_alloc()
         goto final_error;
 
     ctx->efd = efd;
-    good_pool_init(&ctx->events, sizeof(good_epoll_event), 4 * 20 + 20);
-    good_map_init(&ctx->nodes,400);
+    good_pool_init(&ctx->event_pool, sizeof(good_epoll_event), 4 * 20 + 20);
+    good_map_init(&ctx->node_map,400);
     good_mutex_init2(&ctx->mutex,0);
-    ctx->interval = 5000;
-    ctx->watchdog = good_time_clock2kind_with(CLOCK_MONOTONIC,3);
-    ctx->leader = 0;
+    ctx->watchdog_intvl = 5000;
+    ctx->watchdog_active = good_time_clock2kind_with(CLOCK_MONOTONIC,3);
+    ctx->wait_leader = 0;
 
     return ctx;
 
@@ -131,7 +134,7 @@ int good_mux_detach(good_mux_t *ctx,int fd)
 
     good_mutex_lock(&ctx->mutex,1);
 
-    p = good_map_find(&ctx->nodes, &fd, sizeof(fd),0);
+    p = good_map_find(&ctx->node_map, &fd, sizeof(fd),0);
     if(!p)
         goto final_error;
 
@@ -142,7 +145,7 @@ int good_mux_detach(good_mux_t *ctx,int fd)
 
     good_epoll_drop(ctx->efd,fd);
 
-    good_map_remove(&ctx->nodes, &fd, sizeof(fd));
+    good_map_remove(&ctx->node_map, &fd, sizeof(fd));
 
     /*No error.*/
     goto final;
@@ -168,7 +171,7 @@ int good_mux_attach(good_mux_t *ctx,int fd,time_t timeout)
 
     good_mutex_lock(&ctx->mutex,1);
 
-    p = good_map_find(&ctx->nodes, &fd, sizeof(fd), sizeof(good_mux_node));
+    p = good_map_find(&ctx->node_map, &fd, sizeof(fd), sizeof(good_mux_node));
     if(!p)
         goto final_error;
 
@@ -240,28 +243,13 @@ static void _good_mux_disp(good_mux_t *ctx, good_mux_node *node, uint32_t event)
     if (disp.events)
     {
         disp.data.fd = node->fd;
-        good_pool_push(&ctx->events,&disp,sizeof(disp));
+        good_pool_push(&ctx->event_pool,&disp,sizeof(disp));
     }   
 }
 
-int good_mux_mark(good_mux_t *ctx, int fd, uint32_t want, uint32_t done)
+static void _good_mux_mark(good_mux_t *ctx, good_mux_node *node, uint32_t want, uint32_t done)
 {
-    good_allocator_t *p = NULL;
-    good_mux_node *node = NULL;
     good_epoll_event tmp = {0};
-    int chk = 0;
-
-    assert(ctx != NULL && fd >= 0);
-    assert((want & ~(GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR)) == 0);
-    assert((done & ~(GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR)) == 0);
-
-    good_mutex_lock(&ctx->mutex,1);
-
-    p = good_map_find(&ctx->nodes, &fd, sizeof(fd),0);
-    if(!p)
-        goto final_error;
-
-    node = (good_mux_node *)p->pptrs[GOOD_MAP_VALUE];
 
     /*清除分派的事件。*/
     node->event_disp &= ~done;
@@ -283,7 +271,7 @@ int good_mux_mark(good_mux_t *ctx, int fd, uint32_t want, uint32_t done)
         tmp.events = node->event_mark;
         tmp.data.fd = node->fd;
 
-        if (good_epoll_mark(ctx->efd,fd,&tmp,node->mark_first) != 0)
+        if (good_epoll_mark(ctx->efd,node->fd,&tmp,node->mark_first) != 0)
             node->stable = 0;
         
         /*无论是否成功，第一次注册都已经完成。*/
@@ -299,6 +287,55 @@ int good_mux_mark(good_mux_t *ctx, int fd, uint32_t want, uint32_t done)
     */
     if (!node->stable && !(done & GOOD_EPOLL_ERROR))
         _good_mux_disp(ctx, node, GOOD_EPOLL_ERROR);
+
+}
+
+static int _good_mux_mark_cb(good_allocator_t *alloc, void *opaque)
+{
+    good_mux_t *ctx = (good_mux_t *)opaque;
+    good_mux_node *node = (good_mux_node *)alloc->pptrs[GOOD_MAP_VALUE];
+
+    _good_mux_mark(ctx,node,ctx->broadcast_want,0);
+
+    return 1;
+}
+
+int good_mux_mark(good_mux_t *ctx, int fd, uint32_t want, uint32_t done)
+{
+    good_allocator_t *p = NULL;
+    good_mux_node *node = NULL;
+
+    int chk = 0;
+
+    assert(ctx != NULL);
+    assert((want & ~(GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR)) == 0);
+    assert((done & ~(GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR)) == 0);
+
+    good_mutex_lock(&ctx->mutex,1);
+
+    if (fd >= 0)
+    {
+        p = good_map_find(&ctx->node_map, &fd, sizeof(fd), 0);
+        if (!p)
+            goto final_error;
+
+        node = (good_mux_node *)p->pptrs[GOOD_MAP_VALUE];
+
+        _good_mux_mark(ctx, node, want, done);
+    }
+    else
+    {
+        /*Set.*/
+        ctx->broadcast_want = want;
+
+        /*遍历。*/
+        ctx->node_map.dump_cb = _good_mux_mark_cb;
+        ctx->node_map.opaque = ctx;
+        good_map_scan(&ctx->node_map);
+
+        /*Clear.*/
+        ctx->broadcast_want = 0;
+    }
 
     /*No error.*/
     goto final;
@@ -324,11 +361,11 @@ static int _good_mux_watchdog_cb(good_allocator_t *alloc, void *opaque)
         goto final;
 
     /*当事件队列排队过长时，中断看门狗检查，优先处理队列中的事件。*/
-    if (ctx->events.count >= 20)
+    if (ctx->event_pool.count >= 20)
         return -1;
 
     /*如果超时，派发ERROR事件。*/
-    if ((ctx->watchdog - node->active) >= node->timeout)
+    if ((ctx->watchdog_active - node->active) >= node->timeout)
         _good_mux_disp(ctx, node, GOOD_EPOLL_ERROR);
 
 final:
@@ -341,16 +378,16 @@ static void _good_mux_watchdog(good_mux_t *ctx)
     uint64_t current = good_time_clock2kind_with(CLOCK_MONOTONIC,3);
 
     /*看门狗活动间隔时间不能太密集。*/
-    if ((current - ctx->watchdog) < ctx->interval)
+    if ((current - ctx->watchdog_active) < ctx->watchdog_intvl)
         return;
 
     /*更新看门狗活动时间。*/
-    ctx->watchdog = current;
+    ctx->watchdog_active = current;
 
     /*遍历。*/
-    ctx->nodes.dump_cb = _good_mux_watchdog_cb;
-    ctx->nodes.opaque = ctx;
-    good_map_scan(&ctx->nodes);
+    ctx->node_map.dump_cb = _good_mux_watchdog_cb;
+    ctx->node_map.opaque = ctx;
+    good_map_scan(&ctx->node_map);
 
 }
 
@@ -363,7 +400,7 @@ static void _good_mux_wait_disp(good_mux_t *ctx,good_epoll_event *events,int cou
     for (int i = 0; i < count; i++)
     {
         e = &events[i];
-        p = good_map_find(&ctx->nodes, &e->data.fd,sizeof(e->data.fd), 0);
+        p = good_map_find(&ctx->node_map, &e->data.fd,sizeof(e->data.fd), 0);
 
         /*有那么一瞬间，当前返回的事件并不在(可能被分离)锁保护范围内的，因此这要做些处理。*/
         if (p == NULL)
@@ -408,7 +445,7 @@ int good_mux_wait(good_mux_t *ctx,good_epoll_event *event,time_t timeout)
 try_again:
 
     /*优先从事件队列中拉取。*/
-    chk = good_pool_pull(&ctx->events, event, sizeof(*event));
+    chk = good_pool_pull(&ctx->event_pool, event, sizeof(*event));
     if (chk >= 0)
         goto final;
 
@@ -418,7 +455,7 @@ try_again:
         GOOD_ERRNO_AND_GOTO1(EINTR,final_error);
 
     /*多线程选主，只能有一个线程进入IO等待，其它线程等待事件通知。*/
-    if(good_thread_leader_test(&ctx->leader)==0)
+    if(good_thread_leader_test(&ctx->wait_leader)==0)
     {
         /*通过看门狗检测长期不活动的节点。*/
         _good_mux_watchdog(ctx);
@@ -430,7 +467,7 @@ try_again:
         good_mutex_unlock(&ctx->mutex);
 
         /*IO等待。*/
-        count = good_epoll_wait(ctx->efd,w,GOOD_ARRAY_SIZE(w),GOOD_MIN(remaining,ctx->interval));
+        count = good_epoll_wait(ctx->efd,w,GOOD_ARRAY_SIZE(w),GOOD_MIN(remaining,ctx->watchdog_intvl));
 
         /*加锁，禁其它接口被访问。*/
         good_mutex_lock(&ctx->mutex,1);
@@ -442,7 +479,7 @@ try_again:
         good_mutex_signal(&ctx->mutex,1);
 
         /*主线程退出。*/
-        good_thread_leader_quit(&ctx->leader);
+        good_thread_leader_quit(&ctx->wait_leader);
         
     }
     else
@@ -479,7 +516,7 @@ int good_mux_unref(good_mux_t *ctx,good_epoll_event *event)
 
     good_mutex_lock(&ctx->mutex,1);
 
-    p = good_map_find(&ctx->nodes, &event->data.fd, sizeof(event->data.fd),0);
+    p = good_map_find(&ctx->node_map, &event->data.fd, sizeof(event->data.fd),0);
     if(!p)
         goto final_error;
 

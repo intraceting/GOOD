@@ -50,8 +50,9 @@ int good_mux_attach(good_mux_t *ctx,int fd,time_t timeout);
 /**
  * 注册事件。
  * 
+ * @param fd 句柄，-1 广播到所有句柄。
  * @param want 希望的事件。
- * @param done 完成的事件。
+ * @param done 完成的事件，广播无效。
  * 
  * @return 0 成功，!0 失败(或不存在)。
 */
