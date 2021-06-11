@@ -11,7 +11,7 @@
 */
 typedef struct _good_mux
 {
-    /** epoll句柄。 */
+    /** epoll句柄。 >= 0 有效。*/
     int efd;
 
     /** 互斥量。*/
