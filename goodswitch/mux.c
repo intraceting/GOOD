@@ -244,7 +244,7 @@ static void _good_mux_disp(good_mux_t *ctx, good_mux_node *node, uint32_t event)
     }   
 }
 
-int good_mux_mark(good_mux_t *ctx,int fd,uint32_t want,uint32_t done)
+int good_mux_mark(good_mux_t *ctx, int fd, uint32_t want, uint32_t done)
 {
     good_allocator_t *p = NULL;
     good_mux_node *node = NULL;

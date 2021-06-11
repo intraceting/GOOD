@@ -24,7 +24,7 @@ int good_epoll_mark(int efd, int fd, const good_epoll_event *event, int first)
     good_epoll_event mark = {0, 0};
 
     assert(efd >= 0 && fd >= 0 && event != NULL);
-    assert(event->events & (GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR));
+    assert((event->events & ~(GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR)) == 0);
 
     /*如果注册事件中包括错误事件，则直接跳转出错流程。*/
     if (event->events & GOOD_EPOLL_ERROR)

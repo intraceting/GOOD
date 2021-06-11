@@ -39,7 +39,6 @@ enum _good_epoll_event
 #define GOOD_EPOLL_ERROR GOOD_EPOLL_ERROR
 };
 
-
 /**
  * 事件结构体。
  * 
