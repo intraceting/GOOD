@@ -21,10 +21,14 @@ int good_epoll_create()
 int good_epoll_mark(int efd, int fd, const good_epoll_event *event, int first)
 {
     int opt = 0;
-    good_epoll_event mark = {0,0};
+    good_epoll_event mark = {0, 0};
 
     assert(efd >= 0 && fd >= 0 && event != NULL);
-    assert(event->events & (GOOD_EPOLL_INPUT | GOOD_EPOLL_OUTPUT));
+    assert(event->events & (GOOD_EPOLL_INPUT | GOOD_EPOLL_INOOB | GOOD_EPOLL_OUTPUT | GOOD_EPOLL_ERROR));
+
+    /*如果注册事件中包括错误事件，则直接跳转出错流程。*/
+    if (event->events & GOOD_EPOLL_ERROR)
+        goto final_error;
 
     mark.data = event->data;
     mark.events |= (EPOLLERR | EPOLLHUP | EPOLLRDHUP | EPOLLET);
@@ -32,12 +36,18 @@ int good_epoll_mark(int efd, int fd, const good_epoll_event *event, int first)
     /*转换事件。*/
     if (event->events & GOOD_EPOLL_INPUT)
         mark.events |= EPOLLIN;
+    if (event->events & GOOD_EPOLL_INOOB)
+        mark.events |= EPOLLPRI;
     if (event->events & GOOD_EPOLL_OUTPUT)
         mark.events |= EPOLLOUT;
 
     opt = (first ? EPOLL_CTL_ADD : EPOLL_CTL_MOD);
 
     return epoll_ctl(efd, opt, fd, &mark);
+
+final_error:
+
+    return -1;
 }
 
 int good_epoll_drop(int efd, int fd)

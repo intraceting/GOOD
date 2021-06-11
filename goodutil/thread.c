@@ -212,7 +212,7 @@ int good_thread_getname(char name[16])
 
 /*------------------------------------------------------------------------------------------------*/
 
-int good_thread_leader_test(pthread_t *tid)
+int good_thread_leader_test(volatile pthread_t *tid)
 {
     pthread_t self_tid = pthread_self();
 
@@ -222,7 +222,7 @@ int good_thread_leader_test(pthread_t *tid)
     return -1;
 }
 
-int good_thread_leader_quit(pthread_t *tid)
+int good_thread_leader_quit(volatile pthread_t *tid)
 {
     pthread_t self_tid = pthread_self();
 

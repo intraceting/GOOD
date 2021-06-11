@@ -59,15 +59,16 @@ void* server_loop(void* args)
     while(1)
     {
         good_epoll_event e;
-        int chk = good_mux_wait(m, &e, 10000);
+        int chk = good_mux_wait(m, &e, -1);
         if (chk < 0)
             break;
 
         if(e.events & GOOD_EPOLL_ERROR)
         {
             assert(good_mux_mark(m,e.data.fd,0,e.events)==0);
+            assert(good_mux_unref(m,&e)==0);
             assert(good_mux_detach(m,e.data.fd)==0);
-            close(e.data.fd);
+            good_closep(&e.data.fd);
         }
         else if(e.data.fd == l)
         {
@@ -84,7 +85,7 @@ void* server_loop(void* args)
                 assert(good_mux_mark(m,c,GOOD_EPOLL_INPUT,0)==0);
             }
             
-            assert(good_mux_mark(m,e.data.fd,GOOD_EPOLL_INPUT,0)==0);
+            assert(good_mux_mark(m,e.data.fd,GOOD_EPOLL_INPUT,GOOD_EPOLL_INPUT)==0);
         }
         else
         {
@@ -100,7 +101,7 @@ void* server_loop(void* args)
                         continue;
                     }
                     if (r == -1 && errno == EAGAIN)
-                        assert(good_mux_mark(m,e.data.fd, GOOD_EPOLL_INPUT|GOOD_EPOLL_OUTPUT, 0) == 0);
+                        assert(good_mux_mark(m,e.data.fd, GOOD_EPOLL_INPUT|GOOD_EPOLL_OUTPUT, GOOD_EPOLL_INPUT) == 0);
 
                     break;
                 }
@@ -118,6 +119,7 @@ void* server_loop(void* args)
                     if (n <= 0)
                     {
                         good_closep(&fd);
+                        assert(good_mux_mark(m,e.data.fd, 0, GOOD_EPOLL_OUTPUT) == 0);
                         break;
                     }
 
@@ -126,13 +128,13 @@ void* server_loop(void* args)
                     if (s > 0)
                         continue;
                     if (s == -1 && errno == EAGAIN)
-                        assert(good_mux_mark(m,e.data.fd, GOOD_EPOLL_OUTPUT, 0) == 0);
+                        assert(good_mux_mark(m,e.data.fd, GOOD_EPOLL_OUTPUT, GOOD_EPOLL_OUTPUT) == 0);
 
                     break;
                 }
             }
 
-            assert(good_mux_mark(m,e.data.fd,0,e.events)==0);
+            assert(good_mux_unref(m,&e)==0);
         }
         
     }

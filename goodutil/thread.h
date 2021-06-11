@@ -179,7 +179,7 @@ int good_thread_getname(char name[16]);
  * @return 0 成功；!0 出错。
  * 
  */
-int good_thread_leader_test(pthread_t *tid);
+int good_thread_leader_test(volatile pthread_t *tid);
 
 /**
  * 主线程退出
@@ -187,7 +187,7 @@ int good_thread_leader_test(pthread_t *tid);
  *  @return 0 成功；!0 出错。
  * 
  */
-int good_thread_leader_quit(pthread_t *tid);
+int good_thread_leader_quit(volatile pthread_t *tid);
 
 /*------------------------------------------------------------------------------------------------*/
 
