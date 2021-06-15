@@ -103,6 +103,7 @@ struct tm* good_time_get(struct tm* tm,int utc);
 int isodigit(int c);
 
 /*------------------------------------------------------------------------------------------------*/
+
 /**
  * 字符串查找。
  * 
@@ -160,8 +161,10 @@ int good_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
  * 
  * @return !0 通过，0 未通过。
  * 
+ * 
 */
 int good_strtype(const char* str,int (*isctype_cb)(int c));
+
 
 /*------------------------------------------------------------------------------------------------*/
 

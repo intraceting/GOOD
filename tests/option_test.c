@@ -34,10 +34,9 @@ void traversal(good_tree_t *root)
     printf("\n-------------------------------------\n");
 }
 
-int main(int argc, char **argv)
+void test1(int argc, char **argv)
 {
     good_tree_t *t = good_tree_alloc(NULL);
-
 
     good_option_set(t,"-","bbb");
     good_option_set(t,"-","ccc");
@@ -106,9 +105,33 @@ int main(int argc, char **argv)
     good_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
 
- 
 
     good_tree_free(&t);
+ 
+}
+
+void test2(int argc, char **argv)
+{
+    good_tree_t *t = good_tree_alloc(NULL);
+
+    good_getargs_file(t,"/etc/os-release",'\n',0,NULL,NULL);
+
+   printf("\n--------------------------------------\n");
+    good_option_fprintf(stderr,t);
+    printf("\n--------------------------------------\n");
+
+    good_tree_free(&t);
+}
+
+int main(int argc, char **argv)
+{
+
+    test1(argc,argv);
+
+    test2(argc,argv);
+
+
+
 
     return 0;
 }

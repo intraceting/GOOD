@@ -19,7 +19,7 @@ typedef struct _good_allocator
     /**
      * 引用计数器指针。
     */
-    const int *refcount;
+    const volatile int *refcount;
 
     /**
      * 内存块数量。

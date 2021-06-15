@@ -50,6 +50,11 @@ static ssize_t _good_getargs_getline(FILE *fp, char **line, size_t *len, uint8_t
     return chk;
 }
 
+int _good_getargs_valtrim(int c)
+{
+    return (iscntrl(c) || (c == '\"') || (c == '\''));
+}
+
 void good_getargs_fp(good_tree_t *opt, FILE *fp, uint8_t delim, char note,
                      const char *argv0, const char *prefix)
 {
@@ -58,36 +63,66 @@ void good_getargs_fp(good_tree_t *opt, FILE *fp, uint8_t delim, char note,
     char *line = NULL;
     size_t len = 0;
     size_t rows = 0;
+    char *key_p = NULL;
+    char *val_p = NULL;
 
-    assert(opt != NULL && fp != NULL && prefix != NULL);
+    assert(opt != NULL && fp != NULL);
 
-    assert(prefix[0] != '\0');
-
-    prefix_len = strlen(prefix);
-    it_key = prefix;
-
-    if (argv0)
-        good_option_set(opt, it_key, argv0);
-
-    while (_good_getargs_getline(fp, &line, &len, delim, note) != -1)
+    if (prefix != NULL)
     {
-        /* 去掉字符串两端所有控制字符。 */
-        good_strtrim(line, iscntrl, 2);
+        prefix_len = strlen(prefix);
+        it_key = prefix;
 
-        if (good_strncmp(line, prefix, prefix_len, 1) != 0)
+        if (argv0)
+            good_option_set(opt, it_key, argv0);
+
+        while (_good_getargs_getline(fp, &line, &len, delim, note) != -1)
         {
-            good_option_set(opt, it_key, line);
+            /* 去掉字符串两端所有控制字符。 */
+            good_strtrim(line, iscntrl, 2);
+
+            if (good_strncmp(line, prefix, prefix_len, 1) != 0)
+            {
+                good_option_set(opt, it_key, line);
+            }
+            else
+            {
+                if (it_key != prefix)
+                    good_heap_freep((void **)&it_key);
+
+                it_key = good_heap_clone(line, len + 1);
+                if (!it_key)
+                    break;
+
+                good_option_set(opt, it_key, NULL);
+            }
         }
-        else
+    }
+    else
+    {
+        while (_good_getargs_getline(fp, &line, &len, delim, note) != -1)
         {
-            if (it_key != prefix)
-                good_heap_freep((void **)&it_key);
+            /* Find key.*/
+            key_p = line;
 
-            it_key = good_heap_clone(line, len + 1);
-            if (!it_key)
-                break;
+            /* Find Value.*/
+            val_p = strchr(line, '=');
+            if (!val_p)
+                val_p = strchr(line, ':');
 
-            good_option_set(opt, it_key, NULL);
+            if (val_p)
+            {
+                *val_p = '\0'; // for key end.
+                val_p += 1;
+
+                /* 去掉value两端所有控制字符、双引号、单引号。 */
+                good_strtrim(val_p, _good_getargs_valtrim, 2);
+            }
+
+            /* 去掉key两端所有控制字符。 */
+            good_strtrim(key_p, iscntrl, 2);
+
+            good_option_set(opt, key_p, val_p);
         }
     }
 
@@ -103,9 +138,7 @@ void good_getargs_file(good_tree_t *opt, const char *file, uint8_t delim, char n
 {
     FILE *fp = NULL;
 
-    assert(opt != NULL && file != NULL && prefix != NULL);
-
-    assert(file[0] != '\0' && prefix[0] != '\0');
+    assert(opt != NULL && file != NULL);
 
     fp = fopen(file, "r");
     if (!fp)
@@ -121,9 +154,7 @@ void good_getargs_text(good_tree_t *opt, const char *text, size_t len, uint8_t d
 {
     FILE *fp = NULL;
 
-    assert(opt != NULL && text != NULL && len > 0 && prefix != NULL);
-
-    assert(prefix[0] != '\0');
+    assert(opt != NULL && text != NULL && len > 0);
 
     fp = fmemopen((char *)text, len, "r");
     if (!fp)
