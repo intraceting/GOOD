@@ -19,13 +19,13 @@ checkReturnCode()
 CheckSystemName()
 # $1 System Name
 {
-	SYS_NAME=$1
-#	lsb_release -is | grep -iE "${SYS_NAME}" |wc -l
-	if [ -s /etc/redhat-release ];then
-		cat /etc/redhat-release | grep -iE "${SYS_NAME}" |wc -l
-	else
-		cat /etc/issue | grep -iE "${SYS_NAME}" |wc -l
-	fi
+    if [ -f /etc/os-release ];then 
+	    grep '^ID=' /etc/os-release |cut -d = -f 2 |sed 's/\"//g' | grep -iE "${1}" |wc -l
+    elif [ -f /usr/lib/os-release ];then 
+        grep '^ID=' /usr/lib/os-release |cut -d = -f 2 |sed 's/\"//g' | grep -iE "${1}" |wc -l
+    else 
+        echo "0"
+    fi 
 }
 
 #
