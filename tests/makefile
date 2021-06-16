@@ -36,6 +36,9 @@ CCC_FLAGS += -fPIC -Wno-unused-result
 LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./"
 
 #
+CCC_FLAGS += -DBUILD_VERSION_MAJOR=${VERSION_MAJOR} -DBUILD_VERSION_MINOR=${VERSION_MINOR} -DBUILD_VERSION_DATETIME=\"${VERSION_DATETIME}\"
+
+#
 ifeq ($(BUILD_TYPE),debug)
 CCC_FLAGS += -g
 else 
