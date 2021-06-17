@@ -16,10 +16,38 @@ PROJECT_NAME = goodmtx
 include ${MAKE_CONF}
 
 #
+ifeq (${VERSION_MAJOR},)
+VERSION_MAJOR = 1
+else ifeq (${VERSION_MAJOR},"")
+VERSION_MAJOR = 1
+endif
+
+#
+ifeq (${VERSION_MINOR},)
+VERSION_MINOR = 0
+else ifeq (${VERSION_MINOR},"")
+VERSION_MINOR = 0
+endif
+
+#
 ifeq (${BUILD_PATH},)
 BUILD_PATH = $(abspath $(CURDIR)/../build/)
 else ifeq (${BUILD_PATH},"")
 BUILD_PATH = $(abspath $(CURDIR)/../build/)
+endif
+
+#
+ifeq (${INSTALL_PREFIX},)
+INSTALL_PREFIX = /usr/local/good/
+else ifeq (${INSTALL_PREFIX},"")
+INSTALL_PREFIX = /usr/local/good/
+endif
+
+#
+ifeq (${ROOT_PATH},)
+ROOT_PATH = /
+else ifeq (${ROOT_PATH},"")
+ROOT_PATH = /
 endif
 
 #
@@ -33,7 +61,7 @@ CCC_STD = -std=c11
 CCC_FLAGS += -fPIC -Wno-unused-result
 
 #
-LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./"
+LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./" -Wl,-rpath="${INSTALL_PREFIX}/lib/"
 
 #
 CCC_FLAGS += -DBUILD_VERSION_MAJOR=${VERSION_MAJOR} -DBUILD_VERSION_MINOR=${VERSION_MINOR} -DBUILD_VERSION_DATETIME=\"${VERSION_DATETIME}\"
@@ -78,7 +106,7 @@ ${PROJECT_NAME}:${OBJ_FILES}
 	mkdir -p $(BUILD_PATH)
 	rm -f $(BUILD_PATH)/${PROJECT_NAME}.exe
 	$(CCC) -o $(BUILD_PATH)/${PROJECT_NAME}.exe $^ $(LINK_FLAGS)
-
+	ln -f -s ${PROJECT_NAME}.exe $(BUILD_PATH)/${PROJECT_NAME}
 #
 $(OBJ_PATH)/%.o: %.c
 	mkdir -p $(OBJ_PATH)
@@ -89,17 +117,21 @@ $(OBJ_PATH)/%.o: %.c
 clean:
 	rm -rf $(OBJ_PATH)
 	rm -f $(BUILD_PATH)/${PROJECT_NAME}.exe
+	rm -f $(BUILD_PATH)/${PROJECT_NAME}
+
 
 #
-INSTALL_PATH_BIN = $(abspath ${INSTALL_PREFIX}/bin/)
+INSTALL_PATH_BIN = $(abspath ${ROOT_PATH}/${INSTALL_PREFIX}/bin/)
+
 
 #
 install:
 #
 	mkdir -p ${INSTALL_PATH_BIN}
 	cp -f -f $(BUILD_PATH)/${PROJECT_NAME}.exe ${INSTALL_PATH_BIN}/
-
+	ln -f -s ${PROJECT_NAME}.exe $(INSTALL_PATH_BIN)/${PROJECT_NAME}
 #
 uninstall:
 #
 	rm -f $(INSTALL_PATH_BIN)/${PROJECT_NAME}.exe
+	rm -f $(INSTALL_PATH_BIN)/${PROJECT_NAME}

@@ -43,6 +43,13 @@ INSTALL_PREFIX = /usr/local/good/
 endif
 
 #
+ifeq (${ROOT_PATH},)
+ROOT_PATH = /
+else ifeq (${ROOT_PATH},"")
+ROOT_PATH = /
+endif
+
+#
 ARNAME = lib${PROJECT_NAME}.a
 ARREALNAME = ${ARNAME}.${VERSION_MAJOR}.${VERSION_MINOR}
 #
@@ -64,7 +71,7 @@ CCC_STD = -std=c11
 CCC_FLAGS += -fPIC -Wno-unused-result
 
 #
-LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./"
+LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./"  -Wl,-rpath="${INSTALL_PREFIX}/lib/"
 
 #
 LINK_FLAGS += -Wl,--soname,${SONAME}
@@ -155,11 +162,14 @@ clean:
 	rm -f $(BUILD_PATH)/${SOREALNAME}
 	rm -f $(BUILD_PATH)/${SONAME}
 
+
 #
-INSTALL_PATH_INC = $(abspath ${INSTALL_PREFIX}/include/${PROJECT_NAME}/)
-INSTALL_PATH_LIB = $(abspath ${INSTALL_PREFIX}/lib/)
-INSTALL_PATH_BIN = $(abspath ${INSTALL_PREFIX}/bin/)
-INSTALL_PATH_PKG = $(abspath ${INSTALL_PREFIX}/pkgconfig/)
+INSTALL_PATH_INC = $(abspath ${ROOT_PATH}/${INSTALL_PREFIX}/include/${PROJECT_NAME}/)
+INSTALL_PATH_LIB = $(abspath ${ROOT_PATH}/${INSTALL_PREFIX}/lib/)
+INSTALL_PATH_BIN = $(abspath ${ROOT_PATH}/${INSTALL_PREFIX}/bin/)
+INSTALL_PATH_PKG = $(abspath ${ROOT_PATH}/${INSTALL_PREFIX}/pkgconfig/)
+
+
 
 #
 install:
@@ -205,8 +215,8 @@ install:
 #
 	mkdir -p ${INSTALL_PATH_PKG}
 	echo "prefix=${INSTALL_PREFIX}" > ${INSTALL_PATH_PKG}/${PKGNAME}
-	echo "libdir=${INSTALL_PATH_LIB}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
-	echo "incdir=${INSTALL_PATH_INC}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "libdir=\$${prefix}/lib/" >> ${INSTALL_PATH_PKG}/${PKGNAME}
+	echo "incdir=\$${prefix}/include/${PROJECT_NAME}/" >> ${INSTALL_PATH_PKG}/${PKGNAME}
 	echo "" >> ${INSTALL_PATH_PKG}/${PKGNAME}
 	echo "Name: ${PROJECT_NAME}" >> ${INSTALL_PATH_PKG}/${PKGNAME}
 	echo "Description: This ${PROJECT_NAME} is part of GOOD. " >> ${INSTALL_PATH_PKG}/${PKGNAME}
