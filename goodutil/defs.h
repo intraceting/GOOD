@@ -107,7 +107,7 @@
  * 副版本号。
  * 
 */
-#define GOOD_VERSION_MINOR 0
+#define GOOD_VERSION_MINOR 1
 
 /**
  * 转换指针类型。
