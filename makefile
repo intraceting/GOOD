@@ -12,7 +12,7 @@ MAKE_CONF ?= $(abspath $(CURDIR)/build/makefile.conf)
 include ${MAKE_CONF}
 
 #
-all: goodutil goodswitch goodmtx tests
+all: goodutil goodswitch goodtools tests
 
 #
 goodutil: goodutil-clean
@@ -23,15 +23,15 @@ goodswitch: goodswitch-clean
 	make -C $(CURDIR)/goodswitch/
 
 #
-goodmtx: goodmtx-clean
-	make -C $(CURDIR)/goodmtx/
+goodtools: goodtools-clean
+	make -C $(CURDIR)/goodtools/
 
 #
 tests: tests-clean
 	make -C $(CURDIR)/tests/
 
 #
-clean: goodutil-clean goodswitch-clean goodmtx-clean tests-clean
+clean: goodutil-clean goodswitch-clean goodtools-clean tests-clean
 
 #
 goodutil-clean: 
@@ -42,15 +42,15 @@ goodswitch-clean:
 	make -C $(CURDIR)/goodswitch/ clean
 
 #
-goodmtx-clean: 
-	make -C $(CURDIR)/goodmtx/ clean
+goodtools-clean: 
+	make -C $(CURDIR)/goodtools/ clean
 
 #
 tests-clean:
 	make -C $(CURDIR)/tests/ clean
 
 #
-install: goodutil-install goodswitch-install goodmtx-install
+install: goodutil-install goodswitch-install goodtools-install
 
 #
 goodutil-install: 
@@ -61,11 +61,11 @@ goodswitch-install:
 	make -C $(CURDIR)/goodswitch/ install
 
 #
-goodmtx-install: 
-	make -C $(CURDIR)/goodmtx/ install
+goodtools-install: 
+	make -C $(CURDIR)/goodtools/ install
 
 #
-uninstall: goodutil-uninstall goodswitch-uninstall goodmtx-uninstall
+uninstall: goodutil-uninstall goodswitch-uninstall goodtools-uninstall
 
 #
 goodutil-uninstall: 
@@ -76,8 +76,8 @@ goodswitch-uninstall:
 	make -C $(CURDIR)/goodswitch/ uninstall
 
 #
-goodmtx-uninstall: 
-	make -C $(CURDIR)/goodmtx/ uninstall
+goodtools-uninstall: 
+	make -C $(CURDIR)/goodtools/ uninstall
 
 
 

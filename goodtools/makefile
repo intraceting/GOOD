@@ -10,7 +10,7 @@
 MAKE_CONF ?= $(abspath $(CURDIR)/../build/makefile.conf)
 
 #
-PROJECT_NAME = goodmtx
+PROJECT_NAME = goodtools
 
 #加载配置项。
 include ${MAKE_CONF}
@@ -94,19 +94,26 @@ endif
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
 
-# TEST源文件
-OBJ_FILES += \
-	${OBJ_PATH}/mtx.o
-
 #
 all: ${PROJECT_NAME}
 
 #
+OBJ_FILES = \
+	${OBJ_PATH}/mtx.o \
+	${OBJ_PATH}/mt.o
+
+#
 ${PROJECT_NAME}:${OBJ_FILES}
 	mkdir -p $(BUILD_PATH)
-	rm -f $(BUILD_PATH)/${PROJECT_NAME}.exe
-	$(CCC) -o $(BUILD_PATH)/${PROJECT_NAME}.exe $^ $(LINK_FLAGS)
-	ln -f -s ${PROJECT_NAME}.exe $(BUILD_PATH)/${PROJECT_NAME}
+	#
+	rm -f $(BUILD_PATH)/goodmtx.exe
+	$(CCC) -o $(BUILD_PATH)/goodmtx.exe ${OBJ_PATH}/mtx.o $(LINK_FLAGS)
+	ln -f -s goodmtx.exe $(BUILD_PATH)/goodmtx
+	#
+	rm -f $(BUILD_PATH)/goodmt.exe
+	$(CCC) -o $(BUILD_PATH)/goodmt.exe ${OBJ_PATH}/mt.o $(LINK_FLAGS)
+	ln -f -s goodmt.exe $(BUILD_PATH)/goodmt
+
 #
 $(OBJ_PATH)/%.o: %.c
 	mkdir -p $(OBJ_PATH)
@@ -116,8 +123,10 @@ $(OBJ_PATH)/%.o: %.c
 #
 clean:
 	rm -rf $(OBJ_PATH)
-	rm -f $(BUILD_PATH)/${PROJECT_NAME}.exe
-	rm -f $(BUILD_PATH)/${PROJECT_NAME}
+	rm -f $(BUILD_PATH)/goodmtx.exe
+	rm -f $(BUILD_PATH)/goodmtx
+	rm -f $(BUILD_PATH)/goodmt.exe
+	rm -f $(BUILD_PATH)/goodmt
 
 
 #
@@ -128,10 +137,14 @@ INSTALL_PATH_BIN = $(abspath ${ROOT_PATH}/${INSTALL_PREFIX}/bin/)
 install:
 #
 	mkdir -p ${INSTALL_PATH_BIN}
-	cp -f -f $(BUILD_PATH)/${PROJECT_NAME}.exe ${INSTALL_PATH_BIN}/
-	ln -f -s ${PROJECT_NAME}.exe $(INSTALL_PATH_BIN)/${PROJECT_NAME}
+	cp -f -f $(BUILD_PATH)/goodmtx.exe ${INSTALL_PATH_BIN}/
+	ln -f -s goodmtx.exe $(INSTALL_PATH_BIN)/goodmtx
+	cp -f -f $(BUILD_PATH)/goodmt.exe ${INSTALL_PATH_BIN}/
+	ln -f -s goodmt.exe $(INSTALL_PATH_BIN)/goodmt
 #
 uninstall:
 #
-	rm -f $(INSTALL_PATH_BIN)/${PROJECT_NAME}.exe
-	rm -f $(INSTALL_PATH_BIN)/${PROJECT_NAME}
+	rm -f $(INSTALL_PATH_BIN)/goodmtx.exe
+	rm -f $(INSTALL_PATH_BIN)/goodmtx
+	rm -f $(INSTALL_PATH_BIN)/goodmt.exe
+	rm -f $(INSTALL_PATH_BIN)/goodmt

@@ -80,7 +80,7 @@ void _goodmtx_print_usage(good_tree_t *args, int only_version)
     fprintf(stderr, "\n\t--cmd < NUMBER >\n");
     fprintf(stderr, "\t\tCommand. default: %d\n", GOODMTX_STATUS);
 
-    fprintf(stderr, "\n\t\t%d: Reports elements.\n", GOODMTX_STATUS);
+    fprintf(stderr, "\n\t\t%d: Report elements.\n", GOODMTX_STATUS);
     fprintf(stderr, "\t\t%d: Move Medium.\n", GOODMTX_MOVE);
 }
 

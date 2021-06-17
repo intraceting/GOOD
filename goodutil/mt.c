@@ -63,13 +63,16 @@ int good_mt_locate(int fd, int cp, uint8_t part, uint64_t block,
                    uint32_t timeout, good_scsi_io_stat *stat)
 {
     uint8_t cdb[16] = {0};
+    int chk;
 
     cdb[0] = 0x92; /* 0x92 Locate  */
     cdb[1] |= (cp ? 0x02 : 0x00); /* 0x02 Change Partition */
     cdb[3] = part;
     GOOD_PTR2OBJ(uint64_t, cdb,4) = good_endian_hton64(block); /*4,5,6,7,8,9,10,11*/
 
-    return good_scsi_sgioctl2(fd, SG_DXFER_NONE, cdb, 16, NULL,0, timeout, stat);
+    chk = good_scsi_sgioctl2(fd, SG_DXFER_NONE, cdb, 16, NULL,0, timeout, stat);
+
+    return chk;
 }
 
 int good_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *part,
@@ -82,19 +85,19 @@ int good_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *par
     cdb[0] = 0x34; /* 0x34 Read Position   */
     cdb[1] = 0x06; /* 0x06 Long form */
 
-    chk = good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,10,buf, 32, timeout, stat);
+    chk = good_scsi_sgioctl2(fd, SG_DXFER_FROM_DEV, cdb, 10, buf, 32, timeout, stat);
 
-    if(chk == 0)
-    {
-        if(block)
-            *block = good_endian_ntoh64(GOOD_PTR2U64(buf,8)); /*8,9,10,11,12,13,14,15*/
-        if(file)
-            *file = good_endian_ntoh64(GOOD_PTR2U64(buf,16)); /*16,17,18,19,20,21,22,23*/
-        if(part)
-            *part = good_endian_ntoh32(GOOD_PTR2U32(buf,4)); /*4,5,6,7*/
-    }
+    if (chk != 0 || stat->status != GOOD)
+        return -1;
 
-    return chk;
+    if (block)
+        *block = good_endian_ntoh64(GOOD_PTR2U64(buf, 8)); /*8,9,10,11,12,13,14,15*/
+    if (file)
+        *file = good_endian_ntoh64(GOOD_PTR2U64(buf, 16)); /*16,17,18,19,20,21,22,23*/
+    if (part)
+        *part = good_endian_ntoh32(GOOD_PTR2U32(buf, 4)); /*4,5,6,7*/
+
+    return 0;
 }
 
 good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
@@ -114,7 +117,7 @@ good_allocator_t *good_mt_read_attribute(int fd, uint8_t part, uint16_t id,
     GOOD_PTR2U32(cdb,10) = good_endian_hton32(sizeof(buf)); /*10,11,12,13*/
 
     chk = good_scsi_sgioctl2(fd,SG_DXFER_FROM_DEV,cdb,16,buf, sizeof(buf), timeout, stat);
-    if(chk!=0)
+    if (chk != 0 || stat->status != GOOD)
         return NULL;
 
     //printf("%u\n",good_endian_ntoh32(GOOD_PTR2U32(buf, 0)));
