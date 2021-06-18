@@ -32,7 +32,7 @@ enum _goodmt_cmd
     GOODMT_LOAD = 4,
 #define GOODMT_LOAD GOODMT_LOAD
 
-    /** 。*/
+    /** 卸载。*/
     GOODMT_UNLOAD = 5,
 #define GOODMT_UNLOAD GOODMT_UNLOAD
 
@@ -56,22 +56,6 @@ enum _goodmt_cmd
     GOODMT_WRITE_FILEMARK = 10
 #define GOODMT_WRITE_FILEMARK GOODMT_WRITE_FILEMARK
 };
-
-/**/
-struct _goodmt_senseinfo
-{   
-    /** */
-    uint8_t key;
-
-    /** */
-    uint8_t asc;
-
-    /** */
-    uint8_t ascq;
-
-    /** */
-    const char *msg;
-}; 
 
 void _goodmt_print_usage(good_tree_t *args, int only_version)
 {
