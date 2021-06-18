@@ -95,6 +95,6 @@ pack-tar:
 	make -C $(CURDIR) uninstall ROOT_PATH=${ROOT_PATH}
 	make -C $(CURDIR) clean
 #
-	@echo "***"
+	@echo "\n"
 	@echo "${BUILD_PATH}/${PACK_TAR_NAME}"
-	@echo "***"
+
