@@ -79,14 +79,22 @@ goodswitch-uninstall:
 goodtools-uninstall: 
 	make -C $(CURDIR)/goodtools/ uninstall
 
+
+#
+ROOT_PATH = /tmp/good-build-installer.tmp/
+PACK_TAR_NAME=good-${VERSION_MAJOR}.${VERSION_MINOR}-${TARGET_PLATFORM}.tar.gz
 #
 pack: pack-tar
 
 #
-ROOT_PATH=/tmp/good-build-installer.tmp/
-
+pack-tar: 
 #
-pack-tar: all
+	make -C $(CURDIR)
 	make -C $(CURDIR) install ROOT_PATH=${ROOT_PATH}
-	tar -czv -f "${BUILD_PATH}/good-${VERSION_MAJOR}.${VERSION_MINOR}-${TARGET_PLATFORM}.tar.gz" -C "${ROOT_PATH}/${INSTALL_PREFIX}/../" "good"
+	tar -czv -f "${BUILD_PATH}/${PACK_TAR_NAME}" -C "${ROOT_PATH}/${INSTALL_PREFIX}/../" "good"
 	make -C $(CURDIR) uninstall ROOT_PATH=${ROOT_PATH}
+	make -C $(CURDIR) clean
+#
+	@echo "***"
+	@echo "${BUILD_PATH}/${PACK_TAR_NAME}"
+	@echo "***"

@@ -162,6 +162,8 @@ clean:
 	rm -rf $(OBJ_PATH)
 	rm -f $(BUILD_PATH)/${SOREALNAME}
 	rm -f $(BUILD_PATH)/${SONAME}
+	rm -f $(BUILD_PATH)/${ARREALNAME}
+	rm -f $(BUILD_PATH)/${ARNAME}
 
 
 #
@@ -178,6 +180,8 @@ install:
 	mkdir -p ${INSTALL_PATH_LIB}
 	cp -f $(BUILD_PATH)/${SOREALNAME} ${INSTALL_PATH_LIB}/
 	ln -f -s ${SOREALNAME} ${INSTALL_PATH_LIB}/${SONAME}
+	cp -f $(BUILD_PATH)/${ARREALNAME} ${INSTALL_PATH_LIB}/
+	ln -f -s ${ARREALNAME} ${INSTALL_PATH_LIB}/${ARNAME}
 	
 #
 	mkdir -p ${INSTALL_PATH_INC}/
@@ -231,6 +235,8 @@ uninstall:
 #
 	rm -f ${INSTALL_PATH_LIB}/${SOREALNAME}
 	rm -f ${INSTALL_PATH_LIB}/${SONAME}
+	rm -f ${INSTALL_PATH_LIB}/${ARREALNAME}
+	rm -f ${INSTALL_PATH_LIB}/${ARNAME}
 
 #
 	rm -f ${INSTALL_PATH_INC}/allocator.h
