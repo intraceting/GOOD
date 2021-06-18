@@ -78,6 +78,3 @@ goodswitch-uninstall:
 #
 goodtools-uninstall: 
 	make -C $(CURDIR)/goodtools/ uninstall
-
-
-
