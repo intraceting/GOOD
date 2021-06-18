@@ -26,22 +26,6 @@ enum _goodmtx_cmd
 
 };
 
-/**/
-struct _goodmtx_senseinfo
-{   
-    /** */
-    uint8_t key;
-
-    /** */
-    uint8_t asc;
-
-    /** */
-    uint8_t ascq;
-
-    /** */
-    const char *msg;
-}; 
-
 void _goodmtx_print_usage(good_tree_t *args, int only_version)
 {
     char name[NAME_MAX] = {0};
@@ -84,20 +68,21 @@ void _goodmtx_print_usage(good_tree_t *args, int only_version)
     fprintf(stderr, "\t\t%d: Move Medium.\n", GOODMTX_MOVE);
 }
 
-static const struct _goodmtx_senseinfo senseinfo_keys[] = {
+static const good_scsi_sense_info senseinfo_dicts[] = {
+    /*KEY=0x00*/
+    {0x00, 0x00, 0x00, "No Sense"},
+    /*KEY=0x01*/
     {0x01, 0x00, 0x00, "Recovered Error"},
+    /*KEY=0x02*/
     {0x02, 0x00, 0x00, "Not Ready"},
+    /*KEY=0x03*/
     {0x03, 0x00, 0x00, "Medium Error"},
+    /*KEY=0x04*/
     {0x04, 0x00, 0x00, "Hardware Error"},
+    /*KEY=0x05*/
     {0x05, 0x00, 0x00, "Illegal Request"},
-    {0x06, 0x00, 0x00, "Unit Attention"},
-    {0x0b, 0x00, 0x00, "Command Aborted"},
-    {0,0,0,""},
-};
-
-static const struct _goodmtx_senseinfo senseinfo_details[] = {
     {0x05, 0x21, 0x01, "Invalid element address"},
-    {0x05, 0x24, 0x00, "Invalid field CDB or Invalid element address"},
+    {0x05, 0x24, 0x00, "Invalid field CDB or address"},
     {0x05, 0x3b, 0x0d, "Medium destination element full"},
     {0x05, 0x3b, 0x0e, "Medium source element empty"},
     {0x05, 0x53, 0x02, "Library media removal prevented state set"},
@@ -105,7 +90,10 @@ static const struct _goodmtx_senseinfo senseinfo_details[] = {
     {0x05, 0x44, 0x80, "Bad status library controller"},
     {0x05, 0x44, 0x81, "Source not ready"},
     {0x05, 0x44, 0x82, "Destination not ready"},
-    {0,0,0,""},
+    /*KEY=0x06*/
+    {0x06, 0x00, 0x00, "Unit Attention"},
+    /*KEY=0x0b*/
+    {0x0b, 0x00, 0x00, "Command Aborted"}
 };
 
 void _goodmtx_printf_sense(good_scsi_io_stat *stat)
@@ -117,32 +105,19 @@ void _goodmtx_printf_sense(good_scsi_io_stat *stat)
     asc = good_scsi_sense_code(stat->sense);
     ascq = good_scsi_sense_qualifier(stat->sense);
 
-    /**/
-    for (size_t i = 0; i < GOOD_ARRAY_SIZE(senseinfo_details); i++)
+    for (size_t i = 0; i < GOOD_ARRAY_SIZE(senseinfo_dicts); i++)
     {
-        if (senseinfo_details[i].key != key ||
-            senseinfo_details[i].asc != asc ||
-            senseinfo_details[i].ascq != ascq)
+        if (senseinfo_dicts[i].key != key)
             continue;
 
-        msg_p = senseinfo_details[i].msg;
-        break;
-    }
+        msg_p = senseinfo_dicts[i].msg;
 
-    if(msg_p)
-        goto final;
-
-    /*No details, translate KEY.*/
-    for (size_t i = 0; i < GOOD_ARRAY_SIZE(senseinfo_keys); i++)
-    {
-        if(senseinfo_keys[i].key != key)
+        if (senseinfo_dicts[i].asc != asc || senseinfo_dicts[i].ascq != ascq)
             continue;
-        
-        msg_p = senseinfo_keys[i].msg;
+
+        msg_p = senseinfo_dicts[i].msg;
         break;
     }
-
-final:
 
     syslog(LOG_INFO, "Sense(KEY=%02X,ASC=%02X,ASCQ=%02X): %s.", key, asc, ascq, msg_p);
 }

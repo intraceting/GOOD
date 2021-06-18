@@ -126,28 +126,35 @@ void _goodmt_print_usage(good_tree_t *args, int only_version)
     fprintf(stderr, "\t\t%d: Write filemark.\n", GOODMT_WRITE_FILEMARK);
 }
 
-static const struct _goodmt_senseinfo senseinfo_keys[] = {
-    {0x00, 0x00, 0x00, "No Sense"},
-    {0x01, 0x00, 0x00, "Recovered Error"},
-    {0x02, 0x00, 0x00, "Not Ready"},
-    {0x03, 0x00, 0x00, "Medium Error"},
-    {0x04, 0x00, 0x00, "Hardware Error"},
-    {0x05, 0x00, 0x00, "Illegal Request"},
-    {0x06, 0x00, 0x00, "Unit Attention"},
-    {0x07, 0x00, 0x00, "Data Protect"},
-    {0x08, 0x00, 0x00, "Blank Check"},
-    {0x0b, 0x00, 0x00, "Command Aborted"},
-    {0x0d, 0x00, 0x00, "Volume Overflow"},
-    {0,0,0,""},
-};
 
-static const struct _goodmt_senseinfo senseinfo_details[] = {
+static const good_scsi_sense_info senseinfo_dicts[] = {
+    /*KEY=0x00*/
+    {0x00, 0x00, 0x00, "No Sense"},
+    /*KEY=0x01*/
+    {0x01, 0x00, 0x00, "Recovered Error"},
+    /*KEY=0x02*/
+    {0x02, 0x00, 0x00, "Not Ready"},
     {0x02, 0x30, 0x03, "Cleaning in progess"},
     {0x02, 0x30, 0x07, "Cleaning failure"},
     {0x02, 0x3a, 0x00, "Medium not present"},
+    /*KEY=0x03*/
+    {0x03, 0x00, 0x00, "Medium Error"},
+    /*KEY=0x04*/
+    {0x04, 0x00, 0x00, "Hardware Error"},
+    /*KEY=0x05*/
+    {0x05, 0x00, 0x00, "Illegal Request"},
+    /*KEY=0x06*/
+    {0x06, 0x00, 0x00, "Unit Attention"},
+    /*KEY=0x07*/
+    {0x07, 0x00, 0x00, "Data Protect"},
+    /*KEY=0x08*/
+    {0x08, 0x00, 0x00, "Blank Check"},
     {0x08, 0x00, 0x05, "End of data"},
     {0x08, 0x14, 0x03, "New tape"},
-    {0,0,0,""},
+    /*KEY=0x0b*/
+    {0x0b, 0x00, 0x00, "Command Aborted"},
+    /*KEY=0x0d*/
+    {0x0d, 0x00, 0x00, "Volume Overflow"}
 };
 
 void _goodmt_printf_sense(good_scsi_io_stat *stat)
@@ -159,32 +166,20 @@ void _goodmt_printf_sense(good_scsi_io_stat *stat)
     asc = good_scsi_sense_code(stat->sense);
     ascq = good_scsi_sense_qualifier(stat->sense);
 
-    /**/
-    for (size_t i = 0; i < GOOD_ARRAY_SIZE(senseinfo_details); i++)
+    for (size_t i = 0; i < GOOD_ARRAY_SIZE(senseinfo_dicts); i++)
     {
-        if (senseinfo_details[i].key != key ||
-            senseinfo_details[i].asc != asc ||
-            senseinfo_details[i].ascq != ascq)
+        if (senseinfo_dicts[i].key != key)
             continue;
 
-        msg_p = senseinfo_details[i].msg;
+        msg_p = senseinfo_dicts[i].msg;
+
+        if (senseinfo_dicts[i].asc != asc || senseinfo_dicts[i].ascq != ascq)
+            continue;
+
+        msg_p = senseinfo_dicts[i].msg;
         break;
     }
 
-    if(msg_p)
-        goto final;
-
-    /*No details, translate KEY.*/
-    for (size_t i = 0; i < GOOD_ARRAY_SIZE(senseinfo_keys); i++)
-    {
-        if(senseinfo_keys[i].key != key)
-            continue;
-        
-        msg_p = senseinfo_keys[i].msg;
-        break;
-    }
-
-final:
 
     syslog(LOG_INFO, "Sense(KEY=%02X,ASC=%02X,ASCQ=%02X): %s.", key, asc, ascq, msg_p);
 }
