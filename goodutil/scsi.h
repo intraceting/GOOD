@@ -47,25 +47,6 @@ typedef struct _good_scsi_io_stat
 } good_scsi_io_stat;
 
 /**
- * Sense Information.
-*/
-typedef struct _good_scsi_sense_info
-{   
-    /** */
-    uint8_t key;
-
-    /** */
-    uint8_t asc;
-
-    /** */
-    uint8_t ascq;
-
-    /** */
-    const char *msg;
-}good_scsi_sense_info;
-
-
-/**
  * 设备类型数字编码转字符串编码。
  * 
  * 参考lsscsi命令。

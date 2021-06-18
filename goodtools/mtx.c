@@ -68,7 +68,13 @@ void _goodmtx_print_usage(good_tree_t *args, int only_version)
     fprintf(stderr, "\t\t%d: Move Medium.\n", GOODMTX_MOVE);
 }
 
-static const good_scsi_sense_info senseinfo_dicts[] = {
+static struct _goodmtx_sense_dict
+{   
+    uint8_t key;
+    uint8_t asc;
+    uint8_t ascq;
+    const char *msg;
+}goodmtx_sense_dict[] = {
     /*KEY=0x00*/
     {0x00, 0x00, 0x00, "No Sense"},
     /*KEY=0x01*/
@@ -105,17 +111,17 @@ void _goodmtx_printf_sense(good_scsi_io_stat *stat)
     asc = good_scsi_sense_code(stat->sense);
     ascq = good_scsi_sense_qualifier(stat->sense);
 
-    for (size_t i = 0; i < GOOD_ARRAY_SIZE(senseinfo_dicts); i++)
+    for (size_t i = 0; i < GOOD_ARRAY_SIZE(goodmtx_sense_dict); i++)
     {
-        if (senseinfo_dicts[i].key != key)
+        if (goodmtx_sense_dict[i].key != key)
             continue;
 
-        msg_p = senseinfo_dicts[i].msg;
+        msg_p = goodmtx_sense_dict[i].msg;
 
-        if (senseinfo_dicts[i].asc != asc || senseinfo_dicts[i].ascq != ascq)
+        if (goodmtx_sense_dict[i].asc != asc || goodmtx_sense_dict[i].ascq != ascq)
             continue;
 
-        msg_p = senseinfo_dicts[i].msg;
+        msg_p = goodmtx_sense_dict[i].msg;
         break;
     }
 
