@@ -1,17 +1,17 @@
 
-# GOOD
+## GOOD
 
-* Linux C 应用程序开发催化剂。 
+* Linux C/C++ 应用程序开发催化剂。 
 
-## License
+### License
 
 * GOOD is MIT-licensed.
 
-## Build-help
+### Build-help
 
 * ./configure.sh -?
 
-## Build-install
+### Build-install
 
 * $ ./configure.sh [ ... ]
 * $ make
