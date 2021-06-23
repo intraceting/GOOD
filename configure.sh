@@ -144,6 +144,8 @@ DEPEND_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_LIBS}"
 if [ $(checkKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
 {
     HAVE_OPENMP=1
+    DEPEND_FLAGS=" -DHAVE_OPENMP -fopenmp ${DEPEND_FLAGS}"
+    DEPEND_LIBS=" -fopenmp ${DEPEND_LIBS}"
 }
 fi
 
@@ -221,7 +223,6 @@ echo "TARGET_PLATFORM = ${TARGET_PLATFORM}" >> ${MAKE_CONF}
 echo "VERSION_MAJOR = ${VERSION_MAJOR}" >> ${MAKE_CONF}
 echo "VERSION_MINOR = ${VERSION_MINOR}" >> ${MAKE_CONF}
 echo "VERSION_DATETIME = ${VERSION_DATETIME}" >> ${MAKE_CONF}
-echo "HAVE_OPENMP = ${HAVE_OPENMP}" >> ${MAKE_CONF}
 echo "DEPEND_FLAGS = ${DEPEND_FLAGS}" >> ${MAKE_CONF}
 echo "DEPEND_LIBS = ${DEPEND_LIBS}" >> ${MAKE_CONF}
 echo "BUILD_TYPE = ${BUILD_TYPE}" >> ${MAKE_CONF}

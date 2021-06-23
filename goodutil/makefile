@@ -96,12 +96,7 @@ CCC_FLAGS += ${DEPEND_FLAGS}
 
 #
 LINK_FLAGS += ${DEPEND_LIBS}
-
-#
-ifeq ($(HAVE_OPENMP),1)
-CCC_FLAGS += -fopenmp
-LINK_FLAGS += -fopenmp
-endif 
+ 
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/

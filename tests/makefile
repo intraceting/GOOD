@@ -58,12 +58,6 @@ LINK_FLAGS += -lgoodswitch -lgoodutil -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PA
 #LINK_FLAGS += -l:libgoodutil.a -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
 
 #
-ifeq ($(HAVE_OPENMP),1)
-CCC_FLAGS += -fopenmp
-LINK_FLAGS += -fopenmp
-endif 
-
-#
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
 
 #
