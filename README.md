@@ -1,7 +1,7 @@
 
 ## ABTK
 
-* Linux C/C++ a better toolkit。 
+* A better toolkit for C/C++. 
 
 ### License
 
