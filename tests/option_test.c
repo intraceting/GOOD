@@ -1,5 +1,5 @@
 /*
- * This file is part of GOOD.
+ * This file is part of ABTK.
  * 
  * MIT License
  * 
@@ -8,119 +8,119 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "goodutil/option.h"
-#include "goodutil/getargs.h"
+#include "abtkutil/option.h"
+#include "abtkutil/getargs.h"
 
 
-int dump2(size_t deep, good_tree_t *node, void *opaque)
+int dump2(size_t deep, abtk_tree_t *node, void *opaque)
 {
     if(deep==0)
-        good_tree_fprintf(stderr,deep,node,"OPT\n");
+        abtk_tree_fprintf(stderr,deep,node,"OPT\n");
     if(deep==1)
-        good_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[GOOD_OPTION_KEY]);
+        abtk_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[ABTK_OPTION_KEY]);
     if(deep==2)
-        good_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[GOOD_OPTION_VALUE]);
+        abtk_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[ABTK_OPTION_VALUE]);
 
     return 1;
 }
 
-void traversal(good_tree_t *root)
+void traversal(abtk_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    good_tree_iterator_t it = {0,dump2,NULL};
-    good_tree_scan(root,&it);
+    abtk_tree_iterator_t it = {0,dump2,NULL};
+    abtk_tree_scan(root,&it);
 
     printf("\n-------------------------------------\n");
 }
 
 void test1(int argc, char **argv)
 {
-    good_tree_t *t = good_tree_alloc(NULL);
+    abtk_tree_t *t = abtk_tree_alloc(NULL);
 
-    good_option_set(t,"-","bbb");
-    good_option_set(t,"-","ccc");
-    good_option_set(t,"-","fff");
-    good_option_set(t,"-","eee");
-    good_option_set(t,"-","www");
+    abtk_option_set(t,"-","bbb");
+    abtk_option_set(t,"-","ccc");
+    abtk_option_set(t,"-","fff");
+    abtk_option_set(t,"-","eee");
+    abtk_option_set(t,"-","www");
 
-    assert(good_option_count(t,"-")==5);
+    assert(abtk_option_count(t,"-")==5);
 
-    good_option_set(t,"-bbb","123");
-    good_option_set(t,"-bbb","456");
-    good_option_set(t,"-bbb","789");
-    good_option_set(t,"-bbb","543");
-    good_option_set(t,"-bbb","854");
+    abtk_option_set(t,"-bbb","123");
+    abtk_option_set(t,"-bbb","456");
+    abtk_option_set(t,"-bbb","789");
+    abtk_option_set(t,"-bbb","543");
+    abtk_option_set(t,"-bbb","854");
 
-    assert(good_option_count(t,"-bbb")==5);
+    assert(abtk_option_count(t,"-bbb")==5);
 
-    good_option_set(t,"-ddd",NULL);
+    abtk_option_set(t,"-ddd",NULL);
 
-    assert(good_option_exist(t,"-ddd"));
+    assert(abtk_option_exist(t,"-ddd"));
 
-    assert(!good_option_exist(t,"-ccc"));
+    assert(!abtk_option_exist(t,"-ccc"));
 
     traversal(t);
 
-    const char* p = good_option_get(t,"-",0,NULL);
+    const char* p = abtk_option_get(t,"-",0,NULL);
 
     printf("p=%s\n",p);
 
-    const char* p1 = good_option_get(t,"-bbb",1,NULL);
+    const char* p1 = abtk_option_get(t,"-bbb",1,NULL);
 
     printf("p1=%s\n",p1);
 
-    const char* p2 = good_option_get(t,"-ccc",1,NULL);
+    const char* p2 = abtk_option_get(t,"-ccc",1,NULL);
 
     assert(p2==NULL);
 
-    p2 = good_option_get(t,"-ccc",1,"f");
+    p2 = abtk_option_get(t,"-ccc",1,"f");
 
     assert(p2[0]=='f');
 
-    int s = good_option_fprintf(stderr,t);
+    int s = abtk_option_fprintf(stderr,t);
 
     char buf[100] = {0};
 
-    good_option_snprintf(buf,100,t);
+    abtk_option_snprintf(buf,100,t);
 
 
-    good_getargs(t,argc,argv,"--");
+    abtk_getargs(t,argc,argv,"--");
 
     printf("\n--------------------------------------\n");
-    good_option_fprintf(stderr,t);
+    abtk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
     
-    good_getargs_file(t,good_option_get(t,"--test-import",0,NULL),'\n','#',"test-import","--");
+    abtk_getargs_file(t,abtk_option_get(t,"--test-import",0,NULL),'\n','#',"test-import","--");
 
 
     printf("\n--------------------------------------\n");
-    good_option_fprintf(stderr,t);
+    abtk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
 
-    good_option_remove(t,"-bbb");
+    abtk_option_remove(t,"-bbb");
 
 
     printf("\n--------------------------------------\n");
-    good_option_fprintf(stderr,t);
+    abtk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
 
 
-    good_tree_free(&t);
+    abtk_tree_free(&t);
  
 }
 
 void test2(int argc, char **argv)
 {
-    good_tree_t *t = good_tree_alloc(NULL);
+    abtk_tree_t *t = abtk_tree_alloc(NULL);
 
-    good_getargs_file(t,"/etc/os-release",'\n',0,NULL,NULL);
+    abtk_getargs_file(t,"/etc/os-release",'\n',0,NULL,NULL);
 
    printf("\n--------------------------------------\n");
-    good_option_fprintf(stderr,t);
+    abtk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
 
-    good_tree_free(&t);
+    abtk_tree_free(&t);
 }
 
 int main(int argc, char **argv)

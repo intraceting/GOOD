@@ -1,11 +1,11 @@
 
-## GOOD
+## ABTK
 
-* Linux C/C++ 应用程序开发催化剂。 
+* Linux C/C++ a better toolkit。 
 
 ### License
 
-* GOOD is MIT-licensed.
+* ABTK is MIT-licensed.
 
 ### Build-help
 

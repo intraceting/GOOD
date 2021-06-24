@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This file is part of GOOD.
+# This file is part of ABTK.
 #  
 # MIT License
 ##
@@ -68,6 +68,9 @@ checkKeyword()
 }
 
 #
+SOLUTION_NAME=abtk
+
+#
 SHELL_PWD=$(cd `dirname $0`; pwd)
 KIT_NAME=$(CheckPackageKitName)
 
@@ -87,7 +90,7 @@ VERSION_DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 #
 DEPEND_FUNC="Nothing"
 BUILD_TYPE="release"
-INSTALL_PREFIX="/usr/local/good/"
+INSTALL_PREFIX="/usr/local/${SOLUTION_NAME}/"
 
 #
 PrintUsage()
@@ -129,6 +132,9 @@ if [ ! -d ${BUILD_PATH} ];then
 echo "'${BUILD_PATH}' must be an existing directory."
 exit 22
 fi 
+
+#
+echo "SOLUTION_NAME=${SOLUTION_NAME}"
 
 #
 echo "BUILD_PATH=${BUILD_PATH}"
@@ -212,11 +218,12 @@ echo "ROOT_PATH?=/"
 
 #
 echo "#" > ${MAKE_CONF}
-echo "# GOOD is good!" >> ${MAKE_CONF}
+echo "# ABTK is abtk!" >> ${MAKE_CONF}
 echo "#" >> ${MAKE_CONF}
 echo "" >> ${MAKE_CONF}
 
 #
+echo "SOLUTION_NAME = ${SOLUTION_NAME}" >> ${MAKE_CONF}
 echo "BUILD_PATH = ${BUILD_PATH}" >> ${MAKE_CONF}
 echo "HOST_PLATFORM = ${HOST_PLATFORM}" >> ${MAKE_CONF}
 echo "TARGET_PLATFORM = ${TARGET_PLATFORM}" >> ${MAKE_CONF}

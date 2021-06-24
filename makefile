@@ -1,5 +1,5 @@
 #
-# This file is part of GOOD.
+# This file is part of ABTK.
 #
 # MIT License
 #
@@ -12,77 +12,80 @@ MAKE_CONF ?= $(abspath $(CURDIR)/build/makefile.conf)
 include ${MAKE_CONF}
 
 #
-all: goodutil goodswitch goodtools tests
+SOLUTION_NAME ?= abtk
 
 #
-goodutil: goodutil-clean
-	make -C $(CURDIR)/goodutil/
+all: abtkutil abtkcomm tools tests
 
 #
-goodswitch: goodswitch-clean
-	make -C $(CURDIR)/goodswitch/
+abtkutil: abtkutil-clean
+	make -C $(CURDIR)/abtkutil/
 
 #
-goodtools: goodtools-clean
-	make -C $(CURDIR)/goodtools/
+abtkcomm: abtkcomm-clean
+	make -C $(CURDIR)/abtkcomm/
+
+#
+tools: tools-clean
+	make -C $(CURDIR)/tools/
 
 #
 tests: tests-clean
 	make -C $(CURDIR)/tests/
 
 #
-clean: goodutil-clean goodswitch-clean goodtools-clean tests-clean
+clean: abtkutil-clean abtkcomm-clean tools-clean tests-clean
 
 #
-goodutil-clean: 
-	make -C $(CURDIR)/goodutil/ clean
+abtkutil-clean: 
+	make -C $(CURDIR)/abtkutil/ clean
 
 #
-goodswitch-clean: 
-	make -C $(CURDIR)/goodswitch/ clean
+abtkcomm-clean: 
+	make -C $(CURDIR)/abtkcomm/ clean
 
 #
-goodtools-clean: 
-	make -C $(CURDIR)/goodtools/ clean
+tools-clean: 
+	make -C $(CURDIR)/tools/ clean
 
 #
 tests-clean:
 	make -C $(CURDIR)/tests/ clean
 
 #
-install: goodutil-install goodswitch-install goodtools-install
+install: abtkutil-install abtkcomm-install tools-install
 
 #
-goodutil-install: 
-	make -C $(CURDIR)/goodutil/ install
+abtkutil-install: 
+	make -C $(CURDIR)/abtkutil/ install
 
 #
-goodswitch-install: 
-	make -C $(CURDIR)/goodswitch/ install
+abtkcomm-install: 
+	make -C $(CURDIR)/abtkcomm/ install
 
 #
-goodtools-install: 
-	make -C $(CURDIR)/goodtools/ install
+tools-install: 
+	make -C $(CURDIR)/tools/ install
 
 #
-uninstall: goodutil-uninstall goodswitch-uninstall goodtools-uninstall
+uninstall: abtkutil-uninstall abtkcomm-uninstall tools-uninstall
 
 #
-goodutil-uninstall: 
-	make -C $(CURDIR)/goodutil/ uninstall
+abtkutil-uninstall: 
+	make -C $(CURDIR)/abtkutil/ uninstall
 
 #
-goodswitch-uninstall: 
-	make -C $(CURDIR)/goodswitch/ uninstall
+abtkcomm-uninstall: 
+	make -C $(CURDIR)/abtkcomm/ uninstall
 
 #
-goodtools-uninstall: 
-	make -C $(CURDIR)/goodtools/ uninstall
+tools-uninstall: 
+	make -C $(CURDIR)/tools/ uninstall
 
 
 #
-ROOT_PATH = /tmp/good-build-installer.tmp/
-PACK_TAR_NAME=good-${VERSION_MAJOR}.${VERSION_MINOR}-${TARGET_PLATFORM}.tar.gz
+ROOT_PATH = /tmp/${SOLUTION_NAME}-build-installer.tmp/
+PACK_TAR_NAME=${SOLUTION_NAME}-${VERSION_MAJOR}.${VERSION_MINOR}-${TARGET_PLATFORM}.tar.gz
 #
 pack: pack-tar
 
@@ -91,7 +94,7 @@ pack-tar:
 #
 	make -C $(CURDIR)
 	make -C $(CURDIR) install ROOT_PATH=${ROOT_PATH}
-	tar -czv -f "${BUILD_PATH}/${PACK_TAR_NAME}" -C "${ROOT_PATH}/${INSTALL_PREFIX}/../" "good"
+	tar -czv -f "${BUILD_PATH}/${PACK_TAR_NAME}" -C "${ROOT_PATH}/${INSTALL_PREFIX}/../" "abtk"
 	make -C $(CURDIR) uninstall ROOT_PATH=${ROOT_PATH}
 	make -C $(CURDIR) clean
 #

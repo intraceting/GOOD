@@ -1,5 +1,5 @@
 #
-# This file is part of GOOD.
+# This file is part of ABTK.
 #
 # MIT License
 #
@@ -54,8 +54,8 @@ endif
 CCC_FLAGS += -I$(abspath $(CURDIR)/../) ${DEPEND_FLAGS}
 
 #
-LINK_FLAGS += -lgoodswitch -lgoodutil -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
-#LINK_FLAGS += -l:libgoodutil.a -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
+LINK_FLAGS += -labtk-comm -labtk-util -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
+#LINK_FLAGS += -l:libabtkutil.a -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
