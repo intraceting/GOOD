@@ -26,11 +26,6 @@ typedef struct _abtk_tree
     struct _abtk_tree *chain[5];
 
     /**
-     * 颜色。
-    */
-    int color;
-
-    /**
      * 数据。
      * 
      * 当节点被删除时，如果不为NULL(0)，自动调用abtk_allocator_unref()释放。
@@ -64,25 +59,6 @@ enum _abtk_tree_chain
     /** 么娃。*/
    ABTK_TREE_CHAIN_CHILD_LEAST = 4
 #define ABTK_TREE_CHAIN_CHILD_LEAST     ABTK_TREE_CHAIN_CHILD_LEAST
-
-};
-
-/**
- * 树节点颜色。
-*/
-enum _abtk_tree_color
-{
-    /** 无。*/
-    ABTK_TREE_COLOR_NONE = 0,
-#define ABTK_TREE_COLOR_NONE    ABTK_TREE_COLOR_NONE
-
-    /** 红。*/
-    ABTK_TREE_COLOR_RED = 1,
-#define ABTK_TREE_COLOR_RED    ABTK_TREE_COLOR_RED
-
-    /** 黑。*/
-    ABTK_TREE_COLOR_BLACK = 2
-#define ABTK_TREE_COLOR_BLACK    ABTK_TREE_COLOR_BLACK
 
 };
 
