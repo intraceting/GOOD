@@ -24,6 +24,7 @@ void test_dir()
     char* path4 = abcdk_heap_alloc(PATH_MAX);
     char* path5 = abcdk_heap_alloc(PATH_MAX);
     char* path6 = abcdk_heap_alloc(PATH_MAX);
+    char* path7 = abcdk_heap_alloc(PATH_MAX);
 
     abcdk_dirdir(path,"/tmp/abcd/efg/heigh/././././///////sadfasdfasdfasfdsd/.a.a.sdf.../asdfasdfasfd/.../../../dfgsdfg///../..////////aaa.txt");
 
@@ -55,9 +56,17 @@ void test_dir()
 
     printf("[%s]\n",path4);
 
+    //abcdk_abspath(path7, path4,NULL);
+    //abcdk_abspath(path7, path4,"bbb");
+    abcdk_abspath(path7, "/aaa","bbb");
 
+    printf("[%s]\n",path7);
 
     abcdk_heap_free(path4);
+    abcdk_heap_free(path7);
+
+
+    
 }
 
 int compare_cb(const abcdk_tree_t *node1, const abcdk_tree_t *node2, void *opaque)
@@ -426,7 +435,7 @@ void test_termios()
 int main(int argc, char **argv)
 {
     
-    // test_dir();
+     test_dir();
 
    //  test_dirscan();
 
@@ -443,8 +452,8 @@ int main(int argc, char **argv)
   //       test_tar_read(argv[1]);
 
     
-   if(argc>=2)
-        test_tar_write(argv[1]);
+//    if(argc>=2)
+//         test_tar_write(argv[1]);
 
   //  test_termios();
 
