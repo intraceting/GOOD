@@ -1,5 +1,5 @@
 /*
- * This file is part of ABTK.
+ * This file is part of ABCDK.
  * 
  * MIT License
  * 
@@ -7,32 +7,32 @@
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
-#include "abtkutil/thread.h"
-#include "abtkutil/crc32.h"
-#include "abtkutil/clock.h"
-#include "abtkutil/signal.h"
+#include "abcdkutil/thread.h"
+#include "abcdkutil/crc32.h"
+#include "abcdkutil/clock.h"
+#include "abcdkutil/signal.h"
 
 void* specific_cb(void* args)
 {
-    abtk_thread_setname("haha");
+    abcdk_thread_setname("haha");
 
-    printf("dot:%lu\n",abtk_clock_dot(NULL));
+    printf("dot:%lu\n",abcdk_clock_dot(NULL));
 
-    uint32_t sum = abtk_crc32_sum("abc",3,0);
-
-    printf("sun=%u,%08X\n",sum,sum);
-
-    printf("step:%lu\n",abtk_clock_step(NULL));
-
-    sum = abtk_crc32_sum("abc",3,sum);
+    uint32_t sum = abcdk_crc32_sum("abc",3,0);
 
     printf("sun=%u,%08X\n",sum,sum);
 
-    printf("step:%lu\n",abtk_clock_step(NULL));
+    printf("step:%lu\n",abcdk_clock_step(NULL));
+
+    sum = abcdk_crc32_sum("abc",3,sum);
+
+    printf("sun=%u,%08X\n",sum,sum);
+
+    printf("step:%lu\n",abcdk_clock_step(NULL));
 
     sleep(3);
 
-    printf("dot:%lu\n",abtk_clock_dot(NULL));
+    printf("dot:%lu\n",abcdk_clock_dot(NULL));
 
     return NULL;
 }
@@ -55,28 +55,28 @@ int signal_cb(const siginfo_t *info, void *opaque)
 
 int main(int argc, char **argv)
 {
-    abtk_thread_setname("hehe");
+    abcdk_thread_setname("hehe");
 
-    abtk_mutex_t m;
-    abtk_mutex_init2(&m,1);
+    abcdk_mutex_t m;
+    abcdk_mutex_init2(&m,1);
 
-    abtk_mutex_lock(&m,0);
+    abcdk_mutex_lock(&m,0);
 
-    abtk_mutex_unlock(&m);
+    abcdk_mutex_unlock(&m);
 
-    abtk_mutex_destroy(&m);
+    abcdk_mutex_destroy(&m);
 
-    abtk_thread_t p;
+    abcdk_thread_t p;
     p.routine = specific_cb;
-    abtk_thread_create(&p,1);
-    abtk_thread_join(&p);
+    abcdk_thread_create(&p,1);
+    abcdk_thread_join(&p);
 
-    abtk_signal_t sig;
+    abcdk_signal_t sig;
     sigfillset(&sig.signals);
     sig.signal_cb = signal_cb;
     sig.opaque = NULL;
      
-    abtk_sigwaitinfo(&sig,-1);
+    abcdk_sigwaitinfo(&sig,-1);
 
     return 0;
 }

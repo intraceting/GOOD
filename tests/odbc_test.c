@@ -1,5 +1,5 @@
 /*
- * This file is part of ABTK.
+ * This file is part of ABCDK.
  * 
  * MIT License
  * 
@@ -9,17 +9,17 @@
 #include <unistd.h>
 #include <string.h>
 #include <locale.h>
-#include "abtkutil/getargs.h"
-#include "abtkutil/odbc.h"
+#include "abcdkutil/getargs.h"
+#include "abcdkutil/odbc.h"
 
 #ifdef __SQLEXT_H
 
 
-void test_insert(abtk_odbc_t *o)
+void test_insert(abcdk_odbc_t *o)
 {
 
 
-    assert(abtk_odbc_tran_begin(o) == SQL_SUCCESS);
+    assert(abcdk_odbc_tran_begin(o) == SQL_SUCCESS);
 
     time_t begin = time(NULL);
 
@@ -27,21 +27,21 @@ void test_insert(abtk_odbc_t *o)
     {
         char sql[200] = {0};
         sprintf(sql,"insert into LTR_TASK_TRACE(ID,TID,SID) VALUES('%ld','我们','他们');",i);
-        SQLRETURN chk = abtk_odbc_exec_direct(o,sql);
+        SQLRETURN chk = abcdk_odbc_exec_direct(o,sql);
 
         assert(chk==SQL_SUCCESS);
     }
 
-    assert(abtk_odbc_tran_commit(o) == SQL_SUCCESS);
+    assert(abcdk_odbc_tran_commit(o) == SQL_SUCCESS);
 }
 
-void test_select(abtk_odbc_t *o)
+void test_select(abcdk_odbc_t *o)
 {
-    assert(abtk_odbc_autocommit(o,1) == SQL_SUCCESS);
+    assert(abcdk_odbc_autocommit(o,1) == SQL_SUCCESS);
 
-    SQLRETURN chk = abtk_odbc_prepare(o,"select * from LTR_TASK_TRACE where CAST(id AS SIGNED) > ?;");
+    SQLRETURN chk = abcdk_odbc_prepare(o,"select * from LTR_TASK_TRACE where CAST(id AS SIGNED) > ?;");
 
-  //  SQLRETURN chk = abtk_odbc_prepare(o,"select * from LTR_TASK_TRACE;");
+  //  SQLRETURN chk = abcdk_odbc_prepare(o,"select * from LTR_TASK_TRACE;");
 
     assert(chk == SQL_SUCCESS);
 
@@ -52,11 +52,11 @@ void test_select(abtk_odbc_t *o)
 
     assert(chk == SQL_SUCCESS);
 
-    chk = abtk_odbc_execute(o);
+    chk = abcdk_odbc_execute(o);
 
     assert(chk == SQL_SUCCESS || chk == SQL_NO_DATA);
 
-    chk = abtk_odbc_fetch_first(o);
+    chk = abcdk_odbc_fetch_first(o);
 
     assert(chk == SQL_SUCCESS || chk == SQL_NO_DATA);
 
@@ -67,7 +67,7 @@ void test_select(abtk_odbc_t *o)
         char sid[100]={0};
         char ctime[100]={0};
 
-        abtk_odbc_get_data(o,abtk_odbc_name2index(o,"id"),SQL_C_CHAR,id,100,NULL);
+        abcdk_odbc_get_data(o,abcdk_odbc_name2index(o,"id"),SQL_C_CHAR,id,100,NULL);
 
         SQLCHAR state=0;
         SQLINTEGER native =0;
@@ -76,13 +76,13 @@ void test_select(abtk_odbc_t *o)
 
         printf("state=%hhu,native=%d,msg=%s\n",state,native,msg);
 
-        abtk_odbc_get_data(o,abtk_odbc_name2index(o,"tid"),SQL_C_CHAR,tid,100,NULL);
-        abtk_odbc_get_data(o,abtk_odbc_name2index(o,"sid"),SQL_C_CHAR,sid,100,NULL);
-        abtk_odbc_get_data(o,abtk_odbc_name2index(o,"ctime"),SQL_C_CHAR,ctime,100,NULL);
+        abcdk_odbc_get_data(o,abcdk_odbc_name2index(o,"tid"),SQL_C_CHAR,tid,100,NULL);
+        abcdk_odbc_get_data(o,abcdk_odbc_name2index(o,"sid"),SQL_C_CHAR,sid,100,NULL);
+        abcdk_odbc_get_data(o,abcdk_odbc_name2index(o,"ctime"),SQL_C_CHAR,ctime,100,NULL);
 
         printf("%s,%s,%s,%s\n",id,tid,sid,ctime);
 
-        chk = abtk_odbc_fetch_next(o);
+        chk = abcdk_odbc_fetch_next(o);
     }
 
 }
@@ -92,24 +92,24 @@ int main(int argc, char **argv)
 {
     setlocale(LC_ALL,"");
 
-    abtk_tree_t *t = abtk_tree_alloc(NULL);
+    abcdk_tree_t *t = abcdk_tree_alloc(NULL);
 
-    abtk_getargs(t,argc,argv,"--");
+    abcdk_getargs(t,argc,argv,"--");
 
-    abtk_odbc_t o = {0};
+    abcdk_odbc_t o = {0};
 
     const char *tracefile = "/tmp/mysql-trace.log";
 
- //   assert(abtk_odbc_connect(&o,argv[1],30,tracefile) == SQL_SUCCESS);
+ //   assert(abcdk_odbc_connect(&o,argv[1],30,tracefile) == SQL_SUCCESS);
 
-    assert(abtk_odbc_connect2(&o,
-                              abtk_option_get(t, "--product", 0, ""),
-                              abtk_option_get(t, "--driver", 0, ""),
-                              abtk_option_get(t, "--host", 0, ""),
-                              abtk_option_get_int(t, "--port", 0, 1234),
-                              abtk_option_get(t, "--db", 0, ""),
-                              abtk_option_get(t, "--user", 0, ""),
-                              abtk_option_get(t, "--pwd", 0, ""),
+    assert(abcdk_odbc_connect2(&o,
+                              abcdk_option_get(t, "--product", 0, ""),
+                              abcdk_option_get(t, "--driver", 0, ""),
+                              abcdk_option_get(t, "--host", 0, ""),
+                              abcdk_option_get_int(t, "--port", 0, 1234),
+                              abcdk_option_get(t, "--db", 0, ""),
+                              abcdk_option_get(t, "--user", 0, ""),
+                              abcdk_option_get(t, "--pwd", 0, ""),
                               30, 
                               tracefile) == SQL_SUCCESS);
 
@@ -119,12 +119,12 @@ int main(int argc, char **argv)
 
     test_select(&o);
 
-    abtk_odbc_finalize(&o);
+    abcdk_odbc_finalize(&o);
 
 
-    assert(abtk_odbc_disconnect(&o) == SQL_SUCCESS);
+    assert(abcdk_odbc_disconnect(&o) == SQL_SUCCESS);
 
-    abtk_tree_free(&t);
+    abcdk_tree_free(&t);
 
     return 0;
 }

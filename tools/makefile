@@ -1,5 +1,5 @@
 #
-# This file is part of ABTK.
+# This file is part of ABCDK.
 #
 # MIT License
 #
@@ -13,10 +13,10 @@ MAKE_CONF ?= $(abspath $(CURDIR)/../build/makefile.conf)
 include ${MAKE_CONF}
 
 #
-SOLUTION_NAME ?= abtk
+SOLUTION_NAME ?= abcdk
 
 #
-PROJECT_NAME = abtktools
+PROJECT_NAME = abcdktools
 
 #
 ifeq (${VERSION_MAJOR},)
@@ -55,12 +55,12 @@ endif
 
 
 #
-MT_REALNAME = abtk-mt.exe
-MT_NAME = abtk-mt
+MT_REALNAME = abcdk-mt.exe
+MT_NAME = abcdk-mt
 
 #
-MTX_REALNAME = abtk-mtx.exe
-MTX_NAME = abtk-mtx
+MTX_REALNAME = abcdk-mtx.exe
+MTX_NAME = abcdk-mtx
 
 #
 #Compiler
@@ -94,7 +94,7 @@ endif
 CCC_FLAGS += -I$(abspath $(CURDIR)/../) ${DEPEND_FLAGS}
 
 #
-LINK_FLAGS += -labtk-util -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
+LINK_FLAGS += -labcdk-util -L${BUILD_PATH} -Wl,-rpath-link=${BUILD_PATH} ${DEPEND_LIBS}
 
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/

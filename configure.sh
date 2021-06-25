@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This file is part of ABTK.
+# This file is part of ABCDK.
 #  
 # MIT License
 ##
@@ -68,7 +68,7 @@ checkKeyword()
 }
 
 #
-SOLUTION_NAME=abtk
+SOLUTION_NAME=abcdk
 
 #
 SHELL_PWD=$(cd `dirname $0`; pwd)
@@ -218,7 +218,7 @@ echo "ROOT_PATH?=/"
 
 #
 echo "#" > ${MAKE_CONF}
-echo "# ABTK is abtk!" >> ${MAKE_CONF}
+echo "# ABCDK is abcdk!" >> ${MAKE_CONF}
 echo "#" >> ${MAKE_CONF}
 echo "" >> ${MAKE_CONF}
 

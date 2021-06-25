@@ -1,5 +1,5 @@
 /*
- * This file is part of ABTK.
+ * This file is part of ABCDK.
  * 
  * MIT License
  * 
@@ -8,49 +8,49 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "abtkutil/geometry.h"
+#include "abcdkutil/geometry.h"
 
 
 void test1()
 {
     
-    abtk_point_t p1 = {0,0,0};
+    abcdk_point_t p1 = {0,0,0};
 
-    abtk_point_t p2= {95,55,0};
+    abcdk_point_t p2= {95,55,0};
 
-    double d = abtk_geom_p2p_distance(&p1,&p2);
+    double d = abcdk_geom_p2p_distance(&p1,&p2);
 
     printf("d=%lf\n",d);
 
-    double r = abtk_geom_halfline_radian(&p1,&p2,'X');
+    double r = abcdk_geom_halfline_radian(&p1,&p2,'X');
     double a = r*180/M_PIl;
     printf("r=%lf;a=%lf\n",r,a);
 
-    abtk_point_t p3 = {0,0,0};
+    abcdk_point_t p3 = {0,0,0};
 
-    abtk_geom_point_move(&p1,r,d/2,&p3);
+    abcdk_geom_point_move(&p1,r,d/2,&p3);
 
     printf("x = %lf y = %lf\n",p3.x,p3.y);
 
-    double d2 = abtk_geom_p2p_distance(&p1,&p3);
+    double d2 = abcdk_geom_p2p_distance(&p1,&p3);
 
     printf("d2=%lf\n",d2);
 }
 
 void test2()
 {
-    abtk_point_t p = {0,0,0};
+    abcdk_point_t p = {0,0,0};
 
-    //abtk_point_t p1 = {99,95,0};
-    //abtk_point_t p2 = {90,90,0};
+    //abcdk_point_t p1 = {99,95,0};
+    //abcdk_point_t p2 = {90,90,0};
 
-    abtk_point_t p1 = {90,90,0};
-    abtk_point_t p2 = {81,85,0};
+    abcdk_point_t p1 = {90,90,0};
+    abcdk_point_t p2 = {81,85,0};
 
-    double d1 = abtk_geom_p2p_distance(&p,&p1);
-    double d2 = abtk_geom_p2p_distance(&p,&p2);
-    double r1 = abtk_geom_halfline_radian(&p,&p1,'X');
-    double r2 = abtk_geom_halfline_radian(&p,&p2,'X');
+    double d1 = abcdk_geom_p2p_distance(&p,&p1);
+    double d2 = abcdk_geom_p2p_distance(&p,&p2);
+    double r1 = abcdk_geom_halfline_radian(&p,&p1,'X');
+    double r2 = abcdk_geom_halfline_radian(&p,&p2,'X');
     double R1 = r1*180/M_PIl;
     double R2 = r2*180/M_PIl;
 
@@ -59,18 +59,18 @@ void test2()
     printf("R1(%lf)-R2(%lf)=%lf\n",R1,R2,R1-R2);
 }
 
-void GuestLocation(const abtk_point_t *p1,const abtk_point_t *p2,double xspeed,abtk_point_t *p3)
+void GuestLocation(const abcdk_point_t *p1,const abcdk_point_t *p2,double xspeed,abcdk_point_t *p3)
 {
-    double d = abtk_geom_p2p_distance(p1,p2);
-    double r = abtk_geom_halfline_radian(p1,p2,'X');
-    abtk_geom_point_move(p2,r,d*xspeed,p3);
+    double d = abcdk_geom_p2p_distance(p1,p2);
+    double r = abcdk_geom_halfline_radian(p1,p2,'X');
+    abcdk_geom_point_move(p2,r,d*xspeed,p3);
 }
 
 void test3()
 {
-    abtk_point_t p1 = {45,45,0};
-    abtk_point_t p2 = {0,0,0};
-    abtk_point_t p3 = {0,0,0};
+    abcdk_point_t p1 = {45,45,0};
+    abcdk_point_t p2 = {0,0,0};
+    abcdk_point_t p3 = {0,0,0};
 
     GuestLocation(&p1,&p2,1,&p3);
     printf("p1={%lf,%lf},p2={%lf,%lf},p3={%lf,%lf}\n",p1.x,p1.y,p2.x,p2.y,p3.x,p3.y);

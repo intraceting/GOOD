@@ -1,11 +1,11 @@
 
-## ABTK
+## ABCDK
 
-* A better toolkit for C/C++. 
+* A better c development kit. 
 
 ### License
 
-* ABTK is MIT-licensed.
+* ABCDK is MIT-licensed.
 
 ### Build-help
 

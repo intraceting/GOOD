@@ -1,5 +1,5 @@
 /*
- * This file is part of ABTK.
+ * This file is part of ABCDK.
  * 
  * MIT License
  * 
@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "abtkutil/general.h"
+#include "abcdkutil/general.h"
 
 
 int main(int argc, char **argv)
@@ -22,19 +22,19 @@ int main(int argc, char **argv)
 
         int i = -1;
         int o = -1;
-        int p = abtk_popen("bash", NULL, &o, &i, NULL);
+        int p = abcdk_popen("bash", NULL, &o, &i, NULL);
 
         char cmd[] = {"ls /tmp/ -l"};
-        abtk_write(o, cmd, strlen(cmd));
-        abtk_write(o, "\n", 1);
+        abcdk_write(o, cmd, strlen(cmd));
+        abcdk_write(o, "\n", 1);
 
         while (1)
         {
-            if(abtk_poll(i,1,5000)<=0)
+            if(abcdk_poll(i,1,5000)<=0)
                 break;
 
             char buf[2] = {0};
-            ssize_t chk = abtk_read(i, buf, 1);
+            ssize_t chk = abcdk_read(i, buf, 1);
             if (chk <= 0)
                 break;
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
     else
     {
         char name[NAME_MAX]= {0};
-        abtk_proc_pathfile(name);
+        abcdk_proc_pathfile(name);
 
         char cmd[PATH_MAX] = {0};
         sprintf(cmd,"%s asdadf",name);
@@ -62,15 +62,15 @@ int main(int argc, char **argv)
         char* envp[] = {"aaaa=cccc","bbbb=dddd",NULL};
         int i = -1;
         int o = -1;
-        int p = abtk_popen(cmd, envp, NULL,&i,NULL);
+        int p = abcdk_popen(cmd, envp, NULL,&i,NULL);
 
         while (1)
         {
-            if(abtk_poll(i,1,10000)<=0)
+            if(abcdk_poll(i,1,10000)<=0)
                 break;
 
             char buf[2] = {0};
-            ssize_t chk = abtk_read(i, buf, 1);
+            ssize_t chk = abcdk_read(i, buf, 1);
             if (chk <= 0)
                 break;
 

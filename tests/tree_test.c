@@ -1,5 +1,5 @@
 /*
- * This file is part of ABTK.
+ * This file is part of ABCDK.
  * 
  * MIT License
  * 
@@ -8,142 +8,142 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "abtkutil/tree.h"
-#include "abtkutil/buffer.h"
+#include "abcdkutil/tree.h"
+#include "abcdkutil/buffer.h"
 
-int dump(size_t deep, abtk_tree_t *node, void *opaque)
+int dump(size_t deep, abcdk_tree_t *node, void *opaque)
 {
-    abtk_tree_fprintf(stderr,deep,node,"%lu\n",node->alloc->sizes[0]);
+    abcdk_tree_fprintf(stderr,deep,node,"%lu\n",node->alloc->sizes[0]);
 
     // if(deep>=1)
     //     return 0;
     return 1;
 }
 
-void traversal(abtk_tree_t *root)
+void traversal(abcdk_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    abtk_tree_iterator_t it = {0,dump,NULL};
+    abcdk_tree_iterator_t it = {0,dump,NULL};
 
-    abtk_tree_scan(root,&it);
+    abcdk_tree_scan(root,&it);
 
- //   abtk_heap_freep((void **)&it.stack);
+ //   abcdk_heap_freep((void **)&it.stack);
 
     printf("\n-------------------------------------\n");
 }
 
-int dump2(size_t deep, abtk_tree_t *node, void *opaque)
+int dump2(size_t deep, abcdk_tree_t *node, void *opaque)
 {
-    abtk_tree_fprintf(stderr,deep,node,"%d\n",*ABTK_PTR2PTR(int,node->alloc->pptrs[0],0));
+    abcdk_tree_fprintf(stderr,deep,node,"%d\n",*ABCDK_PTR2PTR(int,node->alloc->pptrs[0],0));
 
     // if(deep>=1)
     //     return 0;
     return 1;
 }
 
-void traversal2(abtk_tree_t *root)
+void traversal2(abcdk_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    abtk_tree_iterator_t it = {0,dump2,NULL};
+    abcdk_tree_iterator_t it = {0,dump2,NULL};
 
-    abtk_tree_scan(root,&it);
+    abcdk_tree_scan(root,&it);
 
- //   abtk_heap_freep((void **)&it.stack);
+ //   abcdk_heap_freep((void **)&it.stack);
 
     printf("\n-------------------------------------\n");
 }
 
 void test_tree()
 {
-    abtk_tree_t *d = abtk_tree_alloc(NULL);
+    abcdk_tree_t *d = abcdk_tree_alloc(NULL);
 
-    d->alloc = abtk_allocator_alloc2(1);
+    d->alloc = abcdk_allocator_alloc2(1);
 
-    abtk_tree_t *n = abtk_tree_alloc(NULL);
+    abcdk_tree_t *n = abcdk_tree_alloc(NULL);
 
-    n->alloc = abtk_allocator_alloc2(2);
+    n->alloc = abcdk_allocator_alloc2(2);
 
-    abtk_tree_insert2(d, n,1);
+    abcdk_tree_insert2(d, n,1);
 
-    abtk_tree_t *n2 = n = abtk_tree_alloc(NULL);
+    abcdk_tree_t *n2 = n = abcdk_tree_alloc(NULL);
 
-    n->alloc = abtk_allocator_alloc2(3);
+    n->alloc = abcdk_allocator_alloc2(3);
 
-    abtk_tree_insert2(d, n,1);
+    abcdk_tree_insert2(d, n,1);
 
-    n = abtk_tree_alloc(NULL);
+    n = abcdk_tree_alloc(NULL);
 
-    n->alloc = abtk_allocator_alloc2(4);
+    n->alloc = abcdk_allocator_alloc2(4);
 
-    abtk_tree_insert2(d, n,1);
-
-    traversal(d);
-
-    abtk_tree_t *m = abtk_tree_alloc(NULL);
-
-    m->alloc = abtk_allocator_alloc2(5);
-
-    abtk_tree_insert2(n, m,0);
+    abcdk_tree_insert2(d, n,1);
 
     traversal(d);
 
-    m = abtk_tree_alloc(NULL);
+    abcdk_tree_t *m = abcdk_tree_alloc(NULL);
 
-    m->alloc = abtk_allocator_alloc2(6);
+    m->alloc = abcdk_allocator_alloc2(5);
 
-    abtk_tree_insert2(n, m,0);
-
-    abtk_tree_t *m6 = m = abtk_tree_alloc(NULL);
-
-    m->alloc = abtk_allocator_alloc2(7);
-
-    abtk_tree_insert2(n, m,0);
-
-    abtk_tree_t *k = abtk_tree_alloc(NULL);
-
-    k->alloc = abtk_allocator_alloc2(8);
-
-    abtk_tree_insert2(m, k,0);
-
-    k = abtk_tree_alloc(NULL);
-
-    k->alloc = abtk_allocator_alloc2(9);
-
-    abtk_tree_insert2(m, k,0);
-
-    abtk_tree_t *u = abtk_tree_alloc(NULL);
-
-    u->alloc = abtk_allocator_alloc2(10);
-
-    abtk_tree_insert(m, u, k);
+    abcdk_tree_insert2(n, m,0);
 
     traversal(d);
 
-    abtk_tree_unlink(m6);
+    m = abcdk_tree_alloc(NULL);
+
+    m->alloc = abcdk_allocator_alloc2(6);
+
+    abcdk_tree_insert2(n, m,0);
+
+    abcdk_tree_t *m6 = m = abcdk_tree_alloc(NULL);
+
+    m->alloc = abcdk_allocator_alloc2(7);
+
+    abcdk_tree_insert2(n, m,0);
+
+    abcdk_tree_t *k = abcdk_tree_alloc(NULL);
+
+    k->alloc = abcdk_allocator_alloc2(8);
+
+    abcdk_tree_insert2(m, k,0);
+
+    k = abcdk_tree_alloc(NULL);
+
+    k->alloc = abcdk_allocator_alloc2(9);
+
+    abcdk_tree_insert2(m, k,0);
+
+    abcdk_tree_t *u = abcdk_tree_alloc(NULL);
+
+    u->alloc = abcdk_allocator_alloc2(10);
+
+    abcdk_tree_insert(m, u, k);
 
     traversal(d);
 
-    //abtk_tree_insert_least(d, m6);
-    abtk_tree_insert(d, m6, n2);
+    abcdk_tree_unlink(m6);
 
     traversal(d);
 
-    abtk_tree_unlink(m6);
-    abtk_tree_free(&m6);
+    //abcdk_tree_insert_least(d, m6);
+    abcdk_tree_insert(d, m6, n2);
+
+    traversal(d);
+
+    abcdk_tree_unlink(m6);
+    abcdk_tree_free(&m6);
 
     traversal(d);
 
 
-    abtk_tree_free(&d);
+    abcdk_tree_free(&d);
 }
 
 
-int compare_cb(const abtk_tree_t *node1, const abtk_tree_t *node2, void *opaque)
+int compare_cb(const abcdk_tree_t *node1, const abcdk_tree_t *node2, void *opaque)
 {
-    int src = *ABTK_PTR2PTR(int, node1->alloc->pptrs[0], 0);
-    int dst = *ABTK_PTR2PTR(int, node2->alloc->pptrs[0], 0);
+    int src = *ABCDK_PTR2PTR(int, node1->alloc->pptrs[0], 0);
+    int dst = *ABCDK_PTR2PTR(int, node2->alloc->pptrs[0], 0);
     if( src > dst )
         return 1;
     if( src < dst )
@@ -152,51 +152,51 @@ int compare_cb(const abtk_tree_t *node1, const abtk_tree_t *node2, void *opaque)
     return 0;
 }
 
-void test_sort(abtk_tree_t *t,int by)
+void test_sort(abcdk_tree_t *t,int by)
 {
-    abtk_tree_order_t o = {by,compare_cb,NULL};
+    abcdk_tree_order_t o = {by,compare_cb,NULL};
 
-    abtk_tree_sort(t,&o);
+    abcdk_tree_sort(t,&o);
 }
 
 
 void test_swap()
 {
-    abtk_tree_t *d1 = abtk_tree_alloc3(sizeof(int));
-    *ABTK_PTR2PTR(int,d1->alloc->pptrs[0],0) = 1;
+    abcdk_tree_t *d1 = abcdk_tree_alloc3(sizeof(int));
+    *ABCDK_PTR2PTR(int,d1->alloc->pptrs[0],0) = 1;
 
-    abtk_tree_t *d2 = abtk_tree_alloc3(sizeof(int));
-    *ABTK_PTR2PTR(int,d2->alloc->pptrs[0],0) = 2;
+    abcdk_tree_t *d2 = abcdk_tree_alloc3(sizeof(int));
+    *ABCDK_PTR2PTR(int,d2->alloc->pptrs[0],0) = 2;
 
-    abtk_tree_t *d3 = abtk_tree_alloc3(sizeof(int));
-    *ABTK_PTR2PTR(int,d3->alloc->pptrs[0],0) = 3;
+    abcdk_tree_t *d3 = abcdk_tree_alloc3(sizeof(int));
+    *ABCDK_PTR2PTR(int,d3->alloc->pptrs[0],0) = 3;
 
-    abtk_tree_t *d4 = abtk_tree_alloc3(sizeof(int));
-    *ABTK_PTR2PTR(int,d4->alloc->pptrs[0],0) = 4;
+    abcdk_tree_t *d4 = abcdk_tree_alloc3(sizeof(int));
+    *ABCDK_PTR2PTR(int,d4->alloc->pptrs[0],0) = 4;
 
-    abtk_tree_t *d5 = abtk_tree_alloc3(sizeof(int));
-    *ABTK_PTR2PTR(int,d5->alloc->pptrs[0],0) = 5;
+    abcdk_tree_t *d5 = abcdk_tree_alloc3(sizeof(int));
+    *ABCDK_PTR2PTR(int,d5->alloc->pptrs[0],0) = 5;
 
-    abtk_tree_t *d6 = abtk_tree_alloc3(sizeof(int));
-    *ABTK_PTR2PTR(int,d6->alloc->pptrs[0],0) = 6;
+    abcdk_tree_t *d6 = abcdk_tree_alloc3(sizeof(int));
+    *ABCDK_PTR2PTR(int,d6->alloc->pptrs[0],0) = 6;
 
-    abtk_tree_insert(d1,d2,NULL);
-    abtk_tree_insert(d1,d3,NULL);
-    abtk_tree_insert(d1,d4,NULL);
-    abtk_tree_insert(d1,d5,NULL);
-    abtk_tree_insert(d1,d6,NULL);
-
-    traversal2(d1);
-
-    abtk_tree_swap(d2,d3);
+    abcdk_tree_insert(d1,d2,NULL);
+    abcdk_tree_insert(d1,d3,NULL);
+    abcdk_tree_insert(d1,d4,NULL);
+    abcdk_tree_insert(d1,d5,NULL);
+    abcdk_tree_insert(d1,d6,NULL);
 
     traversal2(d1);
 
-    abtk_tree_swap(d2,d5);
+    abcdk_tree_swap(d2,d3);
 
     traversal2(d1);
 
-    abtk_tree_swap(d6,d2);
+    abcdk_tree_swap(d2,d5);
+
+    traversal2(d1);
+
+    abcdk_tree_swap(d6,d2);
 
     traversal2(d1);
 
@@ -208,7 +208,7 @@ void test_swap()
 
     traversal2(d1);
 
-    abtk_tree_free(&d1);
+    abcdk_tree_free(&d1);
 }
 
 int main(int argc, char **argv)

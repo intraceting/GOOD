@@ -1,5 +1,5 @@
 /*
- * This file is part of ABTK.
+ * This file is part of ABCDK.
  * 
  * MIT License
  * 
@@ -8,119 +8,119 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "abtkutil/option.h"
-#include "abtkutil/getargs.h"
+#include "abcdkutil/option.h"
+#include "abcdkutil/getargs.h"
 
 
-int dump2(size_t deep, abtk_tree_t *node, void *opaque)
+int dump2(size_t deep, abcdk_tree_t *node, void *opaque)
 {
     if(deep==0)
-        abtk_tree_fprintf(stderr,deep,node,"OPT\n");
+        abcdk_tree_fprintf(stderr,deep,node,"OPT\n");
     if(deep==1)
-        abtk_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[ABTK_OPTION_KEY]);
+        abcdk_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[ABCDK_OPTION_KEY]);
     if(deep==2)
-        abtk_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[ABTK_OPTION_VALUE]);
+        abcdk_tree_fprintf(stderr,deep,node,"%s\n",node->alloc->pptrs[ABCDK_OPTION_VALUE]);
 
     return 1;
 }
 
-void traversal(abtk_tree_t *root)
+void traversal(abcdk_tree_t *root)
 {
     printf("\n-------------------------------------\n");
 
-    abtk_tree_iterator_t it = {0,dump2,NULL};
-    abtk_tree_scan(root,&it);
+    abcdk_tree_iterator_t it = {0,dump2,NULL};
+    abcdk_tree_scan(root,&it);
 
     printf("\n-------------------------------------\n");
 }
 
 void test1(int argc, char **argv)
 {
-    abtk_tree_t *t = abtk_tree_alloc(NULL);
+    abcdk_tree_t *t = abcdk_tree_alloc(NULL);
 
-    abtk_option_set(t,"-","bbb");
-    abtk_option_set(t,"-","ccc");
-    abtk_option_set(t,"-","fff");
-    abtk_option_set(t,"-","eee");
-    abtk_option_set(t,"-","www");
+    abcdk_option_set(t,"-","bbb");
+    abcdk_option_set(t,"-","ccc");
+    abcdk_option_set(t,"-","fff");
+    abcdk_option_set(t,"-","eee");
+    abcdk_option_set(t,"-","www");
 
-    assert(abtk_option_count(t,"-")==5);
+    assert(abcdk_option_count(t,"-")==5);
 
-    abtk_option_set(t,"-bbb","123");
-    abtk_option_set(t,"-bbb","456");
-    abtk_option_set(t,"-bbb","789");
-    abtk_option_set(t,"-bbb","543");
-    abtk_option_set(t,"-bbb","854");
+    abcdk_option_set(t,"-bbb","123");
+    abcdk_option_set(t,"-bbb","456");
+    abcdk_option_set(t,"-bbb","789");
+    abcdk_option_set(t,"-bbb","543");
+    abcdk_option_set(t,"-bbb","854");
 
-    assert(abtk_option_count(t,"-bbb")==5);
+    assert(abcdk_option_count(t,"-bbb")==5);
 
-    abtk_option_set(t,"-ddd",NULL);
+    abcdk_option_set(t,"-ddd",NULL);
 
-    assert(abtk_option_exist(t,"-ddd"));
+    assert(abcdk_option_exist(t,"-ddd"));
 
-    assert(!abtk_option_exist(t,"-ccc"));
+    assert(!abcdk_option_exist(t,"-ccc"));
 
     traversal(t);
 
-    const char* p = abtk_option_get(t,"-",0,NULL);
+    const char* p = abcdk_option_get(t,"-",0,NULL);
 
     printf("p=%s\n",p);
 
-    const char* p1 = abtk_option_get(t,"-bbb",1,NULL);
+    const char* p1 = abcdk_option_get(t,"-bbb",1,NULL);
 
     printf("p1=%s\n",p1);
 
-    const char* p2 = abtk_option_get(t,"-ccc",1,NULL);
+    const char* p2 = abcdk_option_get(t,"-ccc",1,NULL);
 
     assert(p2==NULL);
 
-    p2 = abtk_option_get(t,"-ccc",1,"f");
+    p2 = abcdk_option_get(t,"-ccc",1,"f");
 
     assert(p2[0]=='f');
 
-    int s = abtk_option_fprintf(stderr,t);
+    int s = abcdk_option_fprintf(stderr,t);
 
     char buf[100] = {0};
 
-    abtk_option_snprintf(buf,100,t);
+    abcdk_option_snprintf(buf,100,t);
 
 
-    abtk_getargs(t,argc,argv,"--");
+    abcdk_getargs(t,argc,argv,"--");
 
     printf("\n--------------------------------------\n");
-    abtk_option_fprintf(stderr,t);
+    abcdk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
     
-    abtk_getargs_file(t,abtk_option_get(t,"--test-import",0,NULL),'\n','#',"test-import","--");
+    abcdk_getargs_file(t,abcdk_option_get(t,"--test-import",0,NULL),'\n','#',"test-import","--");
 
 
     printf("\n--------------------------------------\n");
-    abtk_option_fprintf(stderr,t);
+    abcdk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
 
-    abtk_option_remove(t,"-bbb");
+    abcdk_option_remove(t,"-bbb");
 
 
     printf("\n--------------------------------------\n");
-    abtk_option_fprintf(stderr,t);
+    abcdk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
 
 
-    abtk_tree_free(&t);
+    abcdk_tree_free(&t);
  
 }
 
 void test2(int argc, char **argv)
 {
-    abtk_tree_t *t = abtk_tree_alloc(NULL);
+    abcdk_tree_t *t = abcdk_tree_alloc(NULL);
 
-    abtk_getargs_file(t,"/etc/os-release",'\n',0,NULL,NULL);
+    abcdk_getargs_file(t,"/etc/os-release",'\n',0,NULL,NULL);
 
    printf("\n--------------------------------------\n");
-    abtk_option_fprintf(stderr,t);
+    abcdk_option_fprintf(stderr,t);
     printf("\n--------------------------------------\n");
 
-    abtk_tree_free(&t);
+    abcdk_tree_free(&t);
 }
 
 int main(int argc, char **argv)

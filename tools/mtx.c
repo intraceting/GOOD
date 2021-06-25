@@ -1,5 +1,5 @@
 /*
- * This file is part of ABTK.
+ * This file is part of ABCDK.
  * 
  * MIT License
  * 
@@ -8,38 +8,38 @@
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include "abtkutil/general.h"
-#include "abtkutil/getargs.h"
-#include "abtkutil/scsi.h"
-#include "abtkutil/mtx.h"
+#include "abcdkutil/general.h"
+#include "abcdkutil/getargs.h"
+#include "abcdkutil/scsi.h"
+#include "abcdkutil/mtx.h"
 
 /**/
-enum _abtkmtx_cmd
+enum _abcdkmtx_cmd
 {
     /** 枚举磁带库所有元素。*/
-    ABTKMTX_STATUS = 1,
-#define ABTKMTX_STATUS ABTKMTX_STATUS
+    ABCDKMTX_STATUS = 1,
+#define ABCDKMTX_STATUS ABCDKMTX_STATUS
 
     /** 移动磁带。*/
-    ABTKMTX_MOVE = 2
-#define ABTKMTX_MOVE ABTKMTX_MOVE
+    ABCDKMTX_MOVE = 2
+#define ABCDKMTX_MOVE ABCDKMTX_MOVE
 
 };
 
-void _abtkmtx_print_usage(abtk_tree_t *args, int only_version)
+void _abcdkmtx_print_usage(abcdk_tree_t *args, int only_version)
 {
     char name[NAME_MAX] = {0};
 
     /*Clear errno.*/
     errno = 0;
 
-    abtk_proc_basename(name);
+    abcdk_proc_basename(name);
 
 #ifdef BUILD_VERSION_DATETIME
     fprintf(stderr, "\n%s Build %s\n", name, BUILD_VERSION_DATETIME);
 #endif //BUILD_VERSION_DATETIME
 
-    fprintf(stderr, "\n%s Version %d.%d\n", name, ABTK_VERSION_MAJOR, ABTK_VERSION_MINOR);
+    fprintf(stderr, "\n%s Version %d.%d\n", name, ABCDK_VERSION_MAJOR, ABCDK_VERSION_MINOR);
 
     if (only_version)
         return;
@@ -62,19 +62,19 @@ void _abtkmtx_print_usage(abtk_tree_t *args, int only_version)
     fprintf(stderr, "\t\tDestination Element Address.\n");
 
     fprintf(stderr, "\n\t--cmd < NUMBER >\n");
-    fprintf(stderr, "\t\tCommand. default: %d\n", ABTKMTX_STATUS);
+    fprintf(stderr, "\t\tCommand. default: %d\n", ABCDKMTX_STATUS);
 
-    fprintf(stderr, "\n\t\t%d: Report elements.\n", ABTKMTX_STATUS);
-    fprintf(stderr, "\t\t%d: Move Medium.\n", ABTKMTX_MOVE);
+    fprintf(stderr, "\n\t\t%d: Report elements.\n", ABCDKMTX_STATUS);
+    fprintf(stderr, "\t\t%d: Move Medium.\n", ABCDKMTX_MOVE);
 }
 
-static struct _abtkmtx_sense_dict
+static struct _abcdkmtx_sense_dict
 {   
     uint8_t key;
     uint8_t asc;
     uint8_t ascq;
     const char *msg;
-}abtkmtx_sense_dict[] = {
+}abcdkmtx_sense_dict[] = {
     /*KEY=0x00*/
     {0x00, 0x00, 0x00, "No Sense"},
     /*KEY=0x01*/
@@ -102,112 +102,112 @@ static struct _abtkmtx_sense_dict
     {0x0b, 0x00, 0x00, "Command Aborted"}
 };
 
-void _abtkmtx_printf_sense(abtk_scsi_io_stat *stat)
+void _abcdkmtx_printf_sense(abcdk_scsi_io_stat *stat)
 {
     uint8_t key = 0, asc = 0, ascq = 0;
     const char *msg_p = "Unknown";
 
-    key = abtk_scsi_sense_key(stat->sense);
-    asc = abtk_scsi_sense_code(stat->sense);
-    ascq = abtk_scsi_sense_qualifier(stat->sense);
+    key = abcdk_scsi_sense_key(stat->sense);
+    asc = abcdk_scsi_sense_code(stat->sense);
+    ascq = abcdk_scsi_sense_qualifier(stat->sense);
 
-    for (size_t i = 0; i < ABTK_ARRAY_SIZE(abtkmtx_sense_dict); i++)
+    for (size_t i = 0; i < ABCDK_ARRAY_SIZE(abcdkmtx_sense_dict); i++)
     {
-        if (abtkmtx_sense_dict[i].key != key)
+        if (abcdkmtx_sense_dict[i].key != key)
             continue;
 
-        msg_p = abtkmtx_sense_dict[i].msg;
+        msg_p = abcdkmtx_sense_dict[i].msg;
 
-        if (abtkmtx_sense_dict[i].asc != asc || abtkmtx_sense_dict[i].ascq != ascq)
+        if (abcdkmtx_sense_dict[i].asc != asc || abcdkmtx_sense_dict[i].ascq != ascq)
             continue;
 
-        msg_p = abtkmtx_sense_dict[i].msg;
+        msg_p = abcdkmtx_sense_dict[i].msg;
         break;
     }
 
     syslog(LOG_INFO, "Sense(KEY=%02X,ASC=%02X,ASCQ=%02X): %s.", key, asc, ascq, msg_p);
 }
 
-int _abtkmtx_printf_elements_cb(size_t deep, abtk_tree_t *node, void *opaque)
+int _abcdkmtx_printf_elements_cb(size_t deep, abcdk_tree_t *node, void *opaque)
 {
     if (deep == 0)
     {
-        abtk_tree_fprintf(stdout, deep, node, "%s\n", node->alloc->pptrs[0]);
+        abcdk_tree_fprintf(stdout, deep, node, "%s\n", node->alloc->pptrs[0]);
     }
     else
     {
-        abtk_tree_fprintf(stdout, deep, node, "%-6hu\t|%-2hhu\t|%-2hhu\t|%-10s\t|%-10s\t|\n",
-                          ABTK_PTR2U16(node->alloc->pptrs[ABTK_MTX_ELEMENT_ADDR], 0),
-                          ABTK_PTR2U8(node->alloc->pptrs[ABTK_MTX_ELEMENT_TYPE], 0),
-                          ABTK_PTR2U8(node->alloc->pptrs[ABTK_MTX_ELEMENT_ISFULL], 0),
-                          node->alloc->pptrs[ABTK_MTX_ELEMENT_BARCODE],
-                          node->alloc->pptrs[ABTK_MTX_ELEMENT_DVCID]);
+        abcdk_tree_fprintf(stdout, deep, node, "%-6hu\t|%-2hhu\t|%-2hhu\t|%-10s\t|%-10s\t|\n",
+                          ABCDK_PTR2U16(node->alloc->pptrs[ABCDK_MTX_ELEMENT_ADDR], 0),
+                          ABCDK_PTR2U8(node->alloc->pptrs[ABCDK_MTX_ELEMENT_TYPE], 0),
+                          ABCDK_PTR2U8(node->alloc->pptrs[ABCDK_MTX_ELEMENT_ISFULL], 0),
+                          node->alloc->pptrs[ABCDK_MTX_ELEMENT_BARCODE],
+                          node->alloc->pptrs[ABCDK_MTX_ELEMENT_DVCID]);
     }
 
     return 1;
 }
 
-void _abtkmtx_printf_elements(abtk_tree_t *root)
+void _abcdkmtx_printf_elements(abcdk_tree_t *root)
 {
-    abtk_tree_iterator_t it = {0, _abtkmtx_printf_elements_cb, NULL};
-    abtk_tree_scan(root, &it);
+    abcdk_tree_iterator_t it = {0, _abcdkmtx_printf_elements_cb, NULL};
+    abcdk_tree_scan(root, &it);
 }
 
-int _abtkmtx_find_changer_cb(size_t deep, abtk_tree_t *node, void *opaque)
+int _abcdkmtx_find_changer_cb(size_t deep, abcdk_tree_t *node, void *opaque)
 {
     uint16_t *t_p = (uint16_t *)opaque;
 
     if (deep == 0)
         return 1;
 
-    if (ABTK_PTR2U8(node->alloc->pptrs[ABTK_MTX_ELEMENT_TYPE], 0) != ABTK_MXT_ELEMENT_CHANGER)
+    if (ABCDK_PTR2U8(node->alloc->pptrs[ABCDK_MTX_ELEMENT_TYPE], 0) != ABCDK_MXT_ELEMENT_CHANGER)
         return 1;
 
-    *t_p = ABTK_PTR2U16(node->alloc->pptrs[ABTK_MTX_ELEMENT_ADDR], 0);
+    *t_p = ABCDK_PTR2U16(node->alloc->pptrs[ABCDK_MTX_ELEMENT_ADDR], 0);
 
     return -1;
 }
 
-uint16_t _abtkmtx_find_changer(abtk_tree_t *root)
+uint16_t _abcdkmtx_find_changer(abcdk_tree_t *root)
 {
     uint16_t t = 0;
 
-    abtk_tree_iterator_t it = {0, _abtkmtx_find_changer_cb, &t};
-    abtk_tree_scan(root, &it);
+    abcdk_tree_iterator_t it = {0, _abcdkmtx_find_changer_cb, &t};
+    abcdk_tree_scan(root, &it);
 
     return t;
 }
 
-void _abtkmtx_move_medium(abtk_tree_t *args, int fd, abtk_tree_t *root)
+void _abcdkmtx_move_medium(abcdk_tree_t *args, int fd, abcdk_tree_t *root)
 {
-    abtk_scsi_io_stat stat = {0};
+    abcdk_scsi_io_stat stat = {0};
     int t = 0, s = 65536, d = 65536;
     int chk;
 
-    t = _abtkmtx_find_changer(root);
-    s = abtk_option_get_int(args, "--src", 0, 65536);
-    d = abtk_option_get_int(args, "--dst", 0, 65536);
+    t = _abcdkmtx_find_changer(root);
+    s = abcdk_option_get_int(args, "--src", 0, 65536);
+    d = abcdk_option_get_int(args, "--dst", 0, 65536);
 
-    chk = abtk_mtx_move_medium(fd, t, s, d, 1800 * 1000, &stat);
+    chk = abcdk_mtx_move_medium(fd, t, s, d, 1800 * 1000, &stat);
     if (chk != 0 || stat.status != GOOD)
-        ABTK_ERRNO_AND_GOTO1(EINVAL,print_sense);
+        ABCDK_ERRNO_AND_GOTO1(EINVAL,print_sense);
 
     /*No error.*/
     goto final;
 
 print_sense:
 
-    _abtkmtx_printf_sense(&stat);
+    _abcdkmtx_printf_sense(&stat);
 
 final:
 
     return;
 }
 
-void _abtkmtx_work(abtk_tree_t *args)
+void _abcdkmtx_work(abcdk_tree_t *args)
 {
-    abtk_scsi_io_stat stat = {0};
-    abtk_tree_t *root = NULL;
+    abcdk_scsi_io_stat stat = {0};
+    abcdk_tree_t *root = NULL;
     uint8_t type = 0;
     char vendor[32] = {0};
     char product[64] = {0};
@@ -220,8 +220,8 @@ void _abtkmtx_work(abtk_tree_t *args)
     /*Clear errno.*/
     errno = 0;
 
-    dev_p = abtk_option_get(args, "--dev", 0, "");
-    cmd = abtk_option_get_int(args, "--cmd", 0, ABTKMTX_STATUS);
+    dev_p = abcdk_option_get(args, "--dev", 0, "");
+    cmd = abcdk_option_get_int(args, "--cmd", 0, ABCDKMTX_STATUS);
 
     if (access(dev_p, F_OK) != 0)
     {
@@ -229,49 +229,49 @@ void _abtkmtx_work(abtk_tree_t *args)
         goto final;
     }
 
-    root = abtk_tree_alloc3(200);
+    root = abcdk_tree_alloc3(200);
     if (!root)
         goto final;
 
-    fd = abtk_open(dev_p, 0, 0, 0);
+    fd = abcdk_open(dev_p, 0, 0, 0);
     if (fd < 0)
     {
         syslog(LOG_WARNING, "'%s' %s.",dev_p,strerror(errno));
         goto final;
     }
 
-    chk = abtk_scsi_inquiry_standard(fd, &type, vendor, product, 3000, &stat);
+    chk = abcdk_scsi_inquiry_standard(fd, &type, vendor, product, 3000, &stat);
     if (chk != 0 || stat.status != GOOD)
-        ABTK_ERRNO_AND_GOTO1(EPERM,print_sense);
+        ABCDK_ERRNO_AND_GOTO1(EPERM,print_sense);
 
     if (type != TYPE_MEDIUM_CHANGER)
     {
         syslog(LOG_WARNING, "'%s' Not Medium Changer.", dev_p);
-        ABTK_ERRNO_AND_GOTO1(EINVAL,final);
+        ABCDK_ERRNO_AND_GOTO1(EINVAL,final);
     }
 
-    chk = abtk_scsi_inquiry_serial(fd, NULL, sn, 3000, &stat);
+    chk = abcdk_scsi_inquiry_serial(fd, NULL, sn, 3000, &stat);
     if (chk != 0 || stat.status != GOOD)
-        ABTK_ERRNO_AND_GOTO1(EPERM,print_sense);
+        ABCDK_ERRNO_AND_GOTO1(EPERM,print_sense);
 
     snprintf(root->alloc->pptrs[0], root->alloc->sizes[0], "%s(%s-%s)", sn, vendor, product);
 
-    chk = abtk_mtx_inquiry_element_status(root, fd, -1, &stat);
+    chk = abcdk_mtx_inquiry_element_status(root, fd, -1, &stat);
     if (chk != 0 || stat.status != GOOD)
-        ABTK_ERRNO_AND_GOTO1(EPERM,print_sense);
+        ABCDK_ERRNO_AND_GOTO1(EPERM,print_sense);
 
-    if (cmd == ABTKMTX_STATUS)
+    if (cmd == ABCDKMTX_STATUS)
     {
-        _abtkmtx_printf_elements(root);
+        _abcdkmtx_printf_elements(root);
     }
-    else if (cmd == ABTKMTX_MOVE)
+    else if (cmd == ABCDKMTX_MOVE)
     {
-        _abtkmtx_move_medium(args, fd, root);
+        _abcdkmtx_move_medium(args, fd, root);
     }
     else
     {
         syslog(LOG_WARNING, "Not supported.");
-        ABTK_ERRNO_AND_GOTO1(EINVAL,final);
+        ABCDK_ERRNO_AND_GOTO1(EINVAL,final);
     }
 
     /*No error.*/
@@ -279,42 +279,42 @@ void _abtkmtx_work(abtk_tree_t *args)
 
 print_sense:
 
-    _abtkmtx_printf_sense(&stat);
+    _abcdkmtx_printf_sense(&stat);
 
 final:
 
-    abtk_closep(&fd);
-    abtk_tree_free(&root);
+    abcdk_closep(&fd);
+    abcdk_tree_free(&root);
 }
 
 int main(int argc, char **argv)
 {
-    abtk_tree_t *args;
+    abcdk_tree_t *args;
 
-    args = abtk_tree_alloc3(1);
+    args = abcdk_tree_alloc3(1);
     if (!args)
         goto final;
 
-    abtk_getargs(args, argc, argv, "--");
+    abcdk_getargs(args, argc, argv, "--");
 
-    abtk_openlog(NULL, LOG_INFO, 1);
+    abcdk_openlog(NULL, LOG_INFO, 1);
 
-    if (abtk_option_exist(args, "--help"))
+    if (abcdk_option_exist(args, "--help"))
     {
-        _abtkmtx_print_usage(args, 0);
+        _abcdkmtx_print_usage(args, 0);
     }
-    else if (abtk_option_exist(args, "--version"))
+    else if (abcdk_option_exist(args, "--version"))
     {
-        _abtkmtx_print_usage(args, 1);
+        _abcdkmtx_print_usage(args, 1);
     }
     else
     {
-        _abtkmtx_work(args);
+        _abcdkmtx_work(args);
     }
 
 final:
 
-    abtk_tree_free(&args);
+    abcdk_tree_free(&args);
 
     return errno;
 }
