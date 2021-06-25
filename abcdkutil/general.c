@@ -708,6 +708,24 @@ final:
     return dst;
 }
 
+
+char *abcdk_abspath(char *buf, const char *file, const char *path)
+{
+    assert(buf != NULL && file != NULL);
+
+    if (file[0] != '/')
+    {
+        if (path && path[0])
+            abcdk_dirdir(buf,path);
+        else
+            getcwd(buf, PATH_MAX);
+    }
+
+    abcdk_dirdir(buf,file);
+
+    return buf;
+}
+
 /*------------------------------------------------------------------------------------------------*/
 
 char *abcdk_proc_pathfile(char *buf)

@@ -327,6 +327,16 @@ char *abcdk_basename(char *dst, const char *src);
 */
 char *abcdk_dirnice(char *dst, const char *src);
 
+/**
+ * 修补文件或目录的绝对路径。
+ * 
+ * 不会检测目录结构是否存在。
+ * 
+ * @param file 文件或目录的指针。
+ * @param path 路径的指针，NULL(0) 当前工作路径。
+*/
+char *abcdk_abspath(char *buf, const char *file, const char *path);
+
 /*------------------------------------------------------------------------------------------------*/
 
 /**
