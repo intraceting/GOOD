@@ -344,8 +344,10 @@ int abcdk_openssl_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
         chk = HMAC_Init_ex(hmac, key, len, EVP_md5(), NULL);
 #endif
 #ifndef OPENSSL_NO_SHA
+#if OPENSSL_VERSION_NUMBER <= 0x10100000L
     else if (type == ABCDK_OPENSSL_HMAC_SHA)
         chk = HMAC_Init_ex(hmac, key, len, EVP_sha(), NULL);
+#endif
     else if (type == ABCDK_OPENSSL_HMAC_SHA1)
         chk = HMAC_Init_ex(hmac, key, len, EVP_sha1(), NULL);
 #endif
