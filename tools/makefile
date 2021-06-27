@@ -16,7 +16,7 @@ include ${MAKE_CONF}
 SOLUTION_NAME ?= abcdk
 
 #
-PROJECT_NAME = abcdktools
+PROJECT_NAME = tools
 
 #
 ifeq (${VERSION_MAJOR},)

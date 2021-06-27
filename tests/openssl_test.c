@@ -27,7 +27,29 @@ void test_rsa(abcdk_tree_t *opt)
     RSA *prikey = NULL;
     RSA *pubkey = NULL;
     int chk;
-#if 0
+#if 1
+
+
+        key = abcdk_openssl_rsa_create(2048,RSA_F4);
+
+        chk = abcdk_openssl_rsa_to_file(
+            abcdk_option_get(opt, "--rsa-key-prifile", 0, "/tmp/abc-pri.pem"),
+            key,
+            1,
+            abcdk_option_get(opt, "--rsa-key-pwd", 0, "123456"));
+
+        assert(chk > 0);
+
+        chk = abcdk_openssl_rsa_to_file(
+            abcdk_option_get(opt, "--rsa-key-pubfile", 0, "/tmp/abc-pub.pem"),
+            key,
+            0,
+            abcdk_option_get(opt, "--rsa-key-pwd", 0, "123456"));
+
+        assert(chk > 0);
+
+#else
+
     prikey = abcdk_openssl_rsa_from_file(
         abcdk_option_get(opt, "--rsa-key-prifile", 0, ""),
         1,
@@ -39,27 +61,8 @@ void test_rsa(abcdk_tree_t *opt)
         NULL);
 
     assert(prikey && pubkey);
-#else
 
-        key = abcdk_openssl_rsa_create(2048,RSA_F4);
 
-        chk = abcdk_openssl_rsa_to_file(
-            abcdk_option_get(opt, "--rsa-key-prifile", 0, ""),
-            key,
-            1,
-            abcdk_option_get(opt, "--rsa-key-pwd", 0, ""));
-
-        assert(chk > 0);
-
-        chk = abcdk_openssl_rsa_to_file(
-            abcdk_option_get(opt, "--rsa-key-pubfile", 0, ""),
-            key,
-            0,
-            abcdk_option_get(opt, "--rsa-key-pwd", 0, ""));
-
-        assert(chk > 0);
-
-#endif 
 
     char *buf1 = (char*) abcdk_heap_alloc(1000);
     char *buf2 = (char*) abcdk_heap_alloc(2000);
@@ -91,6 +94,7 @@ void test_rsa(abcdk_tree_t *opt)
     abcdk_heap_free(buf2);
     abcdk_heap_free(buf3);
 
+#endif 
 
     RSA_free(key);
     RSA_free(prikey);
@@ -144,14 +148,18 @@ void test_ssl(abcdk_tree_t *opt)
 {
    SSL_library_init();
    OpenSSL_add_all_algorithms();
-   SSL_load_error_strings();  
-   const SSL_METHOD *method = TLSv1_2_client_method();
+   SSL_load_error_strings();
+#if OPENSSL_VERSION_NUMBER <= 0x10000000L  
+    const SSL_METHOD *method = TLSv1_2_client_method();
+#else
+    const SSL_METHOD *method = TLS_client_method();
+#endif 
 
     SSL_CTX * ctx = SSL_CTX_new(method);
 
     int chk = abcdk_openssl_ctx_load_cert(ctx, NULL,
-                                     abcdk_option_get(opt, "--rsa-key-prifile", 0, ""),
-                                     abcdk_option_get(opt, "--rsa-key-pwd", 0, ""));
+                                     abcdk_option_get(opt, "--rsa-key-prifile", 0, "/tmp/abc-pri.pem"),
+                                     abcdk_option_get(opt, "--rsa-key-pwd", 0, "123456"));
 
     assert(chk == 0);
 
@@ -181,41 +189,58 @@ void test_ssl(abcdk_tree_t *opt)
 
 void test_hmac(abcdk_tree_t *opt)
 {
-    HMAC_CTX hmac;
-
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+    HMAC_CTX *hmac = abcdk_heap_alloc(sizeof(HMAC_CTX));
+#else
+    HMAC_CTX *hmac = HMAC_CTX_new();
+#endif
     /*123456*/
-    assert(abcdk_openssl_hmac_init(&hmac,"123456",6,ABCDK_OPENSSL_HMAC_SHA256)==0);
+    assert(abcdk_openssl_hmac_init(hmac,"123456",6,ABCDK_OPENSSL_HMAC_SHA256)==0);
 
-    HMAC_Update(&hmac,"123456",6);
+    HMAC_Update(hmac,"123456",6);
 
     uint8_t buf[100]={0};
     int len;
 
-    HMAC_Final(&hmac,buf,&len);
+    HMAC_Final(hmac,buf,&len);
 
     for(int i = 0;i<len;i++)
         printf("%02x",buf[i]);
     printf("\n");
 
-    HMAC_CTX_cleanup(&hmac);
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+    HMAC_CTX_cleanup(hmac);
+    abcdk_heap_free(hmac);
+#else
+    HMAC_CTX_free(hmac);
+#endif 
 
-    HMAC_CTX hmac2;
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+    HMAC_CTX *hmac2 = abcdk_heap_alloc(sizeof(HMAC_CTX));
+#else
+    HMAC_CTX *hmac2 = HMAC_CTX_new();
+#endif
 
     /*123457*/
-    assert(abcdk_openssl_hmac_init(&hmac2,"123457",6,ABCDK_OPENSSL_HMAC_SHA256)==0);
+    assert(abcdk_openssl_hmac_init(hmac2,"123456",6,ABCDK_OPENSSL_HMAC_SHA256)==0);
 
-    HMAC_Update(&hmac2,"123456",6);
+    HMAC_Update(hmac2,"123456",6);
 
     uint8_t buf2[100]={0};
     int len2;
 
-    HMAC_Final(&hmac2,buf2,&len2);
+    HMAC_Final(hmac2,buf2,&len2);
 
     for(int i = 0;i<len2;i++)
         printf("%02x",buf2[i]);
     printf("\n");
 
-    HMAC_CTX_cleanup(&hmac2);
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
+    HMAC_CTX_cleanup(hmac2);
+    abcdk_heap_free(hmac2);
+#else
+    HMAC_CTX_free(hmac2);
+#endif 
 
 }
 

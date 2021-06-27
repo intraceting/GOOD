@@ -108,17 +108,34 @@ int abcdk_openssl_rsa_padding_size(int padding)
 RSA *abcdk_openssl_rsa_create(int bits, unsigned long e)
 {
     RSA *key = NULL;
+    BIGNUM *bne = NULL;
+    int chk;
+    
+    bne = BN_new();
+    if(!bne)
+        ABCDK_ERRNO_AND_GOTO1(ENOMEM,final);
 
-#ifndef OPENSSL_NO_DEPRECATED
-    key = RSA_generate_key(bits, e, NULL, NULL);
-    if (!key)
-        ABCDK_ERRNO_AND_RETURN1(EINVAL, NULL);
-#else
-    key = NULL;
-#endif
+    chk = BN_set_word(bne,e);
+    if(chk <= 0)
+        ABCDK_ERRNO_AND_GOTO1(EINVAL,final);
+
+    key = RSA_new();
+    if(!key)
+        ABCDK_ERRNO_AND_GOTO1(ENOMEM,final);
+
+    chk = RSA_generate_key_ex(key, bits, bne, NULL);
+    if (chk <= 0)
+    {
+        RSA_free(key);
+        key = NULL;
+    }
+
+final:
+        
+    if(bne);
+        BN_clear_free(bne);
 
     return key;
-
 }
 
 RSA *abcdk_openssl_rsa_from_fp(FILE *fp, int type, const char *pwd)
@@ -325,7 +342,7 @@ int abcdk_openssl_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
     assert(type >= ABCDK_OPENSSL_HMAC_MD2 && type <= ABCDK_OPENSSL_HMAC_WHIRLPOOL);
 
     /*不可以省略。*/
-#if OPENSSL_VERSION_NUMBER <= 0x10100000L
+#if OPENSSL_VERSION_NUMBER < 0x10000000L
     HMAC_CTX_init(hmac);
 #endif 
 
