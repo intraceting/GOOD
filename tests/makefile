@@ -81,7 +81,8 @@ ${PROJECT_NAME}: \
 	$(BUILD_PATH)/sqlite_test.exe \
 	$(BUILD_PATH)/odbc_test.exe \
 	$(BUILD_PATH)/openssl_test.exe \
-	$(BUILD_PATH)/mux_test.exe
+	$(BUILD_PATH)/mux_test.exe \
+	$(BUILD_PATH)/general_test.exe
 
 #
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
@@ -115,5 +116,6 @@ clean:
 	rm -f $(BUILD_PATH)/odbc_test.exe
 	rm -f $(BUILD_PATH)/openssl_test.exe
 	rm -f $(BUILD_PATH)/mux_test.exe
+	rm -f $(BUILD_PATH)/general_test.exe
 
 

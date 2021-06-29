@@ -119,6 +119,8 @@ const char* abcdk_strstr(const char *str, const char *sub,int caseAb);
  * 字符串比较。
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
+ * 
+ * @return 1: s1 > s2, 0: s1 = s2, -1: s1 < s2
 */
 int abcdk_strcmp(const char *s1, const char *s2,int caseAb);
 
@@ -126,6 +128,8 @@ int abcdk_strcmp(const char *s1, const char *s2,int caseAb);
  * 字符串比较。
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
+ * 
+ * @return 1: s1 > s2, 0: s1 = s2, -1: s1 < s2
 */
 int abcdk_strncmp(const char *s1, const char *s2,size_t len,int caseAb);
 
@@ -143,7 +147,7 @@ char* abcdk_strtrim(char* str,int (*isctype_cb)(int c),int where);
  * 
  * @param str 待分割字符串的指针。可能会被修改。
  * @param delim 分割字符的串指针。全字匹配，并区分大小写。
- * @param saveptr 临时的指针。不可支持访问。
+ * @param saveptr 临时的指针。不支持访问。
  * 
  * @return !NULL(0) 分割后字符串的指针，NULL(0) 结束。
 */
@@ -162,11 +166,17 @@ int abcdk_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
  * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。isctype等函数在ctype.h文件中。
  * 
  * @return !0 通过，0 未通过。
- * 
- * 
 */
 int abcdk_strtype(const char* str,int (*isctype_cb)(int c));
 
+/**
+ * 字符串查找并替换。
+ * 
+ * @return  !NULL(0) 成功， NULL(0) 失败。
+ * 
+ * @warning 返回的指针，需要用abcdk_heap_free去释放。
+*/
+char* abcdk_strrep(const char* str,const char *src, const char *dst, int caseAb);
 
 /*------------------------------------------------------------------------------------------------*/
 
