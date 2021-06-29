@@ -342,7 +342,7 @@ int abcdk_openssl_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
     assert(type >= ABCDK_OPENSSL_HMAC_MD2 && type <= ABCDK_OPENSSL_HMAC_WHIRLPOOL);
 
     /*不可以省略。*/
-#if OPENSSL_VERSION_NUMBER < 0x10000000L
+#if OPENSSL_VERSION_NUMBER < 0x1000207fL
     HMAC_CTX_init(hmac);
 #endif 
 
@@ -361,7 +361,7 @@ int abcdk_openssl_hmac_init(HMAC_CTX *hmac, const void *key, int len, int type)
         chk = HMAC_Init_ex(hmac, key, len, EVP_md5(), NULL);
 #endif
 #ifndef OPENSSL_NO_SHA
-#if OPENSSL_VERSION_NUMBER <= 0x10100000L
+#if OPENSSL_VERSION_NUMBER <= 0x1000207fL
     else if (type == ABCDK_OPENSSL_HMAC_SHA)
         chk = HMAC_Init_ex(hmac, key, len, EVP_sha(), NULL);
 #endif
