@@ -149,7 +149,7 @@ void test_ssl(abcdk_tree_t *opt)
    SSL_library_init();
    OpenSSL_add_all_algorithms();
    SSL_load_error_strings();
-#if OPENSSL_VERSION_NUMBER <= 0x1000207fL  
+#if OPENSSL_VERSION_NUMBER <= 0x100020bfL  
     const SSL_METHOD *method = TLSv1_2_client_method();
 #else
     const SSL_METHOD *method = TLS_client_method();
@@ -189,8 +189,8 @@ void test_ssl(abcdk_tree_t *opt)
 
 void test_hmac(abcdk_tree_t *opt)
 {
-#if OPENSSL_VERSION_NUMBER <= 0x1000207fL
-    HMAC_CTX *hmac = abcdk_heap_alloc(sizeof(HMAC_CTX));
+#if OPENSSL_VERSION_NUMBER <= 0x100020bfL
+    HMAC_CTX *hmac = (HMAC_CTX *)abcdk_heap_alloc(sizeof(HMAC_CTX));
 #else
     HMAC_CTX *hmac = HMAC_CTX_new();
 #endif
@@ -208,15 +208,15 @@ void test_hmac(abcdk_tree_t *opt)
         printf("%02x",buf[i]);
     printf("\n");
 
-#if OPENSSL_VERSION_NUMBER <= 0x1000207fL
+#if OPENSSL_VERSION_NUMBER <= 0x100020bfL
     HMAC_CTX_cleanup(hmac);
     abcdk_heap_free(hmac);
 #else
     HMAC_CTX_free(hmac);
 #endif 
 
-#if OPENSSL_VERSION_NUMBER <= 0x1000207fL
-    HMAC_CTX *hmac2 = abcdk_heap_alloc(sizeof(HMAC_CTX));
+#if OPENSSL_VERSION_NUMBER <= 0x100020bfL
+    HMAC_CTX *hmac2 = (HMAC_CTX *)abcdk_heap_alloc(sizeof(HMAC_CTX));
 #else
     HMAC_CTX *hmac2 = HMAC_CTX_new();
 #endif
@@ -235,7 +235,7 @@ void test_hmac(abcdk_tree_t *opt)
         printf("%02x",buf2[i]);
     printf("\n");
 
-#if OPENSSL_VERSION_NUMBER <= 0x1000207fL
+#if OPENSSL_VERSION_NUMBER <= 0x100020bfL
     HMAC_CTX_cleanup(hmac2);
     abcdk_heap_free(hmac2);
 #else
