@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /*------------------------------------------------------------------------------------------------*/
 
 /**
@@ -190,5 +192,7 @@ int abcdk_thread_leader_test(volatile pthread_t *tid);
 int abcdk_thread_leader_quit(volatile pthread_t *tid);
 
 /*------------------------------------------------------------------------------------------------*/
+
+__END_DECLS
 
 #endif // ABCDKUTIL_THREAD_H

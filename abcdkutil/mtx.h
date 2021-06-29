@@ -11,6 +11,8 @@
 #include "scsi.h"
 #include "tree.h"
 
+__BEGIN_DECLS
+
 /**
  * 元件类型。
 */
@@ -144,6 +146,8 @@ void abcdk_mtx_parse_element_status(abcdk_tree_t *father,const uint8_t *element,
  * @see abcdk_mtx_parse_element_status
 */
 int abcdk_mtx_inquiry_element_status(abcdk_tree_t *father,int fd,uint32_t timeout, abcdk_scsi_io_stat *stat);
+
+__END_DECLS
 
 
 #endif //ABCDKUTIL_MTX_H

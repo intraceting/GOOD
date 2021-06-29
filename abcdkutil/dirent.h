@@ -10,6 +10,8 @@
 #include "general.h"
 #include "tree.h"
 
+__BEGIN_DECLS
+
 /**
  * 文件和目录项的字段。
 */
@@ -41,5 +43,7 @@ enum _abcdk_dirent_field
  * 
 */
 void abcdk_dirscan(abcdk_tree_t *father,size_t depth, int onefs);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_DIRENT_H

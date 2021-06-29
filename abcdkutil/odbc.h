@@ -10,6 +10,8 @@
 #include "general.h"
 #include "allocator.h"
 
+__BEGIN_DECLS
+
 #ifdef __SQLEXT_H
 
 /**
@@ -179,5 +181,7 @@ SQLRETURN abcdk_odbc_get_data(abcdk_odbc_t *ctx, SQLSMALLINT column, SQLSMALLINT
 SQLSMALLINT abcdk_odbc_name2index(abcdk_odbc_t *ctx, const char *name);
 
 #endif //__SQLEXT_H
+
+__END_DECLS
 
 #endif //ABCDKUTIL_ODBC_H

@@ -10,6 +10,7 @@
 #include "general.h"
 #include "allocator.h"
 
+__BEGIN_DECLS
 
 /**
  * 树节点。
@@ -255,5 +256,6 @@ ssize_t abcdk_tree_vsnprintf(char *buf, size_t max, size_t depth, const abcdk_tr
 */
 void abcdk_tree_sort(abcdk_tree_t *father,abcdk_tree_order_t *order);
 
+__END_DECLS
 
 #endif //ABCDKUTIL_TREE_H

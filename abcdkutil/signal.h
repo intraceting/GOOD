@@ -10,6 +10,8 @@
 #include "general.h"
 #include "thread.h"
 
+__BEGIN_DECLS
+
 /**
  * 简单的信号处理。
 */
@@ -39,5 +41,7 @@ typedef struct _abcdk_signal
  * @param timeout 超时(毫秒)。 >= 0 有信号或时间过期，< 0 直到有信号或出错。
 */
 void abcdk_sigwaitinfo(abcdk_signal_t *sig, time_t timeout);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_SIGNAL_H

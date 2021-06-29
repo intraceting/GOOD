@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * 带引用计数器的内存块信息。
  *
@@ -104,5 +106,6 @@ abcdk_allocator_t *abcdk_allocator_clone(abcdk_allocator_t *src);
 */
 abcdk_allocator_t * abcdk_allocator_privatize(abcdk_allocator_t **dst);
 
+__END_DECLS
 
 #endif //ABCDKUTIL_ALLOCATOR_H

@@ -10,6 +10,8 @@
 #include "general.h"
 #include "allocator.h"
 
+__BEGIN_DECLS
+
 /**
  * 映射已经打开文件句柄到内存页面。
  *
@@ -48,6 +50,8 @@ int abcdk_msync(abcdk_allocator_t* alloc,int async);
  * 
 */
 void abcdk_munmap(abcdk_allocator_t** alloc);
+
+__END_DECLS
 
 
 #endif //ABCDKUTIL_MMAN_H

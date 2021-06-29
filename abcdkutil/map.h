@@ -10,6 +10,8 @@
 #include "general.h"
 #include "tree.h"
 
+__BEGIN_DECLS
+
 /**
  * MAP。
  * 
@@ -128,5 +130,7 @@ void abcdk_map_remove(abcdk_map_t* map,const void* key,size_t ksize);
  * 深度优先遍历节点。
 */
 void abcdk_map_scan(abcdk_map_t *map);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_MAP_H

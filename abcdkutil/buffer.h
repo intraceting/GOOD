@@ -10,6 +10,8 @@
 #include "general.h"
 #include "allocator.h"
 
+__BEGIN_DECLS
+
 /**
  * 简单的缓存。
  * 
@@ -165,6 +167,8 @@ ssize_t abcdk_buffer_export(abcdk_buffer_t *buf,int fd);
  * 导出数据到文件。
 */
 ssize_t abcdk_buffer_export_atmost(abcdk_buffer_t *buf,int fd,size_t howmuch);
+
+__END_DECLS
 
 
 #endif //ABCDKUTIL_BUFFER_H

@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * 编码转换
  * 
@@ -17,5 +19,7 @@
  * @return >= 0 转换成功的数据长度(Bytes)，-1 失败。
 */
 ssize_t abcdk_iconv(iconv_t cd, const char *src, size_t slen, char *dst, size_t dlen,size_t *remain);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_ICONV_H

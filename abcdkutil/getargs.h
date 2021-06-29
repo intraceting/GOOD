@@ -10,6 +10,8 @@
 #include "general.h"
 #include "option.h"
 
+__BEGIN_DECLS
+
 /**
  * 导入参数。
  * 
@@ -52,5 +54,7 @@ void abcdk_getargs_file(abcdk_tree_t *opt, const char *file, uint8_t delim, char
 */
 void abcdk_getargs_text(abcdk_tree_t *opt, const char *text, size_t len, uint8_t delim, char note,
                        const char *argv0, const char *prefix);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_GETARGS_H

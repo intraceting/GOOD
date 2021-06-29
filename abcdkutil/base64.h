@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
 * BASE64 编码
 *
@@ -26,5 +28,7 @@ ssize_t abcdk_base64_encode(const uint8_t *src,size_t slen,char* dst,size_t dmax
 * @return 密文解码后的长度。
 */
 ssize_t abcdk_base64_decode(const char *src,size_t slen,uint8_t* dst,size_t dmaxlen);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_BASE64_H

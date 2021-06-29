@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /******************************************************************************************************/
 
 #ifdef HEADER_AES_H
@@ -255,5 +257,7 @@ SSL *abcdk_openssl_ssl_alloc(SSL_CTX *ctx);
 int abcdk_openssl_ssl_handshake(int fd, SSL *ssl, int server, time_t timeout);
 
 #endif //HEADER_SSL_H
+
+__END_DECLS
 
 #endif //ABCDKUTIL_OPENSSL_H

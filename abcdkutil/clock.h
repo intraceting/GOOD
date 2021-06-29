@@ -10,6 +10,8 @@
 #include "general.h"
 #include "thread.h"
 
+__BEGIN_DECLS
+
 /**
  * 计时器-重置
  * 
@@ -40,5 +42,7 @@ uint64_t abcdk_clock_dot(uint64_t *step);
  * 
 */
 uint64_t abcdk_clock_step(uint64_t *dot);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_CLOCK_H

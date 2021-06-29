@@ -10,6 +10,8 @@
 #include "general.h"
 #include "blockio.h"
 
+__BEGIN_DECLS
+
 /**
  * TAR的块长度(512Bytes)。
 */
@@ -207,5 +209,7 @@ int abcdk_tar_read_hdr(abcdk_tar_t *tar, char name[PATH_MAX], struct stat *attr,
  * @return 0 成功，-1 失败(写入失败或空间不足)。
 */
 int abcdk_tar_write_hdr(abcdk_tar_t *tar, const char *name, const struct stat *attr, const char *linkname);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_TAR_H

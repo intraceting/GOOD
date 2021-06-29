@@ -10,6 +10,8 @@
 #include "defs.h"
 #include "atomic.h"
 
+__BEGIN_DECLS
+
 /*------------------------------------------------------------------------------------------------*/
 
 /**
@@ -506,5 +508,7 @@ void abcdk_openlog(const char *ident,int level,int copy2stderr);
 
 /*------------------------------------------------------------------------------------------------*/
 
+
+__END_DECLS
 
 #endif //ABCDKUTIL_GENERAL_H

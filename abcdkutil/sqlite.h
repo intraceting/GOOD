@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 #ifdef _SQLITE3_H_
 
 /**
@@ -211,5 +213,7 @@ int abcdk_sqlite_name2index(sqlite3_stmt *stmt, const char *name);
 
 
 #endif //_SQLITE3_H_
+
+__END_DECLS
 
 #endif //ABCDKUTIL_SQLITE_H

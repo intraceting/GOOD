@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * 计算CRC32值。
  * 
@@ -18,6 +20,8 @@
  * 
 */
 uint32_t abcdk_crc32_sum(const void *data,size_t size,uint32_t old);
+
+__END_DECLS
 
 
 #endif //ABCDKUTIL_CRC32_H

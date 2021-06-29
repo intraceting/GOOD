@@ -11,6 +11,8 @@
 #include "allocator.h"
 #include "thread.h"
 
+__BEGIN_DECLS
+
 /**
  * 一个简单的池子。
 */
@@ -78,5 +80,7 @@ ssize_t abcdk_pool_pull(abcdk_pool_t *pool, void *buf, size_t size);
  * 
 */
 ssize_t abcdk_pool_push(abcdk_pool_t *pool, const void *buf, size_t size);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_POOL_H

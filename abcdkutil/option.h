@@ -10,6 +10,8 @@
 #include "general.h"
 #include "tree.h"
 
+__BEGIN_DECLS
+
 /**
  * 选项的字段。
 */
@@ -98,5 +100,7 @@ ssize_t abcdk_option_fprintf(FILE *fp,abcdk_tree_t *opt);
  * @return >=0 输出的长度，< 0 失败。
 */
 ssize_t abcdk_option_snprintf(char* buf,size_t max,abcdk_tree_t *opt);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_OPTION_H

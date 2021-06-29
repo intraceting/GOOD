@@ -11,6 +11,8 @@
 #include "allocator.h"
 #include "scsi.h"
 
+__BEGIN_DECLS
+
 /**
  * 属性的字段。
 */
@@ -208,5 +210,7 @@ abcdk_allocator_t *abcdk_mt_read_attribute(int fd, uint8_t part, uint16_t id,
 */
 int abcdk_mt_write_attribute(int fd, uint8_t part, const abcdk_allocator_t *attr,
                             uint32_t timeout, abcdk_scsi_io_stat *stat);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_MT_H

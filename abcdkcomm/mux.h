@@ -14,6 +14,8 @@
 #include "abcdkutil/epoll.h"
 #include "abcdkutil/socket.h"
 
+__BEGIN_DECLS
+
 /** 多路复用器。*/
 typedef struct _abcdk_mux abcdk_mux_t;
 
@@ -74,5 +76,7 @@ int abcdk_mux_wait(abcdk_mux_t *ctx,abcdk_epoll_event *event,time_t timeout);
 */
 int abcdk_mux_unref(abcdk_mux_t *ctx,abcdk_epoll_event *event);
 
+
+__END_DECLS
 
 #endif //ABCDKCOMM_MUX_H

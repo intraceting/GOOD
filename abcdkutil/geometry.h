@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * 点
  * 
@@ -63,5 +65,7 @@ double abcdk_geom_halfline_radian(const abcdk_point_t *p1, const abcdk_point_t *
  * @param p2 
  */
 void abcdk_geom_point_move(const abcdk_point_t *p1,double radian,double dist,abcdk_point_t *p2);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_GEOMETRY_H

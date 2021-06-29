@@ -10,6 +10,8 @@
 #include "general.h"
 #include "buffer.h"
 
+__BEGIN_DECLS
+
 /**
  * 以块为单位读数据。
  * 
@@ -37,6 +39,8 @@ ssize_t abcdk_block_write(int fd, const void *data, size_t size,abcdk_buffer_t *
  * @return > 0 缓存数据全部写完，= 0 缓存无数据或无缓存，< 0 写入失败或空间不足(剩余数据在缓存中)。
 */
 int abcdk_block_write_trailer(int fd, uint8_t stuffing,abcdk_buffer_t *buf);
+
+__END_DECLS
 
 
 #endif //ABCDKUTIL_BLOCKIO_H

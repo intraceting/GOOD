@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * 设置终端句柄属性。
  * 
@@ -29,5 +31,7 @@ int abcdk_tcattr_option(int fd, const struct termios *now, struct termios *old);
  * 
  */
 int abcdk_tcattr_cbreak(int fd,struct termios *old);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_TERMIOS_H

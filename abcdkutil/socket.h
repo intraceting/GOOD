@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * IPv4
 */
@@ -239,5 +241,7 @@ char *abcdk_sockaddr_to_string(char dst[68],const abcdk_sockaddr_t *src);
  * @return !0 是，0 否。
 */
 int abcdk_sockaddr_where(const abcdk_sockaddr_t *test,int where);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_SOCKET_H

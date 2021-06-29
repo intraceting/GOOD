@@ -10,6 +10,8 @@
 #include "general.h"
 #include "buffer.h"
 
+__BEGIN_DECLS
+
 /**
  * 监视器事件
  * 
@@ -69,5 +71,7 @@ int abcdk_notify_remove(int fd,int wd);
 */
 int abcdk_notify_watch(int fd,abcdk_notify_event_t *event,time_t timeout);
 
+
+__END_DECLS
 
 #endif //ABCDKUTIL_NOTIFY_H

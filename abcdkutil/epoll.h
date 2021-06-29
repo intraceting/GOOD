@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * EOPLL的事件。
 */
@@ -77,5 +79,7 @@ int abcdk_epoll_drop(int efd, int fd);
  * @return > 0 事件数量，<= 0 超时或出错。
 */
 int abcdk_epoll_wait(int efd,abcdk_epoll_event *events,int max,time_t timeout);
+
+__END_DECLS
 
 #endif //ABCDKUTIL_EPOLL_H

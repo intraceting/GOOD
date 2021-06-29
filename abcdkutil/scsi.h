@@ -9,6 +9,8 @@
 
 #include "general.h"
 
+__BEGIN_DECLS
+
 /**
  * SCSI接口IO状态信息。
 */
@@ -151,6 +153,8 @@ int abcdk_scsi_inquiry_serial(int fd, uint8_t *type, char serial[255],
                              uint32_t timeout, abcdk_scsi_io_stat *stat);
 
 
+
+__END_DECLS
 
 
 #endif //ABCDKUTIL_SCSI_H
