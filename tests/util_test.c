@@ -69,7 +69,7 @@ void test_ffmpeg(abcdk_tree_t *args)
                                              dst2.width, dst2.height, dst2.pixfmt,
                                              0);
 
-    int h = sws_scale(ctx,src.datas,src.strides,0,src.height,dst2.datas,dst2.strides);
+    int h = sws_scale(ctx,(const uint8_t *const *)src.datas,src.strides,0,src.height,dst2.datas,dst2.strides);
     //int h = sws_scale(ctx,(const uint8_t *const *)src.datas,src.strides,100,src.height,dst2.datas,dst2.strides);
 
     printf("h = %d\n",h);
