@@ -40,11 +40,6 @@
 #include <tar.h>
 #include <termios.h>
 #include <dlfcn.h>
-
-#ifdef _OPENMP
-#include <omp.h>
-#endif //_OPENMP
-
 #include <sys/socket.h>
 #include <sys/inotify.h>
 #include <sys/stat.h>
@@ -63,16 +58,27 @@
 #include <arpa/inet.h>
 #include <net/if.h>
 
+#ifdef HAVE_OPENMP
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif //_OPENMP
+
+#endif //HAVE_OPENMP
+
 #ifdef HAVE_SQLITE
 #include <sqlite3.h>
 #endif //HAVE_SQLITE
 
 #ifdef HAVE_UNIXODBC
+
 #include <sql.h>
 #include <sqlext.h>
+
 #endif //HAVE_UNIXODBC
 
-#ifdef HAVE_OPENSSL 
+#ifdef HAVE_OPENSSL
+
 #include <openssl/opensslconf.h>
 #include <openssl/opensslv.h>
 #include <openssl/err.h>
@@ -96,6 +102,28 @@
 
 #endif //HAVE_OPENSSL
 
+#ifdef HAVE_FFMPEG
+
+__BEGIN_DECLS
+
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif //__STDC_CONSTANT_MACROS
+
+#include <libavutil/avutil.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/pixdesc.h>
+#include <libavutil/dict.h>
+#include <libavutil/avutil.h>
+#include <libavutil/base64.h>
+#include <libavutil/common.h>
+#include <libavutil/log.h>
+
+#include <libswscale/swscale.h>
+
+__END_DECLS
+
+#endif //HAVE_FFMPEG
 
 /**
  * 主版本号。
@@ -167,43 +195,42 @@
  * 
 */
 #define ABCDK_INTEGER_SWAP(A, B) ( \
-    {                             \
-        (A) ^= (B);               \
-        (B) ^= (A);               \
-        (A) ^= (B);               \
+    {                              \
+        (A) ^= (B);                \
+        (B) ^= (A);                \
+        (A) ^= (B);                \
     })
 
 /**
  * 设置出错码，并返回。
 */
 #define ABCDK_ERRNO_AND_RETURN0(E) ( \
-    {                               \
-        errno = (E);                \
-        return;                     \
+    {                                \
+        errno = (E);                 \
+        return;                      \
     })
 
 /**
  * 设置出错码，并返回值。
 */
 #define ABCDK_ERRNO_AND_RETURN1(E, V) ( \
-    {                                  \
-        errno = (E);                   \
-        return (V);                    \
+    {                                   \
+        errno = (E);                    \
+        return (V);                     \
     })
 
 /**
  * 设置出错码，并跳转。
 */
 #define ABCDK_ERRNO_AND_GOTO1(E, M) ( \
-    {                                \
-        errno = (E);                 \
-        goto M;                      \
+    {                                 \
+        errno = (E);                  \
+        goto M;                       \
     })
 
 /**
  * 计算数组大小。
 */
 #define ABCDK_ARRAY_SIZE(V) (sizeof((V)) / sizeof((V)[0]))
-
 
 #endif //ABCDKUTIL_DEFS_H

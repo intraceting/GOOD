@@ -33,7 +33,7 @@ CheckPackageKitName()
 {
 	if [ $(CheckSystemName "Ubuntu|Debian") -ge 1 ];then
 		echo "DEB"
-	elif [ $(CheckSystemName "CentOS|Red Hat|RedHat|Amazon|Oracle") -ge 1 ];then
+	elif [ $(CheckSystemName "CentOS|Red Hat|RedHat|RHEL|fedora|Amazon|Oracle") -ge 1 ];then
 		echo "RPM"
 	else
 		echo ""
@@ -63,7 +63,7 @@ checkKeyword()
 # $1 keywords
 # $2 word
 {
-	NUM=$(echo "$1" |grep -i "$2" | wc -l)
+	NUM=$(echo "$1" |grep -wi "$2" | wc -l)
     echo ${NUM}
 }
 
@@ -97,7 +97,7 @@ PrintUsage()
 {
     echo "usage: [ OPTIONS ]"
     echo -e "\n\t-d < KEY,KEY,... >"
-    echo -e "\t\t依赖项目。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl"
+    echo -e "\t\t依赖项目。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl,have-ffmpeg"
     echo -e "\n\t-g"
     echo -e "\t\t生成调试符号。默认：关闭。"
     echo -e "\n\t-i < PATH >"
@@ -133,12 +133,6 @@ echo "'${BUILD_PATH}' must be an existing directory."
 exit 22
 fi 
 
-#
-echo "SOLUTION_NAME=${SOLUTION_NAME}"
-
-#
-echo "BUILD_PATH=${BUILD_PATH}"
-echo "MAKE_CONF=${MAKE_CONF}"
 
 #
 DEPEND_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_FLAGS}"
@@ -149,20 +143,36 @@ DEPEND_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_LIBS}"
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
 {
-    HAVE_OPENMP=1
-    DEPEND_FLAGS=" -DHAVE_OPENMP -fopenmp ${DEPEND_FLAGS}"
-    DEPEND_LIBS=" -fopenmp ${DEPEND_LIBS}"
+    OPENMP_EXIST=$(CheckHavePackage ${KIT_NAME} libomp-dev libopm-devel)
+    if [ ${OPENMP_EXIST} -ge 1 ];then
+    {
+        HAVE_OPENMP="Yes"
+        DEPEND_FLAGS=" -DHAVE_OPENMP -fopenmp ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" -fopenmp ${DEPEND_LIBS}"
+    }
+    else
+    {
+        echo "libomp-dev or libopm-devel not find."
+        exit 22
+    }
+    fi
 }
 fi
 
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
 {
-    HAVE_UNIXODBC=$(CheckHavePackage ${KIT_NAME} unixodbc-dev unixODBC-devel)
-    if [ ${HAVE_UNIXODBC} -ge 1 ];then
+    UNIXODBC_EXIST=$(CheckHavePackage ${KIT_NAME} unixodbc-dev unixODBC-devel)
+    if [ ${UNIXODBC_EXIST} -ge 1 ];then
     {
+        HAVE_UNIXODBC="Yes"
         DEPEND_FLAGS=" -DHAVE_UNIXODBC ${DEPEND_FLAGS}"
         DEPEND_LIBS=" -lodbc ${DEPEND_LIBS}"
+    }
+    else
+    {
+        echo "unixodbc-dev or unixODBC-devel not find."
+        exit 22
     }
     fi
 }
@@ -171,12 +181,19 @@ fi
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-sqlite") -eq 1 ];then
 {
-    HAVE_SQLITE=$(CheckHavePackage ${KIT_NAME} libsqlite3-dev sqlite-devel)
-    if [ ${HAVE_SQLITE} -ge 1 ];then
+    SQLITE_PCS="sqlite3"
+    SQLITE_EXIST=$(pkg-config --exists ${SQLITE_PCS} --short-errors ; echo $?)
+    if [ ${SQLITE_EXIST} -eq 0 ];then
     {
+        HAVE_SQLITE="Yes"
         DEPEND_FLAGS=" -DHAVE_SQLITE ${DEPEND_FLAGS}"
-        DEPEND_FLAGS=" $(pkg-config --cflags sqlite3) ${DEPEND_FLAGS}"
-        DEPEND_LIBS=" $(pkg-config --libs sqlite3) ${DEPEND_LIBS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags ${SQLITE_PCS}) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs ${SQLITE_PCS}) ${DEPEND_LIBS}"
+    }
+    else
+    {
+        echo "libsqlite3-dev or sqlite-devel not find."
+        exit 22
     }
     fi
 }
@@ -185,16 +202,51 @@ fi
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
 {
-    HAVE_OPENSSL=$(CheckHavePackage ${KIT_NAME} libssl-dev openssl-devel)
-    if [ ${HAVE_OPENSSL} -ge 1 ];then
+    OPENSSL_PCS="openssl"
+    OPENSSL_EXIST=$(pkg-config --exists ${OPENSSL_PCS} --short-errors ; echo $?)
+    if [ ${OPENSSL_EXIST} -eq 0 ];then
     {
+        HAVE_OPENSSL="Yes"
         DEPEND_FLAGS=" -DHAVE_OPENSSL ${DEPEND_FLAGS}"
-        DEPEND_FLAGS=" $(pkg-config --cflags openssl) ${DEPEND_FLAGS}"
-        DEPEND_LIBS=" $(pkg-config --libs openssl) ${DEPEND_LIBS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags ${OPENSSL_PCS}) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs ${OPENSSL_PCS}) ${DEPEND_LIBS}"
+    }
+    else
+    {
+        echo "libssl-dev or openssl-devel not find."
+        exit 22
     }
     fi
 }
 fi
+
+#
+if [ $(checkKeyword ${DEPEND_FUNC} "have-ffmpeg") -eq 1 ];then
+{
+    FFMPEG_PCS="libswscale libavutil"
+    FFMPEG_EXIST=$(pkg-config --exists ${FFMPEG_PCS} --short-errors ; echo $?)
+    if [ ${FFMPEG_EXIST} -eq 0 ];then
+    {
+        HAVE_FFMPEG="Yes"
+        DEPEND_FLAGS=" -DHAVE_FFMPEG ${DEPEND_FLAGS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags ${FFMPEG_PCS}) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs ${FFMPEG_PCS}) ${DEPEND_LIBS}"
+    }
+    else
+    {
+        echo "libswscale-dev or libavutil-dev or ffmpeg-devel not find."
+        exit 22
+    }
+    fi
+}
+fi
+
+#
+echo "SOLUTION_NAME=${SOLUTION_NAME}"
+
+#
+echo "BUILD_PATH=${BUILD_PATH}"
+echo "MAKE_CONF=${MAKE_CONF}"
 
 #
 echo "HOST_PLATFORM=${HOST_PLATFORM}"
@@ -210,6 +262,7 @@ echo "HAVE_OPENMP=${HAVE_OPENMP}"
 echo "HAVE_UNIXODBC=${HAVE_UNIXODBC}"
 echo "HAVE_SQLITE=${HAVE_SQLITE}"
 echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
+echo "HAVE_FFMPEG=${HAVE_FFMPEG}"
 
 #
 echo "BUILD_TYPE=${BUILD_TYPE}"

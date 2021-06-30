@@ -65,24 +65,8 @@ all: ${PROJECT_NAME}
 
 #
 ${PROJECT_NAME}: \
-	$(BUILD_PATH)/thread_test.exe \
-	$(BUILD_PATH)/buffer_test.exe \
-	$(BUILD_PATH)/tree_test.exe \
-	$(BUILD_PATH)/map_test.exe \
-	$(BUILD_PATH)/geometry_test.exe \
-	$(BUILD_PATH)/log_test.exe \
-	$(BUILD_PATH)/bloom_test.exe \
-	$(BUILD_PATH)/file_test.exe \
-	$(BUILD_PATH)/process_test.exe \
-	$(BUILD_PATH)/popen_test.exe \
-	$(BUILD_PATH)/socket_test.exe \
-	$(BUILD_PATH)/option_test.exe \
-	$(BUILD_PATH)/scsi_test.exe \
-	$(BUILD_PATH)/sqlite_test.exe \
-	$(BUILD_PATH)/odbc_test.exe \
-	$(BUILD_PATH)/openssl_test.exe \
-	$(BUILD_PATH)/mux_test.exe \
-	$(BUILD_PATH)/general_test.exe
+	$(BUILD_PATH)/util_test.exe \
+	$(BUILD_PATH)/comm_test.exe
 
 #
 $(BUILD_PATH)/%.exe: ${OBJ_PATH}/%.o
@@ -99,23 +83,7 @@ $(OBJ_PATH)/%.o: %.c
 #
 clean:
 	rm -rf $(OBJ_PATH)
-	rm -f $(BUILD_PATH)/thread_test.exe
-	rm -f $(BUILD_PATH)/buffer_test.exe
-	rm -f $(BUILD_PATH)/tree_test.exe
-	rm -f $(BUILD_PATH)/map_test.exe
-	rm -f $(BUILD_PATH)/geometry_test.exe
-	rm -f $(BUILD_PATH)/log_test.exe
-	rm -f $(BUILD_PATH)/bloom_test.exe
-	rm -f $(BUILD_PATH)/file_test.exe
-	rm -f $(BUILD_PATH)/process_test.exe
-	rm -f $(BUILD_PATH)/popen_test.exe
-	rm -f $(BUILD_PATH)/socket_test.exe
-	rm -f $(BUILD_PATH)/option_test.exe
-	rm -f $(BUILD_PATH)/scsi_test.exe
-	rm -f $(BUILD_PATH)/sqlite_test.exe
-	rm -f $(BUILD_PATH)/odbc_test.exe
-	rm -f $(BUILD_PATH)/openssl_test.exe
-	rm -f $(BUILD_PATH)/mux_test.exe
-	rm -f $(BUILD_PATH)/general_test.exe
-
+	rm -f $(BUILD_PATH)/util_test.exe
+	rm -f $(BUILD_PATH)/comm_test.exe
+	
 
