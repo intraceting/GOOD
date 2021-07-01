@@ -46,7 +46,7 @@ typedef struct _abcdk_tar_hdr
         char fill[167]; /* 345 Filler bis 512*/
     } padding;
 
-} abcdk_tar_hdr;
+} __attribute__ ((packed)) abcdk_tar_hdr;
 
 /*
  * gnu tar extensions:

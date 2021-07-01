@@ -49,6 +49,33 @@ void abcdk_av_log_redirect2syslog()
 
 /*------------------------------------------------------------------------------------------------*/
 
+int abcdk_av_image_pixfmt_bits(enum AVPixelFormat pixfmt, int padded)
+{
+    const AVPixFmtDescriptor *desc;
+
+    assert(ABCDK_AVPIXFMT_CHECK(pixfmt));
+
+    desc = av_pix_fmt_desc_get(pixfmt);
+    if (desc)
+        return (padded ? av_get_padded_bits_per_pixel(desc) : av_get_bits_per_pixel(desc));
+
+    return -1;
+}
+
+const char *abcdk_av_image_pixfmt_name(enum AVPixelFormat pixfmt)
+{
+    const AVPixFmtDescriptor *desc;
+
+    if (ABCDK_AVPIXFMT_CHECK(pixfmt))
+    {
+        desc = av_pix_fmt_desc_get(pixfmt);
+        if (desc)
+            return av_get_pix_fmt_name(pixfmt);
+    }
+
+    return "Unknown";
+}
+
 int abcdk_av_image_fill_heights(int heights[4], int height, enum AVPixelFormat pixfmt)
 {
     const AVPixFmtDescriptor *desc;
@@ -104,6 +131,13 @@ int abcdk_av_image_fill_strides(int strides[4],int width,int height,enum AVPixel
     return stride_nb;
 }
 
+int abcdk_av_image_fill_strides2(abcdk_av_image_t *img,int align)
+{
+    assert (img != NULL);
+
+    return abcdk_av_image_fill_strides(img->strides, img->width, img->height, img->pixfmt, align);
+}
+
 int abcdk_av_image_fill_pointers(uint8_t *datas[4], const int strides[4], int height, enum AVPixelFormat pixfmt, void *buffer)
 {
     int size;
@@ -119,11 +153,37 @@ int abcdk_av_image_fill_pointers(uint8_t *datas[4], const int strides[4], int he
     return size;
 }
 
+int abcdk_av_image_fill_pointers2(abcdk_av_image_t *img,void *buffer)
+{
+    assert (img != NULL);
+
+    return abcdk_av_image_fill_pointers(img->datas, img->strides, img->height, img->pixfmt, buffer);
+}
+
 int abcdk_av_image_size(const int strides[4], int height, enum AVPixelFormat pixfmt)
 {
     uint8_t *datas[4] = {0};
 
     return abcdk_av_image_fill_pointers(datas, strides, height, pixfmt, NULL);
+}
+
+int abcdk_av_image_size2(int width,int height,enum AVPixelFormat pixfmt,int align)
+{
+    int strides[4] = {0};
+    int chk;
+
+    chk = abcdk_av_image_fill_strides(strides,width,height,pixfmt,align);
+    if(chk<=0)
+        return chk;
+
+    return abcdk_av_image_size(strides,height,pixfmt);
+}
+
+int abcdk_av_image_size3(const abcdk_av_image_t *img)
+{
+    assert (img != NULL);
+
+    return abcdk_av_image_size(img->strides, img->height, img->pixfmt);
 }
 
 void abcdk_av_image_copy(uint8_t *dst_datas[4], int dst_strides[4], const uint8_t *src_datas[4], const int src_strides[4],
@@ -136,34 +196,17 @@ void abcdk_av_image_copy(uint8_t *dst_datas[4], int dst_strides[4], const uint8_
     av_image_copy(dst_datas, dst_strides, src_datas, src_strides, pixfmt, width, height);
 }
 
-int abcdk_av_image_pixfmt_bits(enum AVPixelFormat pixfmt, int padded)
+void abcdk_av_image_copy2(abcdk_av_image_t *dst, const abcdk_av_image_t *src)
 {
-    const AVPixFmtDescriptor *desc;
+    assert(dst != NULL && src != NULL);
 
-    assert(ABCDK_AVPIXFMT_CHECK(pixfmt));
+    assert(dst->width == src->width);
+    assert(dst->height == src->height);
+    assert(dst->pixfmt == src->pixfmt);
 
-    desc = av_pix_fmt_desc_get(pixfmt);
-    if (desc)
-        return (padded ? av_get_padded_bits_per_pixel(desc) : av_get_bits_per_pixel(desc));
-
-    return -1;
+    abcdk_av_image_copy(dst->datas,dst->strides,(const uint8_t **)src->datas,src->strides,
+                        src->width,src->height,src->pixfmt);
 }
-
-const char *abcdk_av_image_pixfmt_name(enum AVPixelFormat pixfmt)
-{
-    const AVPixFmtDescriptor *desc;
-
-    if (ABCDK_AVPIXFMT_CHECK(pixfmt))
-    {
-        desc = av_pix_fmt_desc_get(pixfmt);
-        if (desc)
-            return av_get_pix_fmt_name(pixfmt);
-    }
-
-    return "Unknown";
-}
-
-
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -189,6 +232,15 @@ struct SwsContext *abcdk_sws_alloc(int src_width, int src_height, enum AVPixelFo
     return sws_getContext(src_width, src_height, src_pixfmt,
                           dst_width, dst_height, dst_pixfmt,
                           flags, NULL, NULL, NULL);
+}
+
+struct SwsContext *abcdk_sws_alloc2(const abcdk_av_image_t *src, const abcdk_av_image_t *dst, int flags)
+{
+    assert(dst != NULL && src != NULL);
+
+    return abcdk_sws_alloc(src->width, src->height, src->pixfmt,
+                           dst->width, dst->height, dst->pixfmt,
+                           flags);
 }
 
 #endif //AVUTIL_AVUTIL_H && SWSCALE_SWSCALE_H

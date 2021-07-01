@@ -51,23 +51,21 @@ void test_ffmpeg(abcdk_tree_t *args)
     abcdk_av_image_fill_heights(dst_heights,dst.height,dst.pixfmt);
     abcdk_av_image_fill_heights(dst2_heights,dst2.height,dst2.pixfmt);
 
-    abcdk_av_image_fill_strides(src.strides,src.width,src.height,src.pixfmt,16);
-    abcdk_av_image_fill_strides(dst.strides,dst.width,dst.height,dst.pixfmt,10);
-    abcdk_av_image_fill_strides(dst2.strides,dst2.width,dst2.height,dst2.pixfmt,1);
+    abcdk_av_image_fill_strides2(&src,16);
+    abcdk_av_image_fill_strides2(&dst,10);
+    abcdk_av_image_fill_strides2(&dst2,1);
 
-    void *src_buf = abcdk_heap_alloc(abcdk_av_image_size(src.strides,src.height,src.pixfmt));
-    void *dst_buf = abcdk_heap_alloc(abcdk_av_image_size(dst.strides,dst.height,dst.pixfmt));
-    void *dst2_buf = abcdk_heap_alloc(abcdk_av_image_size(dst2.strides,dst2.height,dst2.pixfmt));
+    void *src_buf = abcdk_heap_alloc(abcdk_av_image_size3(&src));
+    void *dst_buf = abcdk_heap_alloc(abcdk_av_image_size3(&dst));
+    void *dst2_buf = abcdk_heap_alloc(abcdk_av_image_size3(&dst2));
 
-    abcdk_av_image_fill_pointers(src.datas,src.strides,src.height,src.pixfmt,src_buf);
-    abcdk_av_image_fill_pointers(dst.datas,dst.strides,dst.height,dst.pixfmt,dst_buf);
-    abcdk_av_image_fill_pointers(dst2.datas,dst2.strides,dst2.height,dst2.pixfmt,dst2_buf);
+    abcdk_av_image_fill_pointers2(&src,src_buf);
+    abcdk_av_image_fill_pointers2(&dst,dst_buf);
+    abcdk_av_image_fill_pointers2(&dst2,dst2_buf);
 
-    abcdk_av_image_copy(dst.datas,dst.strides,(const uint8_t **)src.datas,src.strides,src.width,src.height,src.pixfmt);
+    abcdk_av_image_copy2(&dst,&src);
 
-    struct SwsContext *ctx = abcdk_sws_alloc(src.width, src.height, src.pixfmt,
-                                             dst2.width, dst2.height, dst2.pixfmt,
-                                             0);
+    struct SwsContext *ctx = abcdk_sws_alloc2(&src,&dst2,0);
 
     int h = sws_scale(ctx,(const uint8_t *const *)src.datas,src.strides,0,src.height,dst2.datas,dst2.strides);
     //int h = sws_scale(ctx,(const uint8_t *const *)src.datas,src.strides,100,src.height,dst2.datas,dst2.strides);

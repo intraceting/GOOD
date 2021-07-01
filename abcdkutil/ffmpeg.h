@@ -50,6 +50,20 @@ void abcdk_av_log_redirect2syslog();
 /*------------------------------------------------------------------------------------------------*/
 
 /**
+ * 获取像素位宽。
+ * 
+ * @param padded 0 实际位宽，!0 存储位宽。
+ * 
+ * @return > 0 成功(像素位宽)，<= 0 失败。
+*/
+int abcdk_av_image_pixfmt_bits(enum AVPixelFormat  pixfmt,int padded);
+
+/**
+ * 获取像素格式名字。
+*/
+const char* abcdk_av_image_pixfmt_name(enum AVPixelFormat pixfmt);
+
+/**
  * 计算图像每个图层的高度。
  * 
  * @param pixfmt 像素格式
@@ -70,6 +84,13 @@ int abcdk_av_image_fill_heights(int heights[4],int height,enum AVPixelFormat pix
 int abcdk_av_image_fill_strides(int strides[4],int width,int height,enum AVPixelFormat pixfmt,int align);
 
 /**
+ * 计算图像每个图层的宽步长(字节)。
+ * 
+ * @return > 0 成功(图层数量)， <= 0 失败。
+*/
+int abcdk_av_image_fill_strides2(abcdk_av_image_t *img,int align);
+
+/**
  * 分派存储空间。
  * 
  * @param buffer 内存指针，传入NULL(0)。
@@ -77,6 +98,13 @@ int abcdk_av_image_fill_strides(int strides[4],int width,int height,enum AVPixel
  * @return >0 成功(分派的内存大小)， <= 0 失败。
 */
 int abcdk_av_image_fill_pointers(uint8_t *datas[4],const int strides[4],int height,enum AVPixelFormat pixfmt,void *buffer);
+
+/** 
+ * 分派存储空间。
+ * 
+ * @return >0 成功(分派的内存大小)， <= 0 失败。
+*/
+int abcdk_av_image_fill_pointers2(abcdk_av_image_t *img,void *buffer);
 
 /**
  * 计算需要的内存大小。
@@ -86,28 +114,31 @@ int abcdk_av_image_fill_pointers(uint8_t *datas[4],const int strides[4],int heig
 int abcdk_av_image_size(const int strides[4],int height,enum AVPixelFormat pixfmt);
 
 /**
+ * 计算需要的内存大小。
+ * 
+ * @return >0 成功(需要的内存大小)， <= 0 失败。
+*/
+int abcdk_av_image_size2(int width,int height,enum AVPixelFormat pixfmt,int align);
+
+/**
+ * 计算需要的内存大小。
+ * 
+ * @return >0 成功(需要的内存大小)， <= 0 失败。
+*/
+int abcdk_av_image_size3(const abcdk_av_image_t *img);
+
+/**
  * 图像复制。
  * 
 */
 void abcdk_av_image_copy(uint8_t *dst_datas[4], int dst_strides[4], const uint8_t *src_datas[4], const int src_strides[4],
                          int width, int height, enum AVPixelFormat pixfmt);
 
-
 /**
- * 获取像素位宽。
+ * 图像复制。
  * 
- * @param padded 0 实际位宽，!0 存储位宽。
- * 
- * @return > 0 成功(像素位宽)，<= 0 失败。
 */
-int abcdk_av_image_pixfmt_bits(enum AVPixelFormat  pixfmt,int padded);
-
-/**
- * 获取像素格式名字。
-*/
-const char* abcdk_av_image_pixfmt_name(enum AVPixelFormat pixfmt);
-
-
+void abcdk_av_image_copy2(abcdk_av_image_t *dst, const abcdk_av_image_t *src);
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -126,6 +157,13 @@ void abcdk_sws_free(struct SwsContext **ctx);
 struct SwsContext *abcdk_sws_alloc(int src_width, int src_height, enum AVPixelFormat src_pixfmt,
                                    int dst_width, int dst_height, enum AVPixelFormat dst_pixfmt,
                                    int flags);
+
+/**
+ * 创建图像转换环境。
+ * 
+ * @return !NULL(0) 成功(环境指针)，NULL(0) 失败。
+*/
+struct SwsContext *abcdk_sws_alloc2(const abcdk_av_image_t *src, const abcdk_av_image_t *dst, int flags);
 
 #endif //AVUTIL_AVUTIL_H && SWSCALE_SWSCALE_H
 
