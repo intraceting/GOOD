@@ -82,11 +82,11 @@ typedef struct _abcdk_ifaddrs
  * 
  * @param addrs IP地址数组的指针。
  * @param max IP地址数组元素最大数量。
- * @param canonname 规范名称指针的指针，NULL(0)忽略。返回的指针需要用abcdk_heap_free()释放。
+ * @param canonname 规范名称，NULL(0) 忽略。
  *
  * @return >= 0 IP地址数量， < 0 出错。
 */
-int abcdk_gethostbyname(const char *name, sa_family_t family, abcdk_sockaddr_t *addrs, int max, char **canonname);
+int abcdk_gethostbyname(const char *name, sa_family_t family, abcdk_sockaddr_t *addrs, int max, char canonname[1000]);
 
 /**
  * IP字符串转IP地址。

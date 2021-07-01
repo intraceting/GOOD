@@ -6,7 +6,7 @@
  */
 #include "socket.h"
 
-int abcdk_gethostbyname(const char *name, sa_family_t family, abcdk_sockaddr_t *addrs, int max, char **canonname)
+int abcdk_gethostbyname(const char *name, sa_family_t family, abcdk_sockaddr_t *addrs, int max, char canonname[1000])
 {
     struct addrinfo *results = NULL;
     struct addrinfo *it = NULL;
@@ -35,7 +35,7 @@ int abcdk_gethostbyname(const char *name, sa_family_t family, abcdk_sockaddr_t *
     }
 
     if (canonname && results->ai_canonname)
-        *canonname = abcdk_heap_clone(results->ai_canonname, strlen(results->ai_canonname) + 1);
+        strncpy(canonname,results->ai_canonname, strlen(results->ai_canonname) + 1);
 
     freeaddrinfo(results);
 
@@ -363,9 +363,9 @@ int abcdk_sockaddr_from_string(abcdk_sockaddr_t *dst, const char *src, int try_l
     if(chk==0)
     {
         if(dst->family == ABCDK_IPV6)
-            dst->addr6.sin6_port = abcdk_endian_hton16(port);
+            dst->addr6.sin6_port = abcdk_endian_h_to_b16(port);
         if(dst->family == ABCDK_IPV4)
-            dst->addr4.sin_port = abcdk_endian_hton16(port);
+            dst->addr4.sin_port = abcdk_endian_h_to_b16(port);
     }
 
     return chk;
@@ -385,14 +385,14 @@ char *abcdk_sockaddr_to_string(char dst[68],const abcdk_sockaddr_t *src)
     if (src->family == ABCDK_IPV6)
     {
         if(src->addr6.sin6_port)
-            sprintf(dst,"[%s]:%hu",buf,abcdk_endian_ntoh16(src->addr6.sin6_port));
+            sprintf(dst,"[%s]:%hu",buf,abcdk_endian_b_to_h16(src->addr6.sin6_port));
         else
             strcpy(dst,buf);
     }
     if (src->family == ABCDK_IPV4)
     {
         if(src->addr4.sin_port)
-            sprintf(dst,"%s:%hu",buf,abcdk_endian_ntoh16(src->addr4.sin_port));
+            sprintf(dst,"%s:%hu",buf,abcdk_endian_b_to_h16(src->addr4.sin_port));
         else
             strcpy(dst,buf);
     }

@@ -72,7 +72,7 @@ void test_connect()
     //int n = abcdk_gethostbyname("www.taobao.com",ABCDK_IPV4,&addr,1,NULL);
     //int n = abcdk_gethostbyname("localhost",ABCDK_IPV4,&addr,1,NULL);
     //abcdk_inet_pton("192.168.100.4",ABCDK_IPV4,&addr);
-    //addr.addr4.sin_port = abcdk_endian_hton16(8090);
+    //addr.addr4.sin_port = abcdk_endian_h_to_b16(8090);
 
     assert(abcdk_sockaddr_from_string(&addr,"www.taobao.com:443",1)==0);
   //  assert(abcdk_sockaddr_from_string(&addr,"192.168.100.4:8090",0)==0);
@@ -106,7 +106,7 @@ void test_group()
 
     abcdk_sockaddr_t addr={0};
     abcdk_inet_pton("224.0.0.5",ABCDK_IPV4,&addr);
-    addr.addr4.sin_port = abcdk_endian_hton16(8090);
+    addr.addr4.sin_port = abcdk_endian_h_to_b16(8090);
 
     assert(abcdk_socket_option_multicast(s,&addr,NULL,1)==0);
 

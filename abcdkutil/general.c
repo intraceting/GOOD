@@ -27,10 +27,13 @@
 
 size_t abcdk_align(size_t size, size_t align)
 {
-    size_t padding = 0;
+    size_t pad = 0;
 
     if (align > 1)
-        size +=  align - (size % align);
+    {
+        pad = size % align;
+        size += ((pad > 0) ? (align - pad) : 0);
+    }
 
     return size;
 }
@@ -466,7 +469,7 @@ uint8_t *abcdk_endian_swap(uint8_t *dst, int len)
     return dst;
 }
 
-uint8_t* abcdk_endian_ntoh(uint8_t* dst,int len)
+uint8_t* abcdk_endian_b_to_h(uint8_t* dst,int len)
 {
     if(abcdk_endian_check(0))
         return abcdk_endian_swap(dst,len);
@@ -474,12 +477,12 @@ uint8_t* abcdk_endian_ntoh(uint8_t* dst,int len)
     return dst;
 }
 
-uint16_t abcdk_endian_ntoh16(uint16_t src)
+uint16_t abcdk_endian_b_to_h16(uint16_t src)
 {
-    return *((uint16_t*)abcdk_endian_ntoh((uint8_t*)&src,sizeof(src)));
+    return *((uint16_t*)abcdk_endian_b_to_h((uint8_t*)&src,sizeof(src)));
 }
 
-uint32_t abcdk_endian_ntoh24(const uint8_t* src)
+uint32_t abcdk_endian_b_to_h24(const uint8_t* src)
 {
     uint32_t dst = 0;
 
@@ -497,17 +500,17 @@ uint32_t abcdk_endian_ntoh24(const uint8_t* src)
     return dst;
 }
 
-uint32_t abcdk_endian_ntoh32(uint32_t src)
+uint32_t abcdk_endian_b_to_h32(uint32_t src)
 {
-    return *((uint32_t*)abcdk_endian_ntoh((uint8_t*)&src,sizeof(src)));
+    return *((uint32_t*)abcdk_endian_b_to_h((uint8_t*)&src,sizeof(src)));
 }
 
-uint64_t abcdk_endian_ntoh64(uint64_t src)
+uint64_t abcdk_endian_b_to_h64(uint64_t src)
 {
-    return *((uint64_t*)abcdk_endian_ntoh((uint8_t*)&src,sizeof(src)));
+    return *((uint64_t*)abcdk_endian_b_to_h((uint8_t*)&src,sizeof(src)));
 }
 
-uint8_t* abcdk_endian_hton(uint8_t* dst,int len)
+uint8_t* abcdk_endian_h_to_b(uint8_t* dst,int len)
 {
     if (abcdk_endian_check(0))
         return abcdk_endian_swap(dst,len);
@@ -515,12 +518,12 @@ uint8_t* abcdk_endian_hton(uint8_t* dst,int len)
     return dst;
 }
 
-uint16_t abcdk_endian_hton16(uint16_t src)
+uint16_t abcdk_endian_h_to_b16(uint16_t src)
 {
-    return *((uint16_t *)abcdk_endian_hton((uint8_t *)&src, sizeof(src)));
+    return *((uint16_t *)abcdk_endian_h_to_b((uint8_t *)&src, sizeof(src)));
 }
 
-uint8_t* abcdk_endian_hton24(uint8_t* dst,uint32_t src)
+uint8_t* abcdk_endian_h_to_b24(uint8_t* dst,uint32_t src)
 {
     if (abcdk_endian_check(0))
     {
@@ -536,14 +539,92 @@ uint8_t* abcdk_endian_hton24(uint8_t* dst,uint32_t src)
     return dst;
 }
 
-uint32_t abcdk_endian_hton32(uint32_t src)
+uint32_t abcdk_endian_h_to_b32(uint32_t src)
 {
-    return *((uint32_t *)abcdk_endian_hton((uint8_t *)&src, sizeof(src)));
+    return *((uint32_t *)abcdk_endian_h_to_b((uint8_t *)&src, sizeof(src)));
 }
 
-uint64_t abcdk_endian_hton64(uint64_t src)
+uint64_t abcdk_endian_h_to_b64(uint64_t src)
 {
-    return *((uint64_t *)abcdk_endian_hton((uint8_t *)&src, sizeof(src)));
+    return *((uint64_t *)abcdk_endian_h_to_b((uint8_t *)&src, sizeof(src)));
+}
+
+uint8_t* abcdk_endian_l_to_h(uint8_t* dst,int len)
+{
+    if (abcdk_endian_check(1))
+        return abcdk_endian_swap(dst,len);
+
+    return dst;
+}
+
+uint16_t abcdk_endian_l_to_h16(uint16_t src)
+{
+    return *((uint16_t *)abcdk_endian_l_to_h((uint8_t *)&src, sizeof(src)));
+}
+
+uint8_t* abcdk_endian_l_to_h24(uint8_t* dst,uint32_t src)
+{
+    if (abcdk_endian_check(1))
+    {
+        memcpy(dst, &src, 3);
+        abcdk_endian_swap(dst, 3);
+    }
+    else
+    {
+        src <<= 8;
+        memcpy(dst, &src, 3);
+    }
+
+    return dst;
+}
+
+uint32_t abcdk_endian_l_to_h32(uint32_t src)
+{
+    return *((uint32_t *)abcdk_endian_l_to_h((uint8_t *)&src, sizeof(src)));
+}
+
+uint64_t abcdk_endian_l_to_h64(uint64_t src)
+{
+    return *((uint64_t *)abcdk_endian_l_to_h((uint8_t *)&src, sizeof(src)));
+}
+
+uint8_t* abcdk_endian_h_to_l(uint8_t* dst,int len)
+{
+    if (abcdk_endian_check(1))
+        return abcdk_endian_swap(dst,len);
+
+    return dst;
+}
+
+uint16_t abcdk_endian_h_to_l16(uint16_t src)
+{
+    return *((uint16_t *)abcdk_endian_h_to_l((uint8_t *)&src, sizeof(src)));
+}
+
+uint8_t* abcdk_endian_h_to_l24(uint8_t* dst,uint32_t src)
+{
+    if (abcdk_endian_check(1))
+    {
+        memcpy(dst, &src, 3);
+        abcdk_endian_swap(dst, 3);
+    }
+    else
+    {
+        src <<= 8;
+        memcpy(dst, &src, 3);
+    }
+
+    return dst;
+}
+
+uint32_t abcdk_endian_h_to_l32(uint32_t src)
+{
+    return *((uint32_t *)abcdk_endian_h_to_l((uint8_t *)&src, sizeof(src)));
+}
+
+uint64_t abcdk_endian_h_to_l64(uint64_t src)
+{
+    return *((uint64_t *)abcdk_endian_h_to_l((uint8_t *)&src, sizeof(src)));
 }
 
 /*------------------------------------------------------------------------------------------------*/

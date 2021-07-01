@@ -95,14 +95,14 @@ void test_mtx()
     // assert(abcdk_mtx_mode_sense(fd, 0, 0x1d, 0, buf, 255, -1, &stat) == 0);
 
     // /**/
-    // uint16_t changer_address = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 2));
-    // uint16_t changer_count = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf,4 + 4));
-    // uint16_t storage_address = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 6));
-    // uint16_t storage_count = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 8));
-    // uint16_t storage_ie_address = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 10));
-    // uint16_t storage_ie_count = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 12));
-    // uint16_t driver_address = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 14));
-    // uint16_t driver_count = abcdk_endian_ntoh16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 16));
+    // uint16_t changer_address = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 2));
+    // uint16_t changer_count = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf,4 + 4));
+    // uint16_t storage_address = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 6));
+    // uint16_t storage_count = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 8));
+    // uint16_t storage_ie_address = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 10));
+    // uint16_t storage_ie_count = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 12));
+    // uint16_t driver_address = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 14));
+    // uint16_t driver_count = abcdk_endian_b_to_h16(*ABCDK_PTR2PTR(uint16_t, buf, 4 + 16));
 
     // /**/
     // int buf2size = (0x00ffffff); /*15MB enough!*/
@@ -157,8 +157,8 @@ void test_mt()
      abcdk_allocator_t *e = abcdk_mt_read_attribute(fd,0,0x0405,100,&stat);
      abcdk_allocator_t *f = abcdk_mt_read_attribute(fd,0,0x0806,100,&stat);
 
-     abcdk_endian_ntoh(a->pptrs[ABCDK_MT_ATTR_VALUE],ABCDK_PTR2U16(a->pptrs[ABCDK_MT_ATTR_LENGTH],0));
-     abcdk_endian_ntoh(b->pptrs[ABCDK_MT_ATTR_VALUE],ABCDK_PTR2U16(b->pptrs[ABCDK_MT_ATTR_LENGTH],0));
+     abcdk_endian_b_to_h(a->pptrs[ABCDK_MT_ATTR_VALUE],ABCDK_PTR2U16(a->pptrs[ABCDK_MT_ATTR_LENGTH],0));
+     abcdk_endian_b_to_h(b->pptrs[ABCDK_MT_ATTR_VALUE],ABCDK_PTR2U16(b->pptrs[ABCDK_MT_ATTR_LENGTH],0));
 
      printf("REMAINING CAPACITY:%lu\n",ABCDK_PTR2U64(a->pptrs[ABCDK_MT_ATTR_VALUE], 0));
      printf("MAXIMUM CAPACITY:%lu\n",ABCDK_PTR2U64(b->pptrs[ABCDK_MT_ATTR_VALUE], 0));

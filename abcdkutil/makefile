@@ -134,7 +134,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/sqlite.o \
 	${OBJ_PATH}/odbc.o \
 	${OBJ_PATH}/openssl.o \
-	${OBJ_PATH}/ffmpeg.o
+	${OBJ_PATH}/ffmpeg.o \
+	${OBJ_PATH}/bmp.o
 
 
 #
@@ -185,6 +186,7 @@ install:
 	cp  -f $(CURDIR)/atomic.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/base64.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/blockio.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/bmp.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/buffer.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/clock.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/crc32.h ${INSTALL_PATH_INC}/
@@ -227,6 +229,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/atomic.h
 	rm -f ${INSTALL_PATH_INC}/base64.h
 	rm -f ${INSTALL_PATH_INC}/blockio.h
+	rm -f ${INSTALL_PATH_INC}/bmp.h
 	rm -f ${INSTALL_PATH_INC}/buffer.h
 	rm -f ${INSTALL_PATH_INC}/clock.h
 	rm -f ${INSTALL_PATH_INC}/crc32.h

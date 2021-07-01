@@ -11,6 +11,7 @@
 #include "abcdkutil/general.h"
 #include "abcdkutil/getargs.h"
 #include "abcdkutil/ffmpeg.h"
+#include "abcdkutil/bmp.h"
 
 void test_log(abcdk_tree_t *args)
 {
@@ -42,7 +43,7 @@ void test_ffmpeg(abcdk_tree_t *args)
     
     abcdk_av_image_t src = {AV_PIX_FMT_YUV420P,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
     abcdk_av_image_t dst = {AV_PIX_FMT_YUV420P,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
-    abcdk_av_image_t dst2 = {AV_PIX_FMT_RGB24,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
+    abcdk_av_image_t dst2 = {AV_PIX_FMT_BGR24,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
 
     int src_heights[4]={0}, dst_heights[4]={0}, dst2_heights[4]={0};
 
@@ -72,6 +73,22 @@ void test_ffmpeg(abcdk_tree_t *args)
 
     printf("h = %d\n",h);
 
+    uint8_t *tmp = dst2.datas[0];
+    for (int i = 0; i < dst2.height; i++)
+    {
+        for (int j = 0; j < dst2.width*3; j += 3)
+        {
+            tmp[j+0] = 0;
+            tmp[j+1] = 0;
+            tmp[j+2] = 255;
+        }
+
+        tmp += dst2.strides[0];
+    }
+
+    int chk = abcdk_bmp_save2("/tmp/test_bmp.bmp",dst2.datas[0],dst2.strides[0],dst2.width,dst2.height,24);
+    assert(chk==0);
+
     
     abcdk_sws_free(&ctx);
 
@@ -86,6 +103,19 @@ void test_ffmpeg(abcdk_tree_t *args)
 
 }
 
+void test_bmp(abcdk_tree_t *args)
+{
+    const char *src_file = abcdk_option_get(args,"--src-file",0,"");
+
+    uint32_t stride = 0;
+    uint32_t width = 0;
+    int32_t height = 0;
+    uint8_t bits = 0;
+    int chk = abcdk_bmp_load2(src_file, NULL, 0, 1, &stride, &width, &height, &bits);
+    assert(chk == 0);
+
+    printf("s=%u,w=%u,h=%d,b=%hhu\n",stride,width,height,bits);
+}
 
 int main(int argc, char **argv)
 {
@@ -97,6 +127,9 @@ int main(int argc, char **argv)
 
     if(abcdk_strcmp(func,"test_ffmpeg",0)==0)
         test_ffmpeg(args);
+
+    if(abcdk_strcmp(func,"test_bmp",0)==0)
+        test_bmp(args);
 
 
     abcdk_tree_free(&args);

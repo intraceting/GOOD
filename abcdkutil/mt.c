@@ -150,7 +150,7 @@ int abcdk_mt_locate(int fd, int cp, uint8_t part, uint64_t block,
     cdb[0] = 0x92;                /* 0x92 Locate  */
     cdb[1] |= (cp ? 0x02 : 0x00); /* 0x02 Change Partition */
     cdb[3] = part;
-    ABCDK_PTR2OBJ(uint64_t, cdb, 4) = abcdk_endian_hton64(block); /*4,5,6,7,8,9,10,11*/
+    ABCDK_PTR2OBJ(uint64_t, cdb, 4) = abcdk_endian_h_to_b64(block); /*4,5,6,7,8,9,10,11*/
 
     chk = abcdk_scsi_sgioctl2(fd, SG_DXFER_NONE, cdb, 16, NULL, 0, timeout, stat);
 
@@ -173,11 +173,11 @@ int abcdk_mt_read_position(int fd, uint64_t *block, uint64_t *file, uint32_t *pa
         return -1;
 
     if (block)
-        *block = abcdk_endian_ntoh64(ABCDK_PTR2U64(buf, 8)); /*8,9,10,11,12,13,14,15*/
+        *block = abcdk_endian_b_to_h64(ABCDK_PTR2U64(buf, 8)); /*8,9,10,11,12,13,14,15*/
     if (file)
-        *file = abcdk_endian_ntoh64(ABCDK_PTR2U64(buf, 16)); /*16,17,18,19,20,21,22,23*/
+        *file = abcdk_endian_b_to_h64(ABCDK_PTR2U64(buf, 16)); /*16,17,18,19,20,21,22,23*/
     if (part)
-        *part = abcdk_endian_ntoh32(ABCDK_PTR2U32(buf, 4)); /*4,5,6,7*/
+        *part = abcdk_endian_b_to_h32(ABCDK_PTR2U32(buf, 4)); /*4,5,6,7*/
 
     return 0;
 }
@@ -195,26 +195,26 @@ abcdk_allocator_t *abcdk_mt_read_attribute(int fd, uint8_t part, uint16_t id,
     cdb[0] = 0x8C; /* 0x8C Read Attribute */
     cdb[1] = 0x00; /* 0x00 VALUE  */
     cdb[7] = part;
-    ABCDK_PTR2U16(cdb, 8) = abcdk_endian_hton16(id);           /*8,9*/
-    ABCDK_PTR2U32(cdb, 10) = abcdk_endian_hton32(sizeof(buf)); /*10,11,12,13*/
+    ABCDK_PTR2U16(cdb, 8) = abcdk_endian_h_to_b16(id);           /*8,9*/
+    ABCDK_PTR2U32(cdb, 10) = abcdk_endian_h_to_b32(sizeof(buf)); /*10,11,12,13*/
 
     chk = abcdk_scsi_sgioctl2(fd, SG_DXFER_FROM_DEV, cdb, 16, buf, sizeof(buf), timeout, stat);
     if (chk != 0 || stat->status != GOOD)
         return NULL;
 
-    //printf("%u\n",abcdk_endian_ntoh32(ABCDK_PTR2U32(buf, 0)));
+    //printf("%u\n",abcdk_endian_b_to_h32(ABCDK_PTR2U32(buf, 0)));
 
-    len = abcdk_endian_ntoh16(ABCDK_PTR2U16(buf, 7)); /*7,8*/
+    len = abcdk_endian_b_to_h16(ABCDK_PTR2U16(buf, 7)); /*7,8*/
 
     size_t sizes[5] = {sizeof(uint16_t), sizeof(uint8_t), sizeof(uint8_t), sizeof(uint16_t), len + 1};
     alloc = abcdk_allocator_alloc(sizes, 5, 0);
     if (!alloc)
         return NULL;
 
-    ABCDK_PTR2U16(alloc->pptrs[ABCDK_MT_ATTR_ID], 0) = abcdk_endian_ntoh16(ABCDK_PTR2U16(buf, 4)); /*4,5*/
+    ABCDK_PTR2U16(alloc->pptrs[ABCDK_MT_ATTR_ID], 0) = abcdk_endian_b_to_h16(ABCDK_PTR2U16(buf, 4)); /*4,5*/
     ABCDK_PTR2U8(alloc->pptrs[ABCDK_MT_ATTR_READONLY], 0) = (buf[6] >> 7);
     ABCDK_PTR2U8(alloc->pptrs[ABCDK_MT_ATTR_FORMAT], 0) = (buf[6] & 0x03);
-    ABCDK_PTR2U16(alloc->pptrs[ABCDK_MT_ATTR_LENGTH], 0) = abcdk_endian_ntoh16(ABCDK_PTR2U16(buf, 7)); /*7,8*/
+    ABCDK_PTR2U16(alloc->pptrs[ABCDK_MT_ATTR_LENGTH], 0) = abcdk_endian_b_to_h16(ABCDK_PTR2U16(buf, 7)); /*7,8*/
     memcpy(alloc->pptrs[ABCDK_MT_ATTR_VALUE], ABCDK_PTR2PTR(void, buf, 9), len);
 
     return alloc;
@@ -232,12 +232,12 @@ int abcdk_mt_write_attribute(int fd, uint8_t part, const abcdk_allocator_t *attr
     cdb[0] = 0x8D; /* 0x8D Write Attribute */
     cdb[1] = 0x01; /* 0x01 Write SYNC */
     cdb[7] = part;
-    ABCDK_PTR2U32(cdb, 10) = abcdk_endian_hton32(sizeof(buf)); /*10,11,12,13*/
+    ABCDK_PTR2U32(cdb, 10) = abcdk_endian_h_to_b32(sizeof(buf)); /*10,11,12,13*/
 
-    ABCDK_PTR2U32(buf, 0) = abcdk_endian_hton32(4 + ABCDK_PTR2U16(attr->pptrs[ABCDK_MT_ATTR_LENGTH], 0));
-    ABCDK_PTR2U32(buf, 4) = abcdk_endian_hton16(ABCDK_PTR2U16(attr->pptrs[ABCDK_MT_ATTR_ID], 0));
+    ABCDK_PTR2U32(buf, 0) = abcdk_endian_h_to_b32(4 + ABCDK_PTR2U16(attr->pptrs[ABCDK_MT_ATTR_LENGTH], 0));
+    ABCDK_PTR2U32(buf, 4) = abcdk_endian_h_to_b16(ABCDK_PTR2U16(attr->pptrs[ABCDK_MT_ATTR_ID], 0));
     ABCDK_PTR2U32(buf, 6) |= (ABCDK_PTR2U8(attr->pptrs[ABCDK_MT_ATTR_FORMAT], 0) & 0x03);
-    ABCDK_PTR2U32(buf, 7) = abcdk_endian_hton16(ABCDK_PTR2U16(attr->pptrs[ABCDK_MT_ATTR_LENGTH], 0));
+    ABCDK_PTR2U32(buf, 7) = abcdk_endian_h_to_b16(ABCDK_PTR2U16(attr->pptrs[ABCDK_MT_ATTR_LENGTH], 0));
     memcpy(ABCDK_PTR2PTR(void, buf, 9), attr->pptrs[ABCDK_MT_ATTR_VALUE], ABCDK_PTR2U16(attr->pptrs[ABCDK_MT_ATTR_LENGTH], 0));
 
     return abcdk_scsi_sgioctl2(fd, SG_DXFER_TO_DEV, cdb, 16, buf, sizeof(buf), timeout, stat);
