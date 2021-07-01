@@ -35,7 +35,7 @@ int abcdk_gethostbyname(const char *name, sa_family_t family, abcdk_sockaddr_t *
     }
 
     if (canonname && results->ai_canonname)
-        strncpy(canonname,results->ai_canonname, strlen(results->ai_canonname) + 1);
+        strncpy(canonname,results->ai_canonname, 1000);
 
     freeaddrinfo(results);
 

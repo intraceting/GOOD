@@ -112,7 +112,7 @@ int abcdk_bmp_load(int fd, uint8_t *buf, size_t size, uint32_t align,
     uint8_t bmp_xpad[4] = {0};
     uint32_t bmp_padsize = 0;
     uint32_t img_stride = 0;
-    const uint8_t *tmp = NULL;
+    uint8_t *tmp = NULL;
 
     assert(fd >= 0);
 
@@ -187,7 +187,7 @@ int abcdk_bmp_load(int fd, uint8_t *buf, size_t size, uint32_t align,
     tmp = buf;
 
     /*Read data*/
-    for (int32_t i = 0; i < abs(height); i++)
+    for (int32_t i = 0; i < abs(ihdr.height); i++)
     {
         if (abcdk_read(fd, tmp, bmp_xbytes) != bmp_xbytes)
             return -1;
