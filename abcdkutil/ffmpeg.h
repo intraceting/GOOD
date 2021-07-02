@@ -68,7 +68,7 @@ typedef struct _abcdk_av_image
 /**
  * 日志重定向到syslog。
 */
-void abcdk_av_log_redirect2syslog();
+void abcdk_av_log2syslog();
 
 /*------------------------------------------------------------------------------------------------*/
 

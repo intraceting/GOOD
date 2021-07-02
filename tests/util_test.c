@@ -139,29 +139,35 @@ void test_freeimage(abcdk_tree_t *args)
     abcdk_fi_init(1);
     abcdk_fi_init(1);//test run once.
 
+    abcdk_fi_log2syslog();
+
     const char *src_file = abcdk_option_get(args,"--src-file",0,"");
     const char *dst_file = abcdk_option_get(args,"--dst-file",0,"");
 
+    uint8_t *data = NULL;
     uint32_t stride = 0;
     uint32_t width = 0;
-    int32_t height = 0;
+    uint32_t height = 0;
     uint8_t bits = 0;
-    int chk = abcdk_bmp_load2(src_file, NULL, 0, 13, &stride, &width, &height, &bits);
+    uint32_t xbytes = 0;
+
+    FREE_IMAGE_FORMAT src_fmt = FreeImage_GetFileType(src_file,0);
+
+    FIBITMAP *dib = abcdk_fi_load2(src_fmt,0,src_file);
+    assert(dib!=NULL);
+
+    data = FreeImage_GetBits(dib);
+    stride = FreeImage_GetPitch(dib);
+    width = FreeImage_GetWidth(dib);
+    height = FreeImage_GetHeight(dib);
+    bits = FreeImage_GetBPP(dib);
+    xbytes = FreeImage_GetLine(dib);
+
+    int chk = abcdk_fi_save2(FIF_JPEG,JPEG_QUALITYGOOD,dst_file, data, stride, width, height, bits);
     assert(chk == 0);
 
-    printf("s=%u,w=%u,h=%d,b=%hhu\n",stride,width,height,bits);
 
-    uint8_t *data = abcdk_heap_alloc(stride*height);
-
-    chk = abcdk_bmp_load2(src_file, data, stride*height, 1, &stride, &width, &height, &bits);
-    assert(chk == 0);
-
-
-    chk = abcdk_fi_save2(FIF_JPEG,JPEG_QUALITYGOOD,dst_file, data, stride, width, height, bits);
-    assert(chk == 0);
-
-
-    abcdk_heap_free(data);
+    FreeImage_Unload(dib);
 
 
     abcdk_fi_uninit();

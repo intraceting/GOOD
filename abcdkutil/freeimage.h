@@ -21,6 +21,11 @@ __BEGIN_DECLS
 #define ABCDK_FI_IMGFMT_CHECK(fifmt)   ((fifmt) >= FIF_BMP && (fifmt) <= FIF_JXR)
 
 /**
+ * 日志重定向到syslog。
+*/
+void abcdk_fi_log2syslog();
+
+/**
  * 销毁环境。
  * 
  * @warning 需要与abcdk_fi_init配对使用。
@@ -51,6 +56,21 @@ int abcdk_fi_save(FREE_IMAGE_FORMAT fifmt, int fiflag, int fd, const uint8_t *da
 */
 int abcdk_fi_save2(FREE_IMAGE_FORMAT fifmt, int fiflag, const char *file, const uint8_t *data,
                    uint32_t stride, uint32_t width, uint32_t height, uint8_t bits);
+
+
+/**
+ * 加载图像。
+ * 
+ * @return !NULL(0) 成功(图像指针)，NULL(0) 失败。
+*/
+FIBITMAP *abcdk_fi_load(FREE_IMAGE_FORMAT fifmt,int fiflag,int fd);
+
+/**
+ * 加载图像。
+ * 
+ * @return !NULL(0) 成功(图像指针)，NULL(0) 失败。
+*/
+FIBITMAP *abcdk_fi_load2(FREE_IMAGE_FORMAT fifmt,int fiflag,const char *file);
 
 #endif //FREEIMAGE_H
 

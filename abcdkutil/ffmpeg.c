@@ -42,7 +42,7 @@ static void _abcdk_av_log_cb(void *opaque, int level, const char *fmt, va_list v
     vsyslog(sys_level,fmt,v);
 }
 
-void abcdk_av_log_redirect2syslog()
+void abcdk_av_log2syslog()
 {
     av_log_set_callback(_abcdk_av_log_cb);
 }

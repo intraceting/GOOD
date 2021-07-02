@@ -18,6 +18,11 @@ static void _abcdk_fi_output_msg_cb(FREE_IMAGE_FORMAT fif, const char *msg)
     syslog(LOG_ERR,"FreeImage: %s %s.",fif_str,msg);
 }
 
+void abcdk_fi_log2syslog()
+{
+    FreeImage_SetOutputMessage(_abcdk_fi_output_msg_cb);
+}
+
 void abcdk_fi_uninit()
 {
     int64_t chk = abcdk_atomic_fetch_and_add(&_abcdk_fi_init_count, -1);
@@ -35,11 +40,7 @@ void abcdk_fi_init(int load_local_plugins_only)
     assert(chk >= 0);
 
     if (chk == 0)
-    {   
         FreeImage_Initialise(load_local_plugins_only);
-
-        FreeImage_SetOutputMessage(_abcdk_fi_output_msg_cb);
-    }
 }
 
 static unsigned _abck_fi_read_cb(void *buffer, unsigned size, unsigned count, fi_handle handle)
@@ -106,7 +107,7 @@ int abcdk_fi_save(FREE_IMAGE_FORMAT fifmt, int fiflag, int fd, const uint8_t *da
         ABCDK_ERRNO_AND_GOTO1(EPERM,final);
 
     dib_stride = FreeImage_GetPitch(dib);
-    dib_xbytes = FreeImage_GetLine(dib);;
+    dib_xbytes = FreeImage_GetLine(dib);
 
     /*Copy data pointer.*/
     tmp = data;
@@ -157,6 +158,45 @@ int abcdk_fi_save2(FREE_IMAGE_FORMAT fifmt, int fiflag, const char *file, const 
     abcdk_closep(&fd);
 
     return chk;
+}
+
+FIBITMAP *abcdk_fi_load(FREE_IMAGE_FORMAT fifmt,int fiflag,int fd)
+{
+    FreeImageIO io = {0};
+    FIBITMAP *dib = NULL;
+    
+    assert(ABCDK_FI_IMGFMT_CHECK(fifmt));
+    assert(fd>=0);
+
+    io.read_proc = _abck_fi_read_cb;
+    io.seek_proc = _abck_fi_seek_cb;
+    io.tell_proc = _abck_fi_tell_cb;
+    io.write_proc = _abck_fi_write_cb;
+
+    dib = FreeImage_LoadFromHandle(fifmt,&io,(fi_handle)&fd,fiflag);
+    if(!dib)
+        ABCDK_ERRNO_AND_RETURN1(EPERM,NULL);
+
+    return dib;
+}
+
+FIBITMAP *abcdk_fi_load2(FREE_IMAGE_FORMAT fifmt,int fiflag,const char *file)
+{
+    int fd = -1;
+    FIBITMAP *dib = NULL;
+
+    assert(ABCDK_FI_IMGFMT_CHECK(fifmt));
+    assert(file != NULL);
+
+    fd = abcdk_open(file,0,0,1);
+    if(fd<0)
+        return NULL;
+
+    dib = abcdk_fi_load(fifmt,fiflag,fd);
+
+    abcdk_closep(&fd);
+
+    return dib;
 }
 
 #endif //FREEIMAGE_H
