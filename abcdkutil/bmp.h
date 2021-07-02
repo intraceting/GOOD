@@ -135,7 +135,7 @@ typedef struct _abcdk_bmp_clr_pal
 /**
  * 保存BMP图像。
  * 
- * @param bits 像素位宽，支持24、32。
+ * @param bits 像素位宽，支持24、32位。
  * 
  * @return 0 成功，!0 失败。
 */
@@ -148,6 +148,8 @@ int abcdk_bmp_save2(const char *file, const uint8_t *data, uint32_t stride, uint
 
 /**
  * 加载BMP图像。
+ * 
+ * 支持24、32位。
  * 
  * @param buf 缓存区指针。
  * @param size 缓存区大小(字节)。

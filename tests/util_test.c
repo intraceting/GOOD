@@ -43,7 +43,7 @@ void test_ffmpeg(abcdk_tree_t *args)
     
     abcdk_av_image_t src = {AV_PIX_FMT_YUV420P,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
     abcdk_av_image_t dst = {AV_PIX_FMT_YUV420P,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
-    abcdk_av_image_t dst2 = {AV_PIX_FMT_BGR24,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
+    abcdk_av_image_t dst2 = {AV_PIX_FMT_BGR32,{NULL,NULL,NULL,NULL},{0,0,0,0},1920,1080};
 
     int src_heights[4]={0}, dst_heights[4]={0}, dst2_heights[4]={0};
 
@@ -76,7 +76,7 @@ void test_ffmpeg(abcdk_tree_t *args)
     uint8_t *tmp = dst2.datas[0];
     for (int i = 0; i < dst2.height; i++)
     {
-        for (int j = 0; j < dst2.width*3; j += 3)
+        for (int j = 0; j < dst2.width*4; j += 4)
         {
             tmp[j+0] = 0;
             tmp[j+1] = 0;
@@ -86,7 +86,7 @@ void test_ffmpeg(abcdk_tree_t *args)
         tmp += dst2.strides[0];
     }
 
-    int chk = abcdk_bmp_save2("/tmp/test_bmp.bmp",dst2.datas[0],dst2.strides[0],dst2.width,dst2.height,24);
+    int chk = abcdk_bmp_save2("/tmp/test_bmp.bmp",dst2.datas[0],dst2.strides[0],dst2.width,dst2.height,32);
     assert(chk==0);
 
     
@@ -106,15 +106,29 @@ void test_ffmpeg(abcdk_tree_t *args)
 void test_bmp(abcdk_tree_t *args)
 {
     const char *src_file = abcdk_option_get(args,"--src-file",0,"");
+    const char *dst_file = abcdk_option_get(args,"--dst-file",0,"");
 
     uint32_t stride = 0;
     uint32_t width = 0;
     int32_t height = 0;
     uint8_t bits = 0;
-    int chk = abcdk_bmp_load2(src_file, NULL, 0, 1, &stride, &width, &height, &bits);
+    int chk = abcdk_bmp_load2(src_file, NULL, 0, 13, &stride, &width, &height, &bits);
     assert(chk == 0);
 
     printf("s=%u,w=%u,h=%d,b=%hhu\n",stride,width,height,bits);
+
+    uint8_t *data = abcdk_heap_alloc(stride*height);
+
+    chk = abcdk_bmp_load2(src_file, data, stride*height, 1, &stride, &width, &height, &bits);
+    assert(chk == 0);
+
+
+    chk = abcdk_bmp_save2(dst_file, data, stride, width, height, bits);
+    assert(chk == 0);
+
+
+    abcdk_heap_free(data);
+    
 }
 
 int main(int argc, char **argv)
