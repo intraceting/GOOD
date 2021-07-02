@@ -129,7 +129,6 @@ abcdkcomm-uninstall:
 tools-uninstall: 
 	make -C $(CURDIR)/tools/ uninstall
 
-
 #
 TMP_ROOT_PATH = /tmp/${SOLUTION_NAME}-build-installer.tmp/
 PACK_TAR_NAME = ${SOLUTION_NAME}-${VERSION_MAJOR}.${VERSION_MINOR}-${TARGET_PLATFORM}.tar.gz
