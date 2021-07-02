@@ -18,7 +18,7 @@ __BEGIN_DECLS
 #ifdef FREEIMAGE_H
 
 /** 检查图像格式是否支持。*/
-#define ABCDK_FI_IMGFMT_CHECK(imgfmt)   ((imgfmt) >= FIF_BMP && (imgfmt) <= FIF_JXR)
+#define ABCDK_FI_IMGFMT_CHECK(fifmt)   ((fifmt) >= FIF_BMP && (fifmt) <= FIF_JXR)
 
 /**
  * 销毁环境。
@@ -41,7 +41,7 @@ void abcdk_fi_init(int load_local_plugins_only);
  * 
  * @return 0 成功，!0 失败。
 */
-int abcdk_fi_save(FREE_IMAGE_FORMAT fif, int fd, const uint8_t *data,
+int abcdk_fi_save(FREE_IMAGE_FORMAT fifmt, int fiflag, int fd, const uint8_t *data,
                   uint32_t stride, uint32_t width, uint32_t height, uint8_t bits);
 
 /**
@@ -49,7 +49,7 @@ int abcdk_fi_save(FREE_IMAGE_FORMAT fif, int fd, const uint8_t *data,
  * 
  * @return 0 成功，!0 失败。
 */
-int abcdk_fi_save2(FREE_IMAGE_FORMAT fif, const char *file, const uint8_t *data,
+int abcdk_fi_save2(FREE_IMAGE_FORMAT fifmt, int fiflag, const char *file, const uint8_t *data,
                    uint32_t stride, uint32_t width, uint32_t height, uint8_t bits);
 
 #endif //FREEIMAGE_H

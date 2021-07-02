@@ -11,6 +11,13 @@
 /* 环境初始化计数器*/
 static volatile int64_t _abcdk_fi_init_count = 0;
 
+static void _abcdk_fi_output_msg_cb(FREE_IMAGE_FORMAT fif, const char *msg)
+{
+    const char * fif_str = FreeImage_GetFormatFromFIF(fif);
+
+    syslog(LOG_ERR,"FreeImage: %s %s.",fif_str,msg);
+}
+
 void abcdk_fi_uninit()
 {
     int64_t chk = abcdk_atomic_fetch_and_add(&_abcdk_fi_init_count, -1);
@@ -28,7 +35,11 @@ void abcdk_fi_init(int load_local_plugins_only)
     assert(chk >= 0);
 
     if (chk == 0)
+    {   
         FreeImage_Initialise(load_local_plugins_only);
+
+        FreeImage_SetOutputMessage(_abcdk_fi_output_msg_cb);
+    }
 }
 
 static unsigned _abck_fi_read_cb(void *buffer, unsigned size, unsigned count, fi_handle handle)
@@ -65,7 +76,7 @@ static long _abck_fi_tell_cb(fi_handle handle)
     return lseek(fd, 0, SEEK_SET);
 }
 
-int abcdk_fi_save(FREE_IMAGE_FORMAT fif, int fd, const uint8_t *data,
+int abcdk_fi_save(FREE_IMAGE_FORMAT fifmt, int fiflag, int fd, const uint8_t *data,
                   uint32_t stride, uint32_t width, uint32_t height, uint8_t bits)
 {
     FreeImageIO io = {0};
@@ -76,7 +87,7 @@ int abcdk_fi_save(FREE_IMAGE_FORMAT fif, int fd, const uint8_t *data,
     const uint8_t *tmp = NULL;
     int chk = -1;
 
-    assert(ABCDK_FI_IMGFMT_CHECK(fif));
+    assert(ABCDK_FI_IMGFMT_CHECK(fifmt));
     assert(fd >= 0 && data != NULL && stride > 0 && width > 0 && height > 0 && bits > 0);
 
     assert(bits == 24 || bits == 32);
@@ -114,7 +125,7 @@ int abcdk_fi_save(FREE_IMAGE_FORMAT fif, int fd, const uint8_t *data,
     io.tell_proc = _abck_fi_tell_cb;
     io.write_proc = _abck_fi_write_cb;
 
-    if(!FreeImage_SaveToHandle(fif,dib,&io,(fi_handle)&fd,0))
+    if(!FreeImage_SaveToHandle(fifmt,dib,&io,(fi_handle)&fd,fiflag))
         ABCDK_ERRNO_AND_GOTO1(EPERM,final);
 
     /*No error.*/
@@ -128,20 +139,20 @@ final:
     return chk;
 }
 
-int abcdk_fi_save2(FREE_IMAGE_FORMAT fif, const char *file, const uint8_t *data,
+int abcdk_fi_save2(FREE_IMAGE_FORMAT fifmt, int fiflag, const char *file, const uint8_t *data,
                    uint32_t stride, uint32_t width, uint32_t height, uint8_t bits)
 {
     int fd = -1;
     int chk;
 
-    assert(ABCDK_FI_IMGFMT_CHECK(fif));
+    assert(ABCDK_FI_IMGFMT_CHECK(fifmt));
     assert(file != NULL && data != NULL && stride > 0 && width > 0 && height != 0 && bits > 0);
 
     fd = abcdk_open(file,1,0,1);
     if(fd<0)
         return -1;
 
-    chk = abcdk_fi_save(fif,fd,data,stride,width,height,bits);
+    chk = abcdk_fi_save(fifmt,fiflag,fd,data,stride,width,height,bits);
 
     abcdk_closep(&fd);
 

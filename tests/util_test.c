@@ -157,7 +157,7 @@ void test_freeimage(abcdk_tree_t *args)
     assert(chk == 0);
 
 
-    chk = abcdk_fi_save2(FIF_JPEG,dst_file, data, stride, width, height, bits);
+    chk = abcdk_fi_save2(FIF_JPEG,JPEG_QUALITYGOOD,dst_file, data, stride, width, height, bits);
     assert(chk == 0);
 
 
@@ -172,6 +172,8 @@ void test_freeimage(abcdk_tree_t *args)
 
 int main(int argc, char **argv)
 {
+    abcdk_openlog(NULL,LOG_DEBUG,1);
+
     abcdk_tree_t *args = abcdk_tree_alloc3(1);
 
     abcdk_getargs(args,argc,argv,"--");
