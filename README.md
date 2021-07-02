@@ -9,10 +9,13 @@
 
 ### Build-help
 
-* ./configure.sh -?
-
+```bash
+configure.sh -?
+```
 ### Build-install
 
-* $ ./configure.sh [ ... ]
-* $ make
-* $ sudo make install
+```bash
+configure.sh [ ... ]
+make
+sudo make install
+```
