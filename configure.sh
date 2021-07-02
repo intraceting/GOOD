@@ -244,7 +244,7 @@ fi
 #
 if [ $(checkKeyword ${DEPEND_FUNC} "have-freeimage") -eq 1 ];then
 {
-    FREEIMAGE_EXIST=$(CheckHavePackage ${KIT_NAME} libfreeimage-dev libfreeimage-devel)
+    FREEIMAGE_EXIST=$(CheckHavePackage ${KIT_NAME} libfreeimage-dev freeimage-devel)
     if [ ${FREEIMAGE_EXIST} -ge 1 ];then
     {
         HAVE_FREEIMAGE="Yes"
@@ -253,7 +253,7 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-freeimage") -eq 1 ];then
     }
     else
     {
-        echo "libfreeimage-dev or libfreeimage-devel not find."
+        echo "libfreeimage-dev or freeimage-devel not find."
         exit 22
     }
     fi
