@@ -183,8 +183,12 @@ int main(int argc, char **argv)
     abcdk_tree_t *args = abcdk_tree_alloc3(1);
 
     abcdk_getargs(args,argc,argv,"--");
+    
+    abcdk_option_fprintf(stderr,args);
 
     const char *func = abcdk_option_get(args,"--func",0,"");
+
+    
 
     if(abcdk_strcmp(func,"test_ffmpeg",0)==0)
         test_ffmpeg(args);
