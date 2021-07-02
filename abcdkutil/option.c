@@ -187,32 +187,53 @@ int abcdk_option_remove(abcdk_tree_t *opt, const char *key)
     return 0;
 }
 
-ssize_t abcdk_option_fprintf(FILE *fp,abcdk_tree_t *opt)
+ssize_t abcdk_option_fprintf(FILE *fp,abcdk_tree_t *opt,const char *hyphens)
 {
-    abcdk_tree_t *it_key = NULL;
-    abcdk_tree_t *it_val = NULL;
-    ssize_t wsize = 0;
-    ssize_t wsize2 = 0;
+    abcdk_tree_t *it_key = NULL, *it_val = NULL;
+    const char* key = NULL, *val = NULL;
+    ssize_t wsize = 0, wsize2 = 0;
 
     assert(fp != NULL && opt != NULL);
+
+    assert(hyphens == NULL || hyphens[0] != '\0');
 
     it_key = abcdk_tree_child(opt,1);
     while(it_key)
     {
-        wsize2 = fprintf(fp, "\n%s\n", it_key->alloc->pptrs[ABCDK_OPTION_KEY]);
-        if (wsize2 <= 0)
-            break;
+        key = (char*)it_key->alloc->pptrs[ABCDK_OPTION_KEY];
 
-        wsize += wsize2;
-
-        it_val = abcdk_tree_child(it_key,1);
-        while(it_val)
+        /*有连字符时不在这里输出。*/
+        if (hyphens == NULL)
         {
-            wsize2 = fprintf(fp,"%s\n",it_val->alloc->pptrs[ABCDK_OPTION_VALUE]);
+            wsize2 = fprintf(fp, "%s\n", key);
             if (wsize2 <= 0)
                 break;
 
             wsize += wsize2;
+        }
+
+        it_val = abcdk_tree_child(it_key,1);
+        while(it_val)
+        {
+            val = (char*)it_val->alloc->pptrs[ABCDK_OPTION_VALUE];
+
+            /*无连字符时在这里输出。*/
+            if (hyphens == NULL)
+            {
+                wsize2 = fprintf(fp, "%s\n", val);
+                if (wsize2 <= 0)
+                    break;
+
+                wsize += wsize2;
+            }
+            else /*有连字符时在这里输出。*/
+            {
+                wsize2 = fprintf(fp, "%s%s%s\n",key,hyphens,val);
+                if (wsize2 <= 0)
+                    break;
+
+                wsize += wsize2;
+            }
 
             it_val = abcdk_tree_sibling(it_val,0);  
         }
@@ -223,7 +244,7 @@ ssize_t abcdk_option_fprintf(FILE *fp,abcdk_tree_t *opt)
     return wsize;
 }
 
-ssize_t abcdk_option_snprintf(char* buf,size_t max,abcdk_tree_t *opt)
+ssize_t abcdk_option_snprintf(char* buf,size_t max,abcdk_tree_t *opt,const char *hyphens)
 {
     FILE* fp = NULL;
     ssize_t wsize = 0;
@@ -234,7 +255,7 @@ ssize_t abcdk_option_snprintf(char* buf,size_t max,abcdk_tree_t *opt)
     if(!fp)
         return -1;
 
-    wsize = abcdk_option_fprintf(fp,opt);
+    wsize = abcdk_option_fprintf(fp,opt,hyphens);
 
     fclose(fp);
     

@@ -7,7 +7,7 @@
 #include "getargs.h"
 
 void abcdk_getargs(abcdk_tree_t *opt, int argc, char *argv[],
-                  const char *prefix)
+                   const char *prefix)
 {
     size_t prefix_len = 0;
     const char *it_key = NULL;
@@ -56,7 +56,7 @@ int _abcdk_getargs_valtrim(int c)
 }
 
 void abcdk_getargs_fp(abcdk_tree_t *opt, FILE *fp, uint8_t delim, char note,
-                     const char *argv0, const char *prefix)
+                      const char *argv0, const char *prefix)
 {
     size_t prefix_len = 0;
     const char *it_key = NULL;
@@ -134,7 +134,7 @@ void abcdk_getargs_fp(abcdk_tree_t *opt, FILE *fp, uint8_t delim, char note,
 }
 
 void abcdk_getargs_file(abcdk_tree_t *opt, const char *file, uint8_t delim, char note,
-                       const char *argv0, const char *prefix)
+                        const char *argv0, const char *prefix)
 {
     FILE *fp = NULL;
 
@@ -150,7 +150,7 @@ void abcdk_getargs_file(abcdk_tree_t *opt, const char *file, uint8_t delim, char
 }
 
 void abcdk_getargs_text(abcdk_tree_t *opt, const char *text, size_t len, uint8_t delim, char note,
-                       const char *argv0, const char *prefix)
+                        const char *argv0, const char *prefix)
 {
     FILE *fp = NULL;
 

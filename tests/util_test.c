@@ -184,7 +184,7 @@ int main(int argc, char **argv)
 
     abcdk_getargs(args,argc,argv,"--");
     
-    abcdk_option_fprintf(stderr,args);
+    abcdk_option_fprintf(stderr,args,NULL);
 
     const char *func = abcdk_option_get(args,"--func",0,"");
 

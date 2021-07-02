@@ -89,17 +89,19 @@ int abcdk_option_remove(abcdk_tree_t *opt, const char *key);
 
 /**
  * 格式化打印。
- *  
+ * 
+ * @param hyphens 连字符，NULL(0) KEY和VALUE分行打印。
+ * 
  * @return >=0 输出的长度，< 0 失败。
 */
-ssize_t abcdk_option_fprintf(FILE *fp,abcdk_tree_t *opt);
+ssize_t abcdk_option_fprintf(FILE *fp,abcdk_tree_t *opt,const char *hyphens);
 
 /**
  * 格式化打印。
  * 
  * @return >=0 输出的长度，< 0 失败。
 */
-ssize_t abcdk_option_snprintf(char* buf,size_t max,abcdk_tree_t *opt);
+ssize_t abcdk_option_snprintf(char* buf,size_t max,abcdk_tree_t *opt,const char *hyphens);
 
 __END_DECLS
 

@@ -92,7 +92,8 @@ void _abcdklsb_work(abcdk_tree_t *args)
     }
     else
     {
-        fprintf(stdout, "%s\n", osinfo_mem->pptrs[0]);
+        //fprintf(stdout, "%s\n", osinfo_mem->pptrs[0]);
+        abcdk_option_fprintf(stdout,osinfo_args,"=");
     }
 
 final:
