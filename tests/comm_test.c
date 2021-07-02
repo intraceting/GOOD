@@ -224,23 +224,32 @@ void test_client(abcdk_tree_t *t)
     abcdk_closep(&c);
 }
 
+void test_mux(abcdk_tree_t *args)
+{
+    if(abcdk_option_exist(args,"--server"))
+        test_server(args);
+    else 
+        test_client(args);
+}
+
 int main(int argc, char **argv)
 {
-    abcdk_tree_t *t = abcdk_tree_alloc(NULL);
-
-    abcdk_getargs(t,argc,argv,"--");
+    abcdk_openlog(NULL,LOG_DEBUG,1);
 
     abcdk_thread_t p;
     p.routine = sigwaitinfo_cb;
     abcdk_thread_create(&p,0);
 
+    abcdk_tree_t *args = abcdk_tree_alloc(NULL);
 
-    if(abcdk_option_exist(t,"--server"))
-        test_server(t);
-    else 
-        test_client(t);
+    abcdk_getargs(args,argc,argv,"--");
 
-    abcdk_tree_free(&t);
+    const char *func = abcdk_option_get(args,"--func",0,"");
+
+    if(abcdk_strcmp(func,"test_mux",0)==0)
+        test_mux(args);
+
+    abcdk_tree_free(&args);
 
     return 0;
 }
