@@ -9,6 +9,29 @@
 
 #include "general.h"
 
+#ifdef HAVE_FFMPEG
+
+__BEGIN_DECLS
+
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif //__STDC_CONSTANT_MACROS
+
+#include <libavutil/avutil.h>
+#include <libavutil/imgutils.h>
+#include <libavutil/pixdesc.h>
+#include <libavutil/dict.h>
+#include <libavutil/avutil.h>
+#include <libavutil/base64.h>
+#include <libavutil/common.h>
+#include <libavutil/log.h>
+
+#include <libswscale/swscale.h>
+
+__END_DECLS
+
+#endif //HAVE_FFMPEG
+
 __BEGIN_DECLS
 
 #if defined(AVUTIL_AVUTIL_H) && defined(SWSCALE_SWSCALE_H)

@@ -9,6 +9,10 @@
 
 #include "general.h"
 
+#ifdef HAVE_SQLITE
+#include <sqlite3.h>
+#endif //HAVE_SQLITE
+
 __BEGIN_DECLS
 
 #ifdef _SQLITE3_H_

@@ -10,6 +10,10 @@
 #include "defs.h"
 #include "atomic.h"
 
+#if defined(HAVE_OPENMP) && defined(_OPENMP)
+#include <omp.h>
+#endif //HAVE_OPENMP
+
 __BEGIN_DECLS
 
 /*------------------------------------------------------------------------------------------------*/
@@ -29,7 +33,7 @@ size_t abcdk_align(size_t size,size_t align);
  * 
  * @return 0 第一次，1 第2~N次，-1 失败。
 */
-int abcdk_once(int* status,int (*routine)(void *opaque),void *opaque);
+int abcdk_once(volatile int* status,int (*routine)(void *opaque),void *opaque);
 
 /*------------------------------------------------------------------------------------------------*/
 

@@ -135,7 +135,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/odbc.o \
 	${OBJ_PATH}/openssl.o \
 	${OBJ_PATH}/ffmpeg.o \
-	${OBJ_PATH}/bmp.o
+	${OBJ_PATH}/bmp.o \
+	${OBJ_PATH}/freeimage.o 
 
 
 #
@@ -194,6 +195,7 @@ install:
 	cp  -f $(CURDIR)/defs.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/epoll.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/ffmpeg.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/freeimage.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/general.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/geometry.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/getargs.h ${INSTALL_PATH_INC}/
@@ -237,6 +239,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/dirent.h
 	rm -f ${INSTALL_PATH_INC}/epoll.h
 	rm -f ${INSTALL_PATH_INC}/ffmpeg.h
+	rm -f ${INSTALL_PATH_INC}/freeimage.h
 	rm -f ${INSTALL_PATH_INC}/general.h
 	rm -f ${INSTALL_PATH_INC}/geometry.h
 	rm -f ${INSTALL_PATH_INC}/getargs.h

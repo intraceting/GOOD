@@ -10,6 +10,11 @@
 #include "general.h"
 #include "allocator.h"
 
+#ifdef HAVE_UNIXODBC
+#include <sql.h>
+#include <sqlext.h>
+#endif //HAVE_UNIXODBC
+
 __BEGIN_DECLS
 
 #ifdef __SQLEXT_H

@@ -97,7 +97,7 @@ PrintUsage()
 {
     echo "usage: [ OPTIONS ]"
     echo -e "\n\t-d < KEY,KEY,... >"
-    echo -e "\t\t依赖项目。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl,have-ffmpeg"
+    echo -e "\t\t依赖项目。关键字：have-openmp,have-unixodbc,have-sqlite,have-openssl,have-ffmpeg,have-freeimage"
     echo -e "\n\t-g"
     echo -e "\t\t生成调试符号。默认：关闭。"
     echo -e "\n\t-i < PATH >"
@@ -242,6 +242,25 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-ffmpeg") -eq 1 ];then
 fi
 
 #
+if [ $(checkKeyword ${DEPEND_FUNC} "have-freeimage") -eq 1 ];then
+{
+    FREEIMAGE_EXIST=$(CheckHavePackage ${KIT_NAME} libfreeimage-dev libfreeimage-devel)
+    if [ ${FREEIMAGE_EXIST} -ge 1 ];then
+    {
+        HAVE_FREEIMAGE="Yes"
+        DEPEND_FLAGS=" -DHAVE_FREEIMAGE ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" -lfreeimage ${DEPEND_LIBS}"
+    }
+    else
+    {
+        echo "libfreeimage-dev or libfreeimage-devel not find."
+        exit 22
+    }
+    fi
+}
+fi
+
+#
 echo "SOLUTION_NAME=${SOLUTION_NAME}"
 
 #
@@ -263,6 +282,7 @@ echo "HAVE_UNIXODBC=${HAVE_UNIXODBC}"
 echo "HAVE_SQLITE=${HAVE_SQLITE}"
 echo "HAVE_OPENSSL=${HAVE_OPENSSL}"
 echo "HAVE_FFMPEG=${HAVE_FFMPEG}"
+echo "HAVE_FREEIMAGE=${HAVE_FREEIMAGE}"
 
 #
 echo "BUILD_TYPE=${BUILD_TYPE}"

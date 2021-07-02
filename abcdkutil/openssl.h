@@ -9,6 +9,30 @@
 
 #include "general.h"
 
+#ifdef HAVE_OPENSSL
+#include <openssl/opensslconf.h>
+#include <openssl/opensslv.h>
+#include <openssl/err.h>
+
+#ifndef OPENSSL_NO_RSA
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#endif //OPENSSL_NO_RSA
+
+#ifndef OPENSSL_NO_AES
+#include <openssl/aes.h>
+#endif //OPENSSL_NO_AES
+
+#ifndef OPENSSL_NO_HMAC
+#include <openssl/ssl.h>
+#endif //OPENSSL_NO_HMAC
+
+#ifndef OPENSSL_NO_HMAC
+#include <openssl/hmac.h>
+#endif //OPENSSL_NO_HMAC
+
+#endif //HAVE_OPENSSL
+
 __BEGIN_DECLS
 
 /******************************************************************************************************/

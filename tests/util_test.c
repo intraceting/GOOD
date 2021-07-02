@@ -12,6 +12,7 @@
 #include "abcdkutil/getargs.h"
 #include "abcdkutil/ffmpeg.h"
 #include "abcdkutil/bmp.h"
+#include "abcdkutil/freeimage.h"
 
 void test_log(abcdk_tree_t *args)
 {
@@ -131,6 +132,44 @@ void test_bmp(abcdk_tree_t *args)
     
 }
 
+void test_freeimage(abcdk_tree_t *args)
+{
+#ifdef FREEIMAGE_H
+
+    abcdk_fi_init(1);
+    abcdk_fi_init(1);//test run once.
+
+    const char *src_file = abcdk_option_get(args,"--src-file",0,"");
+    const char *dst_file = abcdk_option_get(args,"--dst-file",0,"");
+
+    uint32_t stride = 0;
+    uint32_t width = 0;
+    int32_t height = 0;
+    uint8_t bits = 0;
+    int chk = abcdk_bmp_load2(src_file, NULL, 0, 13, &stride, &width, &height, &bits);
+    assert(chk == 0);
+
+    printf("s=%u,w=%u,h=%d,b=%hhu\n",stride,width,height,bits);
+
+    uint8_t *data = abcdk_heap_alloc(stride*height);
+
+    chk = abcdk_bmp_load2(src_file, data, stride*height, 1, &stride, &width, &height, &bits);
+    assert(chk == 0);
+
+
+    chk = abcdk_fi_save2(FIF_JPEG,dst_file, data, stride, width, height, bits);
+    assert(chk == 0);
+
+
+    abcdk_heap_free(data);
+
+
+    abcdk_fi_uninit();
+    abcdk_fi_uninit();//test run once.
+
+#endif //FREEIMAGE_H
+}
+
 int main(int argc, char **argv)
 {
     abcdk_tree_t *args = abcdk_tree_alloc3(1);
@@ -144,6 +183,9 @@ int main(int argc, char **argv)
 
     if(abcdk_strcmp(func,"test_bmp",0)==0)
         test_bmp(args);
+
+    if(abcdk_strcmp(func,"test_freeimage",0)==0)
+        test_freeimage(args);
 
 
     abcdk_tree_free(&args);

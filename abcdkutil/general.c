@@ -38,7 +38,7 @@ size_t abcdk_align(size_t size, size_t align)
     return size;
 }
 
-int abcdk_once(int *status, int (*routine)(void *opaque), void *opaque)
+int abcdk_once(volatile int *status, int (*routine)(void *opaque), void *opaque)
 {
     int chk, ret;
 

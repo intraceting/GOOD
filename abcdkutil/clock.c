@@ -36,7 +36,7 @@ int _abcdk_clock_create(void *opaque)
 
 abcdk_clock_t *_abcdk_clock_init(uint64_t set)
 {
-    static int init = 0;
+    static volatile int init = 0;
     static pthread_key_t key = -1;
 
     int chk = 0;

@@ -25,17 +25,14 @@ int abcdk_bmp_save(int fd, const uint8_t *data, uint32_t stride, uint32_t width,
     if (bits == 32)
         assert(stride >= width * 4);
 
-    /**/
     bmp_xbytes = width * (bits / 8);
 
     /*The width must be a multiple of 4.*/
     bmp_stride = abcdk_align(bmp_xbytes, 4);
 
-    /**/
     if (bmp_xbytes < bmp_stride)
         bmp_padsize = bmp_stride - bmp_xbytes;
 
-    /*Fill information header.*/
     ihdr.size = abcdk_endian_h_to_l32(sizeof(ihdr));
     ihdr.width = abcdk_endian_h_to_l32(width);
     ihdr.height = abcdk_endian_h_to_l32(height);
@@ -48,24 +45,20 @@ int abcdk_bmp_save(int fd, const uint8_t *data, uint32_t stride, uint32_t width,
     ihdr.color_used = 0;
     ihdr.color_important = 0;
 
-    /*Fill file header.*/
     fhdr.type = abcdk_endian_h_to_l16(0x4D42);
     fhdr.size = abcdk_endian_h_to_l32(sizeof(fhdr) + ihdr.size + ihdr.size_image);
     fhdr.reserved1 = fhdr.reserved2 = 0;
     fhdr.offset = abcdk_endian_h_to_l32(sizeof(fhdr) + sizeof(ihdr));
 
-    /*Write file header.*/
     if(abcdk_write(fd,&fhdr,sizeof(fhdr)) !=sizeof(fhdr))
         return -1; 
     
-    /*Write information header.*/
     if(abcdk_write(fd,&ihdr,sizeof(ihdr)) !=sizeof(ihdr))
         return -1;
 
     /*Copy data pointer.*/
     tmp = data;
 
-    /*Write data*/
     for (int32_t i = 0; i < abs(height); i++)
     {
         if (abcdk_write(fd, tmp, bmp_xbytes) != bmp_xbytes)
@@ -116,7 +109,6 @@ int abcdk_bmp_load(int fd, uint8_t *buf, size_t size, uint32_t align,
 
     assert(fd >= 0);
 
-    /*Read file header.*/
     if (abcdk_read(fd, &fhdr, sizeof(fhdr)) != sizeof(fhdr))
         return -1;
 
@@ -125,11 +117,10 @@ int abcdk_bmp_load(int fd, uint8_t *buf, size_t size, uint32_t align,
     fhdr.size = abcdk_endian_l_to_h32(fhdr.size);
     fhdr.offset = abcdk_endian_l_to_h32(fhdr.offset);
 
-    /*Check magic.*/
+    /*Check magic(BM).*/
     if(fhdr.type != 0x4D42)
         ABCDK_ERRNO_AND_RETURN1(EINVAL,-1);
 
-    /*Read information header.*/
     if (abcdk_read(fd, &ihdr, sizeof(ihdr)) != sizeof(ihdr))
         return -1;
 
@@ -164,11 +155,9 @@ int abcdk_bmp_load(int fd, uint8_t *buf, size_t size, uint32_t align,
     if (bmp_stride * ihdr.height  != ihdr.size_image)
         ABCDK_ERRNO_AND_RETURN1(EINVAL, -1);
 
-    /**/
     if (bmp_xbytes < bmp_stride)
         bmp_padsize = bmp_stride - bmp_xbytes;
 
-    /**/
     img_stride = abcdk_align(bmp_xbytes,align);
 
     /*May be check image info.*/
@@ -186,7 +175,6 @@ int abcdk_bmp_load(int fd, uint8_t *buf, size_t size, uint32_t align,
     /*Copy buffer pointer.*/
     tmp = buf;
 
-    /*Read data*/
     for (int32_t i = 0; i < abs(ihdr.height); i++)
     {
         if (abcdk_read(fd, tmp, bmp_xbytes) != bmp_xbytes)
