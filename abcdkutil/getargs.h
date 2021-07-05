@@ -30,8 +30,13 @@ void abcdk_getargs(abcdk_tree_t *opt, int argc, char *argv[],
  * @param delim 分割字符。
  * @param note 注释字符。
  * @param argv0 命令字符串的指针，可以为NULL(0)。
+ * @param prefix 键的前缀字符串的指针，NULL(0) 连字符模式匹配。
  * 
- * prefixKEY VALUE [ VALUE ...]
+ * prefixKEY 
+ * [ VALUE ]
+ * [ VALUE ]
+ * [ ... ]
+ * 
  * KEY = VALUE
  * KEY : VALUE
  *  

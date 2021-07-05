@@ -99,9 +99,11 @@ CCC_FLAGS += ${DEPEND_FLAGS}
 #
 LINK_FLAGS += ${DEPEND_LIBS}
  
-
 #
 OBJ_PATH = ${BUILD_PATH}/${PROJECT_NAME}.o.tmp/
+
+#
+#OBJ_FILES = $(addprefix ${OBJ_PATH}/,$(patsubst %.c,%.o,$(wildcard *.c)))
 
 #
 OBJ_FILES = \
@@ -151,6 +153,7 @@ ${PROJECT_NAME}: $(OBJ_FILES)
 	rm -f $(BUILD_PATH)/${A_REALNAME}
 	$(ARC) rcs $(BUILD_PATH)/${A_REALNAME} $^
 	ln -f -s ${A_REALNAME} $(BUILD_PATH)/${A_NAME}
+
 #
 $(OBJ_PATH)/%.o: %.c
 	mkdir -p $(OBJ_PATH)
