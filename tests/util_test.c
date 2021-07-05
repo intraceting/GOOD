@@ -14,6 +14,7 @@
 #include "abcdkutil/bmp.h"
 #include "abcdkutil/freeimage.h"
 
+
 void test_log(abcdk_tree_t *args)
 {
     abcdk_openlog(NULL,LOG_DEBUG,1);

@@ -6,7 +6,7 @@
  */
 #include "odbc.h"
 
-#ifdef __SQLEXT_H
+#if defined(__SQL_H) && defined(__SQLEXT_H)
 
 SQLRETURN _abcdk_odbc_check_return(SQLRETURN ret)
 {
@@ -496,4 +496,4 @@ final_error:
     return -1;
 }
 
-#endif //__SQLEXT_H
+#endif //defined(__SQL_H) && defined(__SQLEXT_H)

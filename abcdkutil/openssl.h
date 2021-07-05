@@ -261,7 +261,7 @@ int abcdk_openssl_ctx_load_cert(SSL_CTX *ctx,const char *cert,const char *key,co
 /**
  * 释放SSL句柄。
 */
-void abcdk_openssl_ssl_freep(SSL **ssl);
+void abcdk_openssl_ssl_free(SSL **ssl);
 
 /**
  * 创建SSL句柄。

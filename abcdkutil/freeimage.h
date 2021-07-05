@@ -9,6 +9,10 @@
 
 #include "general.h"
 
+#if defined(__SQL_H) || defined(__SQLEXT_H)
+#error "There is a conflict in the header files of FreeImage and unixODBC, so we can't use 'include' reference directly."
+#endif //defined(__SQL_H) || defined(__SQLEXT_H)
+
 #ifdef HAVE_FREEIMAGE
 #include <FreeImage.h>
 #endif //HAVE_FREEIMAGE

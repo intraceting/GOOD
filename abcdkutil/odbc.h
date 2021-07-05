@@ -10,6 +10,10 @@
 #include "general.h"
 #include "allocator.h"
 
+#ifdef FREEIMAGE_H
+#error "There is a conflict in the header files of FreeImage and unixODBC, so we can't use 'include' reference directly."
+#endif //FREEIMAGE_H
+
 #ifdef HAVE_UNIXODBC
 #include <sql.h>
 #include <sqlext.h>
@@ -17,7 +21,7 @@
 
 __BEGIN_DECLS
 
-#ifdef __SQLEXT_H
+#if defined(__SQL_H) && defined(__SQLEXT_H)
 
 /**
  * ODBC接口。
@@ -185,7 +189,7 @@ SQLRETURN abcdk_odbc_get_data(abcdk_odbc_t *ctx, SQLSMALLINT column, SQLSMALLINT
 */
 SQLSMALLINT abcdk_odbc_name2index(abcdk_odbc_t *ctx, const char *name);
 
-#endif //__SQLEXT_H
+#endif //defined(__SQL_H) && defined(__SQLEXT_H)
 
 __END_DECLS
 

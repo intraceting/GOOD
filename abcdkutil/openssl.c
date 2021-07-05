@@ -437,7 +437,7 @@ final_error:
     return -1;
 }
 
-void abcdk_openssl_ssl_freep(SSL **ssl)
+void abcdk_openssl_ssl_free(SSL **ssl)
 {
     if (!ssl || !*ssl)
         return;
