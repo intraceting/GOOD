@@ -185,13 +185,13 @@ char* abcdk_strrep(const char* str,const char *src, const char *dst, int caseAb)
 /**
  * BKDR32
  * 
- */
+*/
 uint32_t abcdk_hash_bkdr(const void* data,size_t size);
 
 /**
  * BKDR64
  * 
- */
+*/
 uint64_t abcdk_hash_bkdr64(const void* data,size_t size);
 
 /*------------------------------------------------------------------------------------------------*/
