@@ -45,6 +45,9 @@ typedef struct _abcdk_mux_node
     /** 句柄。>= 0 有效。*/
     int fd;
 
+    /** 关联数据。*/
+    epoll_data_t data;
+
     /** 状态。!0 正常，0 异常。 */
     int stable;
 
@@ -161,13 +164,13 @@ final:
     return chk;
 }
 
-int abcdk_mux_attach(abcdk_mux_t *ctx,int fd,time_t timeout)
+int abcdk_mux_attach(abcdk_mux_t *ctx,int fd,const epoll_data_t *data,time_t timeout)
 {
     abcdk_allocator_t *p = NULL;
     abcdk_mux_node *node = NULL;
     int chk = 0;
 
-    assert(ctx != NULL && fd >= 0);
+    assert(ctx != NULL && fd >= 0 && data != NULL);
 
     abcdk_mutex_lock(&ctx->mutex,1);
 
@@ -181,6 +184,7 @@ int abcdk_mux_attach(abcdk_mux_t *ctx,int fd,time_t timeout)
         ABCDK_ERRNO_AND_GOTO1(EINVAL,final_error);
 
     node->fd = fd;
+    node->data = *data;
     node->timeout = timeout;
     node->stable = 1;
     node->active = abcdk_time_clock2kind_with(CLOCK_MONOTONIC,3);
@@ -201,6 +205,17 @@ final:
     abcdk_mutex_unlock(&ctx->mutex);
 
     return chk;
+}
+
+int abcdk_mux_attach2(abcdk_mux_t *ctx, int fd,time_t timeout)
+{
+    epoll_data_t data;
+
+    assert(ctx != NULL && fd >= 0);
+
+    data.fd = fd;
+
+    return abcdk_mux_attach(ctx,fd,&data,timeout);
 }
 
 static void _abcdk_mux_disp(abcdk_mux_t *ctx, abcdk_mux_node *node, uint32_t event)
@@ -242,7 +257,7 @@ static void _abcdk_mux_disp(abcdk_mux_t *ctx, abcdk_mux_node *node, uint32_t eve
     /*有事件时再推送到活动队列。*/
     if (disp.events)
     {
-        disp.data.fd = node->fd;
+        disp.data = node->data;
         abcdk_pool_push(&ctx->event_pool,&disp,sizeof(disp));
     }   
 }
@@ -502,41 +517,40 @@ final:
     return chk; 
 }
 
-int abcdk_mux_unref(abcdk_mux_t *ctx,abcdk_epoll_event *event)
+int abcdk_mux_unref(abcdk_mux_t *ctx,int fd, uint32_t events)
 {
     abcdk_allocator_t *p = NULL;
     abcdk_mux_node *node = NULL;
     abcdk_epoll_event tmp = {0};
     int chk = 0;
 
-    assert(ctx != NULL && event != NULL);
+    assert(ctx != NULL && fd >= 0);
 
-    assert(event->data.fd >= 0);
-    assert((event->events & ~(ABCDK_EPOLL_INPUT | ABCDK_EPOLL_INOOB | ABCDK_EPOLL_OUTPUT | ABCDK_EPOLL_ERROR)) == 0);
+    assert((events & ~(ABCDK_EPOLL_INPUT | ABCDK_EPOLL_INOOB | ABCDK_EPOLL_OUTPUT | ABCDK_EPOLL_ERROR)) == 0);
 
     abcdk_mutex_lock(&ctx->mutex,1);
 
-    p = abcdk_map_find(&ctx->node_map, &event->data.fd, sizeof(event->data.fd),0);
+    p = abcdk_map_find(&ctx->node_map, &fd, sizeof(fd),0);
     if(!p)
         goto final_error;
 
     node = (abcdk_mux_node *)p->pptrs[ABCDK_MAP_VALUE];
 
     /*无论成功或失败，记数器都要相应的减少，不然无法释放。*/
-    if (event->events & ABCDK_EPOLL_ERROR)
+    if (events & ABCDK_EPOLL_ERROR)
         node->refcount -= 1;
-    if (event->events & ABCDK_EPOLL_INPUT)
+    if (events & ABCDK_EPOLL_INPUT)
         node->refcount -= 1;
-    if (event->events & ABCDK_EPOLL_INOOB)
+    if (events & ABCDK_EPOLL_INOOB)
         node->refcount -= 1;
-    if (event->events & ABCDK_EPOLL_OUTPUT)
+    if (events & ABCDK_EPOLL_OUTPUT)
         node->refcount -= 1;
 
     /*
      * 1：如果发生错误，进入异常流程。
      * 2：如果当前处理的事件包括ERROR事件，则不用再次发出通知。
     */
-    if (!node->stable && !(event->events & ABCDK_EPOLL_ERROR))
+    if (!node->stable && !(events & ABCDK_EPOLL_ERROR))
         _abcdk_mux_disp(ctx, node, ABCDK_EPOLL_ERROR);
 
     /*No error.*/

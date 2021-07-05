@@ -45,9 +45,22 @@ int abcdk_mux_detach(abcdk_mux_t *ctx,int fd);
  * 
  * @warning 关联成功后，句柄在分离前不可被关闭或释放。
  * 
+ * @param fd 句柄。
+ * @param data 关联数据。
+ * @param timeout 超时(毫秒)，<=0 忽略。
+ * 
  * @return 0 成功，!0 失败(或重复)。
 */
-int abcdk_mux_attach(abcdk_mux_t *ctx,int fd,time_t timeout);
+int abcdk_mux_attach(abcdk_mux_t *ctx, int fd, const epoll_data_t *data,time_t timeout);
+
+/**
+ * 关联句柄。
+ * 
+ * @warning 关联成功后，句柄在分离前不可被关闭或释放。
+ * 
+ * @return 0 成功，!0 失败(或重复)。
+*/
+int abcdk_mux_attach2(abcdk_mux_t *ctx, int fd,time_t timeout);
 
 /**
  * 注册事件。
@@ -74,7 +87,7 @@ int abcdk_mux_wait(abcdk_mux_t *ctx,abcdk_epoll_event *event,time_t timeout);
  * 
  * @return 0 成功，!0 失败(或不存在)。
 */
-int abcdk_mux_unref(abcdk_mux_t *ctx,abcdk_epoll_event *event);
+int abcdk_mux_unref(abcdk_mux_t *ctx,int fd, uint32_t events);
 
 
 __END_DECLS

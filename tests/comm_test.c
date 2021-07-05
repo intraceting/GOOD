@@ -53,7 +53,7 @@ void* server_loop(void* args)
         abcdk_bind(l, &a);
         listen(l, SOMAXCONN);
 
-        assert(abcdk_mux_attach(m, l, 0) == 0);
+        assert(abcdk_mux_attach2(m, l, 0) == 0);
         assert(abcdk_mux_mark(m, l, ABCDK_EPOLL_INPUT, 0) == 0);
     }
 
@@ -67,7 +67,7 @@ void* server_loop(void* args)
         if(e.events & ABCDK_EPOLL_ERROR)
         {
             assert(abcdk_mux_mark(m,e.data.fd,0,e.events)==0);
-            assert(abcdk_mux_unref(m,&e)==0);
+            assert(abcdk_mux_unref(m,e.data.fd,e.events)==0);
             assert(abcdk_mux_detach(m,e.data.fd)==0);
             abcdk_closep(&e.data.fd);
         }
@@ -82,7 +82,7 @@ void* server_loop(void* args)
                 int flag=1;
                 assert(abcdk_sockopt_option_int(c, IPPROTO_TCP, TCP_NODELAY,&flag, 2) == 0);
 
-                assert(abcdk_mux_attach(m, c,10*1000) == 0);
+                assert(abcdk_mux_attach2(m, c,10*1000) == 0);
                 assert(abcdk_mux_mark(m,c,ABCDK_EPOLL_INPUT,0)==0);
             }
             
@@ -113,7 +113,7 @@ void* server_loop(void* args)
                 {
                     static int fd = -1;
                     if(fd ==-1)
-                        fd = abcdk_open("/tmp/mysql-trace.log",0,0,0);
+                        fd = abcdk_open("/var/log/syslog",0,0,0);
 #if 0 
                     char buf[100];
                     size_t n = abcdk_read(fd, buf, 100);
@@ -150,7 +150,7 @@ void* server_loop(void* args)
                 }
             }
 
-            assert(abcdk_mux_unref(m,&e)==0);
+            assert(abcdk_mux_unref(m,e.data.fd,e.events)==0);
         }
         
     }

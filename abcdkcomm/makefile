@@ -77,7 +77,7 @@ CCC_FLAGS += -fPIC -Wno-unused-result
 LINK_FLAGS += -Wl,--as-needed -Wl,-rpath="./" -Wl,-rpath="${INSTALL_PREFIX}/lib/"
 
 #
-LINK_FLAGS += -Wl,--soname,${SONAME}
+LINK_FLAGS += -Wl,--soname,${SO_NAME}
 
 #
 CCC_FLAGS += -DBUILD_VERSION_MAJOR=${VERSION_MAJOR} -DBUILD_VERSION_MINOR=${VERSION_MINOR} -DBUILD_VERSION_DATETIME=\"${VERSION_DATETIME}\"
