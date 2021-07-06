@@ -106,7 +106,7 @@ struct tm* abcdk_time_get(struct tm* tm,int utc);
  * 
  * @return !0 是，0 否。
 */
-int isodigit(int c);
+int abcdk_isodigit(int c);
 
 /*------------------------------------------------------------------------------------------------*/
 

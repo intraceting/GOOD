@@ -92,7 +92,7 @@ int abcdk_tar_char2num(const char *buf, size_t len, uintmax_t *val)
         /*跳过不是8进制的数字字符。*/
         for (i = 0; i < len; i++)
         {
-            if (isodigit(tmpbuf[i]))
+            if (abcdk_isodigit(tmpbuf[i]))
                 break;
         }
 
@@ -100,7 +100,7 @@ int abcdk_tar_char2num(const char *buf, size_t len, uintmax_t *val)
         for (; i < len; i++)
         {
             /*遇到非8进制的数字符时，提前终止。*/
-            if (!isodigit(tmpbuf[i]))
+            if (!abcdk_isodigit(tmpbuf[i]))
                 break;
 
             /*检查是否发生数值溢出。*/

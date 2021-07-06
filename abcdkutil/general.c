@@ -178,7 +178,7 @@ struct tm* abcdk_time_get(struct tm* tm,int utc)
 
 /*------------------------------------------------------------------------------------------------*/
 
-int isodigit(int c)
+int abcdk_isodigit(int c)
 {
     return ((c >= '0' && c <= '7') ? 1 : 0);
 }
