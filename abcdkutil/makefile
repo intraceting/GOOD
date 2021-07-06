@@ -138,7 +138,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/openssl.o \
 	${OBJ_PATH}/ffmpeg.o \
 	${OBJ_PATH}/bmp.o \
-	${OBJ_PATH}/freeimage.o 
+	${OBJ_PATH}/freeimage.o \
+	${OBJ_PATH}/uri.o 
 
 
 #
@@ -220,6 +221,7 @@ install:
 	cp  -f $(CURDIR)/termios.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/thread.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/tree.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/uri.h ${INSTALL_PATH_INC}/
 
 #
 uninstall:
@@ -264,3 +266,4 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/termios.h
 	rm -f ${INSTALL_PATH_INC}/thread.h
 	rm -f ${INSTALL_PATH_INC}/tree.h
+	rm -f ${INSTALL_PATH_INC}/uri.h

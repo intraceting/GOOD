@@ -131,7 +131,7 @@ abcdk_allocator_t *abcdk_allocator_alloc(size_t *sizes, size_t numbers, int drag
              * 内存块容量可能为0，需要跳过。
             */
             in_p->out.sizes[i] = (drag ? sizes[0] : sizes[i]);
-            if (drag == 0 && sizes[i] <= 0)
+            if (in_p->out.sizes[i] <= 0) //(drag == 0 && sizes[i] <= 0)
                 continue;
 
             /*

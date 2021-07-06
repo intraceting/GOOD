@@ -13,6 +13,7 @@
 #include "abcdkutil/ffmpeg.h"
 #include "abcdkutil/bmp.h"
 #include "abcdkutil/freeimage.h"
+#include "abcdkutil/uri.h"
 
 
 void test_log(abcdk_tree_t *args)
@@ -177,6 +178,20 @@ void test_freeimage(abcdk_tree_t *args)
 #endif //FREEIMAGE_H
 }
 
+void test_uri(abcdk_tree_t *args)
+{
+    const char *uri = abcdk_option_get(args,"--uri",0,"");
+
+    abcdk_allocator_t * alloc = abcdk_uri_split(uri);
+    assert(alloc);
+
+
+    for(size_t i = 0;i<alloc->numbers;i++)
+        printf("[%ld]: %s\n",i,alloc->pptrs[i]);
+
+    abcdk_allocator_unref(&alloc);
+}
+
 int main(int argc, char **argv)
 {
     abcdk_openlog(NULL,LOG_DEBUG,1);
@@ -199,6 +214,10 @@ int main(int argc, char **argv)
 
     if(abcdk_strcmp(func,"test_freeimage",0)==0)
         test_freeimage(args);
+
+    if(abcdk_strcmp(func,"test_uri",0)==0)
+        test_uri(args);
+
 
 
     abcdk_tree_free(&args);
