@@ -192,6 +192,18 @@ void test_uri(abcdk_tree_t *args)
     abcdk_allocator_unref(&alloc);
 }
 
+void test_strrep(abcdk_tree_t *args)
+{
+    char buf[]={"abcab|     |cabcabc"};
+
+    char *p = abcdk_strrep(buf," ","",1);
+
+    printf("%s\n",p);
+
+
+    abcdk_heap_free(p);
+}
+
 int main(int argc, char **argv)
 {
     abcdk_openlog(NULL,LOG_DEBUG,1);
@@ -218,6 +230,8 @@ int main(int argc, char **argv)
     if(abcdk_strcmp(func,"test_uri",0)==0)
         test_uri(args);
 
+    if (abcdk_strcmp(func, "test_strrep", 0) == 0)
+        test_strrep(args);
 
 
     abcdk_tree_free(&args);
