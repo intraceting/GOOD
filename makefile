@@ -46,7 +46,7 @@ endif
 PKG_NAME = ${SOLUTION_NAME}.pc
 
 #
-all: abcdkutil abcdkcomm tools tests
+all: abcdkutil abcdkcomm abcdkweb tools tests
 
 #
 abcdkutil: abcdkutil-clean
@@ -57,6 +57,10 @@ abcdkcomm: abcdkcomm-clean
 	make -C $(CURDIR)/abcdkcomm/
 
 #
+abcdkweb: abcdkweb-clean
+	make -C $(CURDIR)/abcdkweb/
+
+#
 tools: tools-clean
 	make -C $(CURDIR)/tools/
 
@@ -65,7 +69,7 @@ tests: tests-clean
 	make -C $(CURDIR)/tests/
 
 #
-clean: abcdkutil-clean abcdkcomm-clean tools-clean tests-clean
+clean: abcdkutil-clean abcdkcomm-clean abcdkweb-clean tools-clean tests-clean
 
 #
 abcdkutil-clean: 
@@ -74,6 +78,10 @@ abcdkutil-clean:
 #
 abcdkcomm-clean: 
 	make -C $(CURDIR)/abcdkcomm/ clean
+
+#
+abcdkweb-clean: 
+	make -C $(CURDIR)/abcdkweb/ clean
 
 #
 tools-clean: 
@@ -87,7 +95,7 @@ tests-clean:
 INSTALL_PATH_PKG = $(abspath ${ROOT_PATH}/${INSTALL_PREFIX}/pkgconfig/)
 
 #
-install: abcdkutil-install abcdkcomm-install tools-install
+install: abcdkutil-install abcdkcomm-install abcdkweb-install tools-install
 #
 	mkdir -p ${INSTALL_PATH_PKG}
 	echo "prefix=${INSTALL_PREFIX}" > ${INSTALL_PATH_PKG}/${PKG_NAME}
@@ -110,11 +118,15 @@ abcdkcomm-install:
 	make -C $(CURDIR)/abcdkcomm/ install
 
 #
+abcdkweb-install: 
+	make -C $(CURDIR)/abcdkweb/ install
+
+#
 tools-install: 
 	make -C $(CURDIR)/tools/ install
 
 #
-uninstall: abcdkutil-uninstall abcdkcomm-uninstall tools-uninstall
+uninstall: abcdkutil-uninstall abcdkcomm-uninstall abcdkweb-uninstall tools-uninstall
 #
 	rm -f ${INSTALL_PATH_PKG}/${PKG_NAME}
 #
@@ -124,6 +136,10 @@ abcdkutil-uninstall:
 #
 abcdkcomm-uninstall: 
 	make -C $(CURDIR)/abcdkcomm/ uninstall
+
+#
+abcdkweb-uninstall: 
+	make -C $(CURDIR)/abcdkweb/ uninstall
 
 #
 tools-uninstall: 

@@ -296,23 +296,6 @@ char *abcdk_strtok(char *str,const char *delim, char **saveptr)
     return prev;
 }
 
-int abcdk_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath)
-{
-    int flag = 0;
-    int chk = FNM_NOMATCH;
-
-    assert(str && wildcard);
-
-    if (caseAb)
-        flag |= FNM_CASEFOLD;
-    if (ispath)
-        FNM_PATHNAME | FNM_PERIOD;
-
-    chk = fnmatch(wildcard, str, flag);
-
-    return ((chk==FNM_NOMATCH)?-1:0);
-}
-
 int abcdk_strtype(const char* str,int (*isctype_cb)(int c))
 {
     const char* s = NULL;
@@ -393,6 +376,25 @@ final_error:
     abcdk_heap_free(str2);
 
     return NULL;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+int abcdk_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath)
+{
+    int flag = 0;
+    int chk = FNM_NOMATCH;
+
+    assert(str && wildcard);
+
+    if (caseAb)
+        flag |= FNM_CASEFOLD;
+    if (ispath)
+        FNM_PATHNAME | FNM_PERIOD;
+
+    chk = fnmatch(wildcard, str, flag);
+
+    return ((chk==FNM_NOMATCH)?-1:0);
 }
 
 /*------------------------------------------------------------------------------------------------*/

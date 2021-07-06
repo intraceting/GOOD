@@ -158,13 +158,6 @@ char* abcdk_strtrim(char* str,int (*isctype_cb)(int c),int where);
 char *abcdk_strtok(char *str, const char *delim, char **saveptr);
 
 /**
- * 字符串匹配。
- * 
- * @return 0 成功，!0 失败。
-*/
-int abcdk_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
-
-/**
  * 检测字符串中的字符类型。
  * 
  * @param isctype_cb 字符比较函数。返回值：!0 是，0 否。isctype等函数在ctype.h文件中。
@@ -179,6 +172,15 @@ int abcdk_strtype(const char* str,int (*isctype_cb)(int c));
  * @return  !NULL(0) 成功(指针需要用abcdk_heap_free去释放)， NULL(0) 失败。
 */
 char* abcdk_strrep(const char* str,const char *src, const char *dst, int caseAb);
+
+/*------------------------------------------------------------------------------------------------*/
+
+/**
+ * 字符串匹配。
+ * 
+ * @return 0 成功，!0 失败。
+*/
+int abcdk_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath);
 
 /*------------------------------------------------------------------------------------------------*/
 
