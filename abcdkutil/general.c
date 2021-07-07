@@ -102,7 +102,7 @@ void *abcdk_heap_clone(const void *data, size_t size)
 
     assert(data && size > 0);
 
-    buf = abcdk_heap_alloc(size);
+    buf = abcdk_heap_alloc(size + 1);
     if (!buf)
         ABCDK_ERRNO_AND_RETURN1(EINVAL, NULL);
 

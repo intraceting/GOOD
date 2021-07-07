@@ -15,6 +15,7 @@
 #include "abcdkutil/freeimage.h"
 #include "abcdkutil/uri.h"
 #include "abcdkutil/html.h"
+#include "abcdkutil/clock.h"
 
 
 void test_log(abcdk_tree_t *args)
@@ -205,12 +206,65 @@ void test_strrep(abcdk_tree_t *args)
     abcdk_heap_free(p);
 }
 
+/**/
+const char *_test_html_cntrl_replace(char *text, char c)
+{
+    if(!text)
+        return "";
+
+    char *tmp = text;
+    while (*tmp)
+    {
+        if (iscntrl(*tmp))
+            *tmp = c;
+
+        tmp += 1;
+    }
+
+    return text;
+}
+
+static int _test_html_dump_cb(size_t deep, abcdk_tree_t *node, void *opaque)
+{
+    if(deep==0)
+    {
+        abcdk_tree_fprintf(stderr,deep,node,"%s\n",".");
+    }
+    else
+    {
+        if (abcdk_strncmp(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0), "script",6,0) != 0 &&
+            (abcdk_strncmp(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0), "style",5,0) != 0))
+        {
+
+            abcdk_tree_fprintf(stderr, deep, node, "%s(%s):%s\n",
+                               ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0),
+                               _test_html_cntrl_replace(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_ATTR], 0), ' '),
+                               _test_html_cntrl_replace(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_VALUE], 0), ' '));
+        }
+        else
+        {
+            abcdk_tree_fprintf(stderr, deep, node, "%s(%s):\n",
+                               ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0),
+                               _test_html_cntrl_replace(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_ATTR], 0), ' '));
+        }
+    }
+
+    return 1;
+}
+
 void test_html(abcdk_tree_t *args)
 {
-     const char *file = abcdk_option_get(args,"--file",0,"");
+    const char *file = abcdk_option_get(args,"--file",0,"");
+
+    abcdk_clock_dot(NULL);
 
     abcdk_tree_t *t = abcdk_html_parse_file(file);
 
+    printf("%lu\n",abcdk_clock_step(NULL));
+
+    abcdk_tree_iterator_t it = {0,_test_html_dump_cb,NULL};
+
+    abcdk_tree_scan(t,&it);
 
     abcdk_tree_free(&t);
 }
@@ -228,7 +282,7 @@ int main(int argc, char **argv)
 
     const char *func = abcdk_option_get(args,"--func",0,"");
 
-    
+    abcdk_clock_reset();
 
     if(abcdk_strcmp(func,"test_ffmpeg",0)==0)
         test_ffmpeg(args);
