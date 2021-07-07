@@ -4,8 +4,8 @@
  * MIT License
  * 
  */
-#ifndef ABCDKCOMM_HTML_H
-#define ABCDKCOMM_HTML_H
+#ifndef ABCDKUTIL_HTML_H
+#define ABCDKUTIL_HTML_H
 
 #include "tree.h"
 #include "mman.h"
@@ -32,16 +32,21 @@ enum _abcdk_html_field
 };
 
 /**
+ * 解析HTML文本。
+ * 
+ * @param text 文本指针。
  * 
 */
 abcdk_tree_t *abcdk_html_parse_text(const char *text);
 
 /**
+ * 解析HTML文件。
  * 
+ * @param file 文件名(包含路径)。
 */
 abcdk_tree_t *abcdk_html_parse_file(const char *file);
 
 
 __END_DECLS
 
-#endif //ABCDKCOMM_HTML_H
+#endif //ABCDKUTIL_HTML_H
