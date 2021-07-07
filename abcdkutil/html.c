@@ -6,6 +6,122 @@
  */
 #include "html.h"
 
+void _abcdk_html_destroy_cb(abcdk_allocator_t *alloc, void *opaque)
+{
+    if(alloc->pptrs[ABCDK_HTML_KEY])
+        abcdk_heap_free(alloc->pptrs[ABCDK_HTML_KEY]);
+    if(alloc->pptrs[ABCDK_HTML_VALUE])
+        abcdk_heap_free(alloc->pptrs[ABCDK_HTML_VALUE]);
+    if(alloc->pptrs[ABCDK_HTML_ATTR])
+        abcdk_heap_free(alloc->pptrs[ABCDK_HTML_ATTR]);
+}
+
+void _abcdk_html_attr_parse(abcdk_tree_t *tag, const char *b, const char *e)
+{
+    abcdk_tree_t *attr = NULL;
+    const char *key_b = NULL;
+    const char *key_e = NULL;
+    const char *val_b = NULL;
+    const char *val_e = NULL;
+    char r = '\0';
+
+    /**/
+    key_b = b;
+
+next:
+
+    r = '\0';
+    val_b = val_e = key_e = NULL;
+    for (;; key_b++)
+    {
+        if (key_b == e)
+            return;
+
+        if (!isspace(*key_b))
+            break;
+    }
+
+    if (*key_b == '>')
+        return;
+
+    if (*key_b == '/')
+    {
+        key_e = key_b + 1;
+    }
+    else
+    {
+        for (key_e = key_b;; key_e++)
+        {
+            if (key_e == e)
+                return;
+
+            if (isspace(*key_e) || *key_e == '=' || *key_e == '>')
+                break;
+        }
+
+        if (*key_e == '>')
+            goto copy_attr;
+
+        r = '\0';
+        val_e = NULL;
+        for (val_b = key_e;; val_b++)
+        {
+            if (val_b == e)
+                return;
+
+            if (!isspace(*val_b) && *val_b != '=')
+                break;
+        }
+
+        /*检查VALUE是否补引号包围。*/
+        if (*val_b == '\'' || *val_b == '\"')
+        {
+            r = *val_b;
+            val_b += 1;
+        }
+
+        for (val_e = val_b;;val_e++)
+        {
+            if (val_e == e)
+                return;
+            
+            /*
+             * 1：引号包围要配对。
+             * 2：其它以“空白字符”为标记。
+            */
+            if (r ? (*val_e == r) : isspace(*val_e))
+                break;
+        }
+    }
+
+copy_attr:
+
+    attr = abcdk_tree_alloc2(NULL, 3, 0);
+    if (!attr)
+        return;
+
+    /*复制VALUE。*/
+    if (val_e - val_b > 0)
+        attr->alloc->pptrs[ABCDK_HTML_VALUE] = (uint8_t *)abcdk_heap_clone(val_b, val_e - val_b);
+
+    /*复制KEY。*/
+    attr->alloc->pptrs[ABCDK_HTML_KEY] = (uint8_t *)abcdk_heap_clone(key_b, key_e - key_b);
+
+    /*注册专用内存回收函数。*/
+    abcdk_allocator_atfree(attr->alloc, _abcdk_html_destroy_cb, NULL);
+
+    /*加入到树的子节点末尾.*/
+    abcdk_tree_insert2(tag,attr, 0);
+
+    /*Next ATTR*/
+    if(val_e)
+        key_b = val_e + (r ? 1 : 0);
+    else 
+        key_b = key_e;
+
+    goto next;
+}
+
 abcdk_tree_t *_abcdk_html_tag_parse(const char *b, const char *e)
 {
     abcdk_tree_t *tag = NULL;
@@ -71,6 +187,8 @@ abcdk_tree_t *_abcdk_html_tag_parse(const char *b, const char *e)
 
         /*复制ATTR。*/
         tag->alloc->pptrs[ABCDK_HTML_ATTR] = (uint8_t *)abcdk_heap_clone(attr_b, tmp - attr_b);
+
+        _abcdk_html_attr_parse(tag,attr_b,tmp);
     }
 
 final:
@@ -133,16 +251,6 @@ const char *_abcdk_html_value_parse(abcdk_tree_t *tag, const char *text)
 final:
 
     return tmp;
-}
-
-void _abcdk_html_destroy_cb(abcdk_allocator_t *alloc, void *opaque)
-{
-    if(alloc->pptrs[ABCDK_HTML_KEY])
-        abcdk_heap_free(alloc->pptrs[ABCDK_HTML_KEY]);
-    if(alloc->pptrs[ABCDK_HTML_VALUE])
-        abcdk_heap_free(alloc->pptrs[ABCDK_HTML_VALUE]);
-    if(alloc->pptrs[ABCDK_HTML_ATTR])
-        abcdk_heap_free(alloc->pptrs[ABCDK_HTML_ATTR]);
 }
 
 void _abcdk_html_parse_real(abcdk_tree_t *root, const char *text)
