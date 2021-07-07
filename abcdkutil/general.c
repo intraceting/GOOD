@@ -195,6 +195,20 @@ const char *abcdk_strstr(const char *str, const char *sub, int caseAb)
     return strcasestr(str, sub);
 }
 
+const char* abcdk_strstr_eod(const char *str, const char *sub,int caseAb)
+{
+    const char *addr = NULL;
+
+    assert(str != NULL && sub != NULL);
+
+    addr = abcdk_strstr(str,sub,caseAb);
+    
+    if(addr)
+        addr += strlen(sub);
+
+    return addr;
+}
+
 int abcdk_strcmp(const char *s1, const char *s2, int caseAb)
 {
     assert(s1 != NULL && s2 != NULL);

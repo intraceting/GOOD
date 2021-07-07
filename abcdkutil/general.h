@@ -115,9 +115,16 @@ int abcdk_isodigit(int c);
  * 
  * @param caseAb 0 不区分大小写，!0 区分大小写。
  * 
- * @return NULL(0) 未找到，!NULL(0) 匹配到的首地址。
+ * @return !NULL(0) 匹配字符串的首地址， NULL(0) 未找到。
 */
 const char* abcdk_strstr(const char *str, const char *sub,int caseAb);
+
+/**
+ * 字符串查找。
+ * 
+ * @return !NULL(0) 匹配字符串尾地址之后，NULL(0) 未找到。
+*/
+const char* abcdk_strstr_eod(const char *str, const char *sub,int caseAb);
 
 /**
  * 字符串比较。

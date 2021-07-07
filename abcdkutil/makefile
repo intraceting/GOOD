@@ -139,7 +139,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/ffmpeg.o \
 	${OBJ_PATH}/bmp.o \
 	${OBJ_PATH}/freeimage.o \
-	${OBJ_PATH}/uri.o 
+	${OBJ_PATH}/uri.o \
+	${OBJ_PATH}/html.o
 
 
 #
@@ -203,6 +204,7 @@ install:
 	cp  -f $(CURDIR)/general.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/geometry.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/getargs.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/html.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/iconv.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/odbc.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/map.h ${INSTALL_PATH_INC}/
@@ -248,6 +250,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/general.h
 	rm -f ${INSTALL_PATH_INC}/geometry.h
 	rm -f ${INSTALL_PATH_INC}/getargs.h
+	rm -f ${INSTALL_PATH_INC}/html.h
 	rm -f ${INSTALL_PATH_INC}/iconv.h
 	rm -f ${INSTALL_PATH_INC}/odbc.h
 	rm -f ${INSTALL_PATH_INC}/map.h

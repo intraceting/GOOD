@@ -14,6 +14,7 @@
 #include "abcdkutil/bmp.h"
 #include "abcdkutil/freeimage.h"
 #include "abcdkutil/uri.h"
+#include "abcdkutil/html.h"
 
 
 void test_log(abcdk_tree_t *args)
@@ -204,6 +205,17 @@ void test_strrep(abcdk_tree_t *args)
     abcdk_heap_free(p);
 }
 
+void test_html(abcdk_tree_t *args)
+{
+     const char *file = abcdk_option_get(args,"--file",0,"");
+
+    abcdk_tree_t *t = abcdk_html_parse_file(file);
+
+
+    abcdk_tree_free(&t);
+}
+
+
 int main(int argc, char **argv)
 {
     abcdk_openlog(NULL,LOG_DEBUG,1);
@@ -232,6 +244,9 @@ int main(int argc, char **argv)
 
     if (abcdk_strcmp(func, "test_strrep", 0) == 0)
         test_strrep(args);
+
+     if (abcdk_strcmp(func, "test_html", 0) == 0)
+        test_html(args);
 
 
     abcdk_tree_free(&args);
