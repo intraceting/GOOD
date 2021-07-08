@@ -133,6 +133,14 @@ echo "'${BUILD_PATH}' must be an existing directory."
 exit 22
 fi 
 
+#
+PKGCONFIG_EXIST=$(CheckHavePackage ${KIT_NAME} pkg-config pkgconfig)
+if [ ${PKGCONFIG_EXIST} -lt 1 ];then
+{
+    echo "pkg-config or pkgconfig not find."
+    exit 22
+}
+fi
 
 #
 DEPEND_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_FLAGS}"
