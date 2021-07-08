@@ -53,8 +53,13 @@ next:
             if (key_e == e)
                 goto copy_attr;
 
+            /*特殊处理一下。*/
+            if(abcdk_strcmp((char*)tag->alloc->pptrs[ABCDK_HTML_KEY],"!DOCTYPE",0)==0)
+                continue;
+            
             if (isspace(*key_e) || *key_e == '=' || *key_e == '>')
                 break;
+            
         }
 
         if (*key_e == '>')
