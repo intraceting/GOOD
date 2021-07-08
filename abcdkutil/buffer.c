@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "buffer.h"
 
 abcdk_buffer_t *abcdk_buffer_alloc(abcdk_allocator_t *alloc)

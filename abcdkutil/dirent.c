@@ -6,7 +6,6 @@
  */
 #include "dirent.h"
 
-
 void abcdk_dirscan(abcdk_tree_t *father,size_t depth,int onefs)
 {
     DIR *f_dir = NULL;

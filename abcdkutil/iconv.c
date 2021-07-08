@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "iconv.h"
 
 ssize_t abcdk_iconv(iconv_t cd, const char *src, size_t slen, char *dst, size_t dlen,size_t *remain)
