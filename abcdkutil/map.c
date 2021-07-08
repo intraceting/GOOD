@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "map.h"
 
 uint64_t abcdk_map_hash(const void *data, size_t size, void *opaque)

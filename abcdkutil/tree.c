@@ -6,7 +6,6 @@
  */
 #include "tree.h"
 
-
 abcdk_tree_t *abcdk_tree_father(const abcdk_tree_t *self)
 {
     assert(self);

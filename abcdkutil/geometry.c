@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "geometry.h"
 
 double abcdk_geom_p2p_distance(const abcdk_point_t *p1, const abcdk_point_t *p2)

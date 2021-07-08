@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "pool.h"
 
 void abcdk_pool_destroy(abcdk_pool_t *pool)

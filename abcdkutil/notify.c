@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "notify.h"
 
 int abcdk_notify_init(int nonblock)

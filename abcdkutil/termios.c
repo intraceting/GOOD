@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "termios.h"
 
 int abcdk_tcattr_option(int fd, const struct termios *now, struct termios *old)

@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "base64.h"
 
 static char _abcdk_base64_encode_table(int n)

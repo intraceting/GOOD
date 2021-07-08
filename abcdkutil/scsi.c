@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "scsi.h"
 
 const char* abcdk_scsi_type2string(uint8_t type)

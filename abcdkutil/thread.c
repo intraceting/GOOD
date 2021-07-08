@@ -120,7 +120,6 @@ int abcdk_mutex_wait(abcdk_mutex_t* ctx,time_t timeout)
     return err;
 }
 
-
 int abcdk_mutex_signal(abcdk_mutex_t* ctx,int broadcast)
 {
     int err = -1;

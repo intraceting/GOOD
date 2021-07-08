@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #include "sqlite.h"
 
 #ifdef _SQLITE3_H_

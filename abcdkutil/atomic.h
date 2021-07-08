@@ -3,7 +3,7 @@
  * 
  * MIT License
  * 
- */
+*/
 #ifndef ABCDKUTIL_ATOMIC_H
 #define ABCDKUTIL_ATOMIC_H
 
