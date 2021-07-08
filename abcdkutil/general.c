@@ -401,10 +401,10 @@ int abcdk_fnmatch(const char *str,const char *wildcard,int caseAb,int ispath)
 
     assert(str && wildcard);
 
-    if (caseAb)
+    if (!caseAb)
         flag |= FNM_CASEFOLD;
     if (ispath)
-        FNM_PATHNAME | FNM_PERIOD;
+        flag |= FNM_PATHNAME | FNM_PERIOD;
 
     chk = fnmatch(wildcard, str, flag);
 

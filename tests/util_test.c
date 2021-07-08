@@ -257,6 +257,16 @@ void test_html(abcdk_tree_t *args)
     abcdk_tree_free(&t);
 }
 
+void test_fnmatch()
+{
+    char str[]={"abcdQQQcde"};
+    char wd[]={"abcdq?qcde"};
+
+    int chk = abcdk_fnmatch(str,wd,1,0);
+    assert(chk==0);
+
+}
+
 
 int main(int argc, char **argv)
 {
@@ -287,9 +297,11 @@ int main(int argc, char **argv)
     if (abcdk_strcmp(func, "test_strrep", 0) == 0)
         test_strrep(args);
 
-     if (abcdk_strcmp(func, "test_html", 0) == 0)
+    if (abcdk_strcmp(func, "test_html", 0) == 0)
         test_html(args);
 
+    if (abcdk_strcmp(func, "test_fnmatch", 0) == 0)
+        test_fnmatch(args);
 
     abcdk_tree_free(&args);
     
