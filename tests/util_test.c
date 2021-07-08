@@ -232,21 +232,9 @@ static int _test_html_dump_cb(size_t deep, abcdk_tree_t *node, void *opaque)
     }
     else
     {
-        if (abcdk_strncmp(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0), "script",6,0) != 0 &&
-            (abcdk_strncmp(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0), "style",5,0) != 0))
-        {
-
-            abcdk_tree_fprintf(stderr, deep, node, "%s(%s):%s\n",
+            abcdk_tree_fprintf(stderr, deep, node, "%s:<%s>\n",
                                ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0),
-                               _test_html_cntrl_replace(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_ATTR], 0), ' '),
                                _test_html_cntrl_replace(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_VALUE], 0), ' '));
-        }
-        else
-        {
-            abcdk_tree_fprintf(stderr, deep, node, "%s(%s):\n",
-                               ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_KEY], 0),
-                               _test_html_cntrl_replace(ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_HTML_ATTR], 0), ' '));
-        }
     }
 
     return 1;

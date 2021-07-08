@@ -25,10 +25,6 @@ enum _abcdk_html_field
    ABCDK_HTML_VALUE = 1,
 #define ABCDK_HTML_VALUE    ABCDK_HTML_VALUE
 
-    /** Attribute 字段索引。*/
-   ABCDK_HTML_ATTR = 2
-#define ABCDK_HTML_ATTR    ABCDK_HTML_ATTR
-
 };
 
 /**

@@ -12,8 +12,6 @@ void _abcdk_html_destroy_cb(abcdk_allocator_t *alloc, void *opaque)
         abcdk_heap_free(alloc->pptrs[ABCDK_HTML_KEY]);
     if(alloc->pptrs[ABCDK_HTML_VALUE])
         abcdk_heap_free(alloc->pptrs[ABCDK_HTML_VALUE]);
-    if(alloc->pptrs[ABCDK_HTML_ATTR])
-        abcdk_heap_free(alloc->pptrs[ABCDK_HTML_ATTR]);
 }
 
 void _abcdk_html_attr_parse(abcdk_tree_t *tag, const char *b, const char *e)
@@ -53,7 +51,7 @@ next:
         for (key_e = key_b;; key_e++)
         {
             if (key_e == e)
-                return;
+                goto copy_attr;
 
             if (isspace(*key_e) || *key_e == '=' || *key_e == '>')
                 break;
@@ -66,8 +64,8 @@ next:
         val_e = NULL;
         for (val_b = key_e;; val_b++)
         {
-            if (val_b == e)
-                return;
+            if (val_b == e || *val_b == '>')
+                goto copy_attr;
 
             if (!isspace(*val_b) && *val_b != '=')
                 break;
@@ -82,8 +80,8 @@ next:
 
         for (val_e = val_b;;val_e++)
         {
-            if (val_e == e)
-                return;
+            if (val_e == e || *val_e == '>')
+                goto copy_attr;
             
             /*
              * 1：引号包围要配对。
@@ -96,12 +94,12 @@ next:
 
 copy_attr:
 
-    attr = abcdk_tree_alloc2(NULL, 3, 0);
+    attr = abcdk_tree_alloc2(NULL, 2, 0);
     if (!attr)
         return;
 
     /*复制VALUE。*/
-    if (val_e - val_b > 0)
+    if (val_b && val_e && (val_e - val_b > 0))
         attr->alloc->pptrs[ABCDK_HTML_VALUE] = (uint8_t *)abcdk_heap_clone(val_b, val_e - val_b);
 
     /*复制KEY。*/
@@ -129,7 +127,7 @@ abcdk_tree_t *_abcdk_html_tag_parse(const char *b, const char *e)
     const char *key_b = NULL;
     const char *attr_b = NULL;
 
-    tag = abcdk_tree_alloc2(NULL, 3, 0);
+    tag = abcdk_tree_alloc2(NULL, 2, 0);
     if (!tag)
         goto final;
 
@@ -185,9 +183,7 @@ abcdk_tree_t *_abcdk_html_tag_parse(const char *b, const char *e)
                 break;
         }
 
-        /*复制ATTR。*/
-        tag->alloc->pptrs[ABCDK_HTML_ATTR] = (uint8_t *)abcdk_heap_clone(attr_b, tmp - attr_b);
-
+        /*分析ATTR。*/
         _abcdk_html_attr_parse(tag,attr_b,tmp);
     }
 
