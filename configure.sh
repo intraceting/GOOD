@@ -41,25 +41,121 @@ CheckPackageKitName()
 }
 
 #
-CheckHavePackage()
+CheckHavePackageFromKit()
 # $1 KIT_NAME
-# $2 DEB_NAME
-# $3 RPM_NAME
+# $1 PACKAGE
 {
     #
-    HAVE_NUM="0"
+    STATUS="1"
+
     #
-	if [ "DEB" == "$1" ];then 
-		HAVE_NUM=$(dpkg -l |grep $2 | wc -l)
-	elif [ "RPM" == "$1" ];then
-		HAVE_NUM=$(rpm -qa |grep $3 | wc -l)
-    fi 
+    KIT_NAME="$1"
+    PACKAGE="$2"
+
+    #
+	if [ "DEB" == "${KIT_NAME}" ];then 
+        STATUS=$(dpkg -V ${PACKAGE} >> /dev/null 2>&1 ; echo $?)
+	elif [ "RPM" == "${KIT_NAME}" ];then
+		STATUS=$(rpm -q ${PACKAGE} >> /dev/null 2>&1 ; echo $?)
+    fi
+
 	#
-	echo "${HAVE_NUM}"
+	echo "${STATUS}"
 }
 
 #
-checkKeyword()
+CheckHavePackageFromWhich()
+# $1 KIT_NAME
+# $2 PACKAGE
+{
+    #
+    STATUS="1"
+
+    #
+    KIT_NAME="$1"
+    PACKAGE="$2"
+
+    #
+    STATUS=$(which ${PACKAGE} >> /dev/null 2>&1 ; echo $?)
+
+	#
+	echo "${STATUS}"
+}
+
+#
+CheckHavePackage()
+# $1 KIT_NAME
+# $2 PACKAGE
+{
+    # 0 is Ok, otherwise not Ok.
+    STATUS="1" 
+    NAMES=""
+
+    # 1 is KIT,2 is WHICH.
+    METHOD=1
+
+    #
+    KIT_NAME="$1"
+    PACKAGE="$2"
+
+    #
+	if [ "DEB" == "${KIT_NAME}" ];then 
+	{   
+        if [ "${PACKAGE}" == "openmp" ];then
+            NAMES="libomp-dev"
+        elif [ "${PACKAGE}" == "unixodbc" ];then
+            NAMES="unixodbc-dev"
+        elif [ "${PACKAGE}" == "sqlite" ];then
+            NAMES="libsqlite3-dev"
+        elif [ "${PACKAGE}" == "openssl" ];then
+            NAMES="libssl-dev"
+        elif [ "${PACKAGE}" == "ffmpeg" ];then
+            NAMES="libswscale-dev libavutil-dev"
+        elif [ "${PACKAGE}" == "freeimage" ];then
+            NAMES="libfreeimage-dev"
+        elif [ "${PACKAGE}" == "pkgconfig" ];then
+        {
+            METHOD=2
+            NAMES="pkg-config"
+        }
+        fi     
+    }
+	elif [ "RPM" == "${KIT_NAME}" ];then
+	{
+        if [ "${PACKAGE}" == "openmp" ];then
+            NAMES="gcc"
+        elif [ "${PACKAGE}" == "unixodbc" ];then
+            NAMES="unixODBC-devel"
+        elif [ "${PACKAGE}" == "sqlite" ];then
+            NAMES="sqlite-devel"
+        elif [ "${PACKAGE}" == "openssl" ];then
+            NAMES="openssl-devel"
+        elif [ "${PACKAGE}" == "ffmpeg" ];then
+            NAMES="ffmpeg-devel"
+        elif [ "${PACKAGE}" == "freeimage" ];then
+            NAMES="freeimage-devel"
+        elif [ "${PACKAGE}" == "pkgconfig" ];then
+        {
+            METHOD=2
+            NAMES="pkg-config"
+        }
+        fi
+    }
+    fi 
+
+    #
+    if [ ${METHOD} -eq 1 ];then
+        STATUS=$(CheckHavePackageFromKit ${KIT_NAME} "${NAMES}")
+    elif [ ${METHOD} -eq 2 ];then
+        STATUS=$(CheckHavePackageFromWhich ${KIT_NAME} "${NAMES}")
+    fi
+
+	#
+	echo "${STATUS}"
+}
+
+#
+CheckKeyword()
 # $1 keywords
 # $2 word
 {
@@ -134,25 +230,25 @@ exit 22
 fi 
 
 #
-PKGCONFIG_EXIST=$(which pkg-config >> /dev/null 2>&1 ; echo $?)
-if [ ${PKGCONFIG_EXIST} -ne 0 ];then
-{
-    echo "pkg-config or pkgconfig not find."
-    exit 22
-}
-fi
-
-#
 DEPEND_FLAGS="-D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 ${DEPEND_FLAGS}"
 
 #
 DEPEND_LIBS="-ldl -pthread -lrt -lc -lm ${DEPEND_LIBS}"
 
 #
-if [ $(checkKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
+STATUS=$(CheckHavePackage ${KIT_NAME} pkgconfig)
+if [ ${STATUS} -ne 0 ];then
 {
-    OPENMP_EXIST=$(CheckHavePackage ${KIT_NAME} libomp-dev libopm-devel)
-    if [ ${OPENMP_EXIST} -ge 1 ];then
+    echo "pkgconfig kit not found."
+    exit 22
+}
+fi
+
+#
+if [ $(CheckKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
+{
+    STATUS=$(CheckHavePackage ${KIT_NAME} openmp)
+    if [ ${STATUS} -eq 0 ];then
     {
         HAVE_OPENMP="Yes"
         DEPEND_FLAGS=" -DHAVE_OPENMP -fopenmp ${DEPEND_FLAGS}"
@@ -160,7 +256,7 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
     }
     else
     {
-        echo "libomp-dev or libopm-devel not find."
+        echo "openmp kit not found."
         exit 22
     }
     fi
@@ -168,10 +264,10 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-openmp") -eq 1 ];then
 fi
 
 #
-if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
+if [ $(CheckKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
 {
-    UNIXODBC_EXIST=$(CheckHavePackage ${KIT_NAME} unixodbc-dev unixODBC-devel)
-    if [ ${UNIXODBC_EXIST} -ge 1 ];then
+    STATUS=$(CheckHavePackage ${KIT_NAME} unixodbc)
+    if [ ${STATUS} -eq 0 ];then
     {
         HAVE_UNIXODBC="Yes"
         DEPEND_FLAGS=" -DHAVE_UNIXODBC ${DEPEND_FLAGS}"
@@ -179,7 +275,7 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
     }
     else
     {
-        echo "unixodbc-dev or unixODBC-devel not find."
+        echo "unixodbc kit not found."
         exit 22
     }
     fi
@@ -187,20 +283,19 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-unixodbc") -eq 1 ];then
 fi
 
 #
-if [ $(checkKeyword ${DEPEND_FUNC} "have-sqlite") -eq 1 ];then
+if [ $(CheckKeyword ${DEPEND_FUNC} "have-sqlite") -eq 1 ];then
 {
-    SQLITE_PCS="sqlite3"
-    SQLITE_EXIST=$(pkg-config --exists ${SQLITE_PCS} --short-errors ; echo $?)
-    if [ ${SQLITE_EXIST} -eq 0 ];then
+    STATUS=$(CheckHavePackage ${KIT_NAME} sqlite)
+    if [ ${STATUS} -eq 0 ];then
     {
         HAVE_SQLITE="Yes"
         DEPEND_FLAGS=" -DHAVE_SQLITE ${DEPEND_FLAGS}"
-        DEPEND_FLAGS=" $(pkg-config --cflags ${SQLITE_PCS}) ${DEPEND_FLAGS}"
-        DEPEND_LIBS=" $(pkg-config --libs ${SQLITE_PCS}) ${DEPEND_LIBS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags sqlite3) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs sqlite3) ${DEPEND_LIBS}"
     }
     else
     {
-        echo "libsqlite3-dev or sqlite-devel not find."
+        echo "sqlite kit not found."
         exit 22
     }
     fi
@@ -208,20 +303,19 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-sqlite") -eq 1 ];then
 fi
 
 #
-if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
+if [ $(CheckKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
 {
-    OPENSSL_PCS="openssl"
-    OPENSSL_EXIST=$(pkg-config --exists ${OPENSSL_PCS} --short-errors ; echo $?)
-    if [ ${OPENSSL_EXIST} -eq 0 ];then
+    STATUS=$(CheckHavePackage ${KIT_NAME} openssl)
+    if [ ${STATUS} -eq 0 ];then
     {
         HAVE_OPENSSL="Yes"
         DEPEND_FLAGS=" -DHAVE_OPENSSL ${DEPEND_FLAGS}"
-        DEPEND_FLAGS=" $(pkg-config --cflags ${OPENSSL_PCS}) ${DEPEND_FLAGS}"
-        DEPEND_LIBS=" $(pkg-config --libs ${OPENSSL_PCS}) ${DEPEND_LIBS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags openssl) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs openssl) ${DEPEND_LIBS}"
     }
     else
     {
-        echo "libssl-dev or openssl-devel not find."
+        echo "openssl kit not found."
         exit 22
     }
     fi
@@ -229,20 +323,19 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-openssl") -eq 1 ];then
 fi
 
 #
-if [ $(checkKeyword ${DEPEND_FUNC} "have-ffmpeg") -eq 1 ];then
+if [ $(CheckKeyword ${DEPEND_FUNC} "have-ffmpeg") -eq 1 ];then
 {
-    FFMPEG_PCS="libswscale libavutil"
-    FFMPEG_EXIST=$(pkg-config --exists ${FFMPEG_PCS} --short-errors ; echo $?)
-    if [ ${FFMPEG_EXIST} -eq 0 ];then
+    STATUS=$(CheckHavePackage ${KIT_NAME} ffmpeg)
+    if [ ${STATUS} -eq 0 ];then
     {
         HAVE_FFMPEG="Yes"
         DEPEND_FLAGS=" -DHAVE_FFMPEG ${DEPEND_FLAGS}"
-        DEPEND_FLAGS=" $(pkg-config --cflags ${FFMPEG_PCS}) ${DEPEND_FLAGS}"
-        DEPEND_LIBS=" $(pkg-config --libs ${FFMPEG_PCS}) ${DEPEND_LIBS}"
+        DEPEND_FLAGS=" $(pkg-config --cflags libswscale libavutil) ${DEPEND_FLAGS}"
+        DEPEND_LIBS=" $(pkg-config --libs libswscale libavutil) ${DEPEND_LIBS}"
     }
     else
     {
-        echo "libswscale-dev or libavutil-dev or ffmpeg-devel not find."
+        echo "ffmpeg kit not found."
         exit 22
     }
     fi
@@ -250,10 +343,10 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-ffmpeg") -eq 1 ];then
 fi
 
 #
-if [ $(checkKeyword ${DEPEND_FUNC} "have-freeimage") -eq 1 ];then
+if [ $(CheckKeyword ${DEPEND_FUNC} "have-freeimage") -eq 1 ];then
 {
-    FREEIMAGE_EXIST=$(CheckHavePackage ${KIT_NAME} libfreeimage-dev freeimage-devel)
-    if [ ${FREEIMAGE_EXIST} -ge 1 ];then
+    STATUS=$(CheckHavePackage ${KIT_NAME} freeimage)
+    if [ ${STATUS} -eq 0 ];then
     {
         HAVE_FREEIMAGE="Yes"
         DEPEND_FLAGS=" -DHAVE_FREEIMAGE ${DEPEND_FLAGS}"
@@ -261,7 +354,7 @@ if [ $(checkKeyword ${DEPEND_FUNC} "have-freeimage") -eq 1 ];then
     }
     else
     {
-        echo "libfreeimage-dev or freeimage-devel not find."
+        echo "freeimage kit not found."
         exit 22
     }
     fi
