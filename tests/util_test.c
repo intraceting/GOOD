@@ -259,12 +259,11 @@ void test_html(abcdk_tree_t *args)
 
 void test_fnmatch()
 {
-    char str[]={"abcdQQQcde"};
-    char wd[]={"abcdq?qcde"};
+    char str[]={"abcd?*Qcde"};
+    char wd[]={"abc?\\?\\*q*e"};
 
-    int chk = abcdk_fnmatch(str,wd,1,0);
+    int chk = abcdk_fnmatch(str,wd,0,0);
     assert(chk==0);
-
 }
 
 

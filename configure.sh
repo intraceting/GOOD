@@ -134,8 +134,8 @@ exit 22
 fi 
 
 #
-PKGCONFIG_EXIST=$(CheckHavePackage ${KIT_NAME} pkg-config pkgconfig)
-if [ ${PKGCONFIG_EXIST} -lt 1 ];then
+PKGCONFIG_EXIST=$(which pkg-config >> /dev/null 2>&1 ; echo $?)
+if [ ${PKGCONFIG_EXIST} -ne 0 ];then
 {
     echo "pkg-config or pkgconfig not find."
     exit 22
