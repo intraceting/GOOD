@@ -16,6 +16,7 @@
 #include "abcdkutil/uri.h"
 #include "abcdkutil/html.h"
 #include "abcdkutil/clock.h"
+#include "abcdkutil/crc32.h"
 
 
 void test_log(abcdk_tree_t *args)
@@ -266,6 +267,19 @@ void test_fnmatch()
     assert(chk==0);
 }
 
+void test_crc32()
+{
+//    uint32_t sum = abcdk_crc32_sum("abc",3,0);
+//    printf("%u\n",sum);
+
+    #pragma omp parallel for num_threads(30)
+    for (int i = 0; i < 300000000; i++)
+    {
+        uint32_t sum2 = abcdk_crc32_sum("abc",3,0);
+        assert(891568578 ==sum2);
+    }
+}
+
 
 int main(int argc, char **argv)
 {
@@ -301,6 +315,9 @@ int main(int argc, char **argv)
 
     if (abcdk_strcmp(func, "test_fnmatch", 0) == 0)
         test_fnmatch(args);
+
+    if (abcdk_strcmp(func, "test_crc32", 0) == 0)
+        test_crc32(args);
 
     abcdk_tree_free(&args);
     
