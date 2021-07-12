@@ -286,7 +286,7 @@ final:
 final_error:
 
     if (fix_buf)
-        abcdk_heap_freep(&fix_buf);
+        abcdk_heap_free2(&fix_buf);
 
     return ret;
 }

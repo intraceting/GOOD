@@ -166,8 +166,8 @@ void test_file(const char *f1, const char *f2)
 
     assert(abcdk_block_write_trailer(fd2,0, wbuf) == 0);
 
-    abcdk_buffer_freep(&rbuf);
-    abcdk_buffer_freep(&wbuf);
+    abcdk_buffer_free(&rbuf);
+    abcdk_buffer_free(&wbuf);
 
     abcdk_closep(&fd1);
     abcdk_closep(&fd2);
@@ -274,7 +274,7 @@ void test_notify()
         printf("%s\n",t.name);
     }
 
-    abcdk_buffer_freep(&t.buf);
+    abcdk_buffer_free(&t.buf);
 
     abcdk_closep(&fd);
 }
@@ -332,8 +332,8 @@ void test_tar_read(const char* tarfile)
         
     }
 
-    abcdk_heap_freep(&buf);
-    abcdk_buffer_freep(&t.buf);
+    abcdk_heap_free2(&buf);
+    abcdk_buffer_free(&t.buf);
     abcdk_closep(&t.fd);
 }
 
@@ -407,7 +407,7 @@ void test_tar_write(const char* tarfile)
     assert(abcdk_tar_write_trailer(&t,0)==0);
     
     abcdk_tree_free(&dir);
-    abcdk_buffer_freep(&t.buf);
+    abcdk_buffer_free(&t.buf);
     abcdk_closep(&t.fd);
 }
 

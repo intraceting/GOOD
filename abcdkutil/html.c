@@ -306,7 +306,6 @@ abcdk_tree_t *abcdk_html_parse_text(const char *text)
     if (!root)
         goto final;
 
-
     _abcdk_html_parse_real(root, text);
 
 final:

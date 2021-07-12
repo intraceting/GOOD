@@ -196,7 +196,7 @@ void abcdk_allocator_unref(abcdk_allocator_t **dst)
         in_p->out.pptrs = NULL;
 
         /* 只要释放一次即可全部释放，因为内存是一次性申请的。*/
-        abcdk_heap_freep((void **)&in_p);
+        abcdk_heap_free2((void **)&in_p);
     }
 
     /*Set to NULL(0)*/

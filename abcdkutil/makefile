@@ -140,7 +140,8 @@ OBJ_FILES = \
 	${OBJ_PATH}/bmp.o \
 	${OBJ_PATH}/freeimage.o \
 	${OBJ_PATH}/uri.o \
-	${OBJ_PATH}/html.o
+	${OBJ_PATH}/html.o \
+	${OBJ_PATH}/robots.o
 
 
 #
@@ -214,6 +215,7 @@ install:
 	cp  -f $(CURDIR)/notify.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/option.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/pool.h ${INSTALL_PATH_INC}/
+	cp  -f $(CURDIR)/robots.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/scsi.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/signal.h ${INSTALL_PATH_INC}/
 	cp  -f $(CURDIR)/socket.h ${INSTALL_PATH_INC}/
@@ -260,6 +262,7 @@ uninstall:
 	rm -f ${INSTALL_PATH_INC}/notify.h
 	rm -f ${INSTALL_PATH_INC}/option.h
 	rm -f ${INSTALL_PATH_INC}/pool.h
+	rm -f ${INSTALL_PATH_INC}/robots.h
 	rm -f ${INSTALL_PATH_INC}/scsi.h
 	rm -f ${INSTALL_PATH_INC}/signal.h
 	rm -f ${INSTALL_PATH_INC}/socket.h

@@ -24,8 +24,8 @@ void test1()
     printf("a={%s}\n",(char*)a->data);
     printf("b={%s}\n",(char*)b->data);
 
-   abcdk_buffer_freep(&a);
-   abcdk_buffer_freep(&b);
+   abcdk_buffer_free(&a);
+   abcdk_buffer_free(&b);
 
    void* c = abcdk_heap_alloc(1000);
 
@@ -40,9 +40,9 @@ void test1()
 
     abcdk_buffer_t *d2 =abcdk_buffer_copy(d);
 
-    abcdk_heap_freep((void**)&d);
-    abcdk_heap_freep(&c);
-    abcdk_buffer_freep(&d2);
+    abcdk_heap_free2((void**)&d);
+    abcdk_heap_free2(&c);
+    abcdk_buffer_free(&d2);
 
     abcdk_buffer_t *e = abcdk_buffer_alloc2(1000*100000);
 
@@ -51,11 +51,11 @@ void test1()
 
     abcdk_buffer_t *h = abcdk_buffer_clone(g);
 
-    abcdk_buffer_freep(&e);
-    abcdk_buffer_freep(&f);
+    abcdk_buffer_free(&e);
+    abcdk_buffer_free(&f);
 
-    abcdk_buffer_freep(&g);
-    abcdk_buffer_freep(&h);
+    abcdk_buffer_free(&g);
+    abcdk_buffer_free(&h);
 }
 
 void test2()
@@ -82,7 +82,7 @@ void test2()
 
     abcdk_buffer_resize(a,1000);
 
-    abcdk_buffer_freep(&a);
+    abcdk_buffer_free(&a);
 }
 
 void test3()
@@ -93,9 +93,9 @@ void test3()
 
     abcdk_buffer_t *c = abcdk_buffer_clone(b);
 
-    abcdk_buffer_freep(&a);
-    abcdk_buffer_freep(&b);
-    abcdk_buffer_freep(&c);
+    abcdk_buffer_free(&a);
+    abcdk_buffer_free(&b);
+    abcdk_buffer_free(&c);
 }
 
 void test4()

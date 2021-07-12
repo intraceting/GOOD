@@ -55,7 +55,7 @@ abcdk_clock_t *_abcdk_clock_init(uint64_t set)
 
         chk = pthread_setspecific(key, ctx);
         if (chk != 0)
-            abcdk_heap_freep((void **)&ctx);
+            abcdk_heap_free2((void **)&ctx);
     }
 
     if (ctx && chk == 0)

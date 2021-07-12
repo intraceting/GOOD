@@ -87,7 +87,7 @@ void abcdk_heap_free(void *data)
         free(data);
 }
 
-void abcdk_heap_freep(void **data)
+void abcdk_heap_free2(void **data)
 {
     if (!data || !*data)
         ABCDK_ERRNO_AND_RETURN0(EINVAL);
@@ -756,7 +756,7 @@ void abcdk_mkdir(const char *path, mode_t mode)
     }
 
     if (tmp)
-        abcdk_heap_freep((void**)&tmp);
+        abcdk_heap_free2((void**)&tmp);
 }
 
 char *abcdk_dirname(char *dst, const char *src)
@@ -774,7 +774,7 @@ char *abcdk_dirname(char *dst, const char *src)
     if (find)
         memcpy(dst, find, strlen(find) + 1);
 
-    abcdk_heap_freep((void**)&path);
+    abcdk_heap_free2((void**)&path);
 
     return dst;
 }
@@ -794,7 +794,7 @@ char *abcdk_basename(char *dst, const char *src)
     if (find)
         memcpy(dst, find, strlen(find) + 1);
 
-    abcdk_heap_freep((void**)&path);
+    abcdk_heap_free2((void**)&path);
 
     return dst;
 }
@@ -861,8 +861,8 @@ char *abcdk_dirnice(char *dst, const char *src)
 
 final:
 
-    abcdk_heap_freep((void **)&stack);
-    abcdk_heap_freep((void **)&s);
+    abcdk_heap_free2((void **)&stack);
+    abcdk_heap_free2((void **)&s);
 
     return dst;
 }
@@ -920,7 +920,7 @@ char *abcdk_proc_dirname(char *buf, const char *append)
         buf = NULL;
     }
 
-    abcdk_heap_freep((void **)&tmp);
+    abcdk_heap_free2((void **)&tmp);
 
     return buf;
 }
@@ -945,7 +945,7 @@ char *abcdk_proc_basename(char *buf)
         buf = NULL;
     }
 
-    abcdk_heap_freep((void **)&tmp);
+    abcdk_heap_free2((void **)&tmp);
 
     return buf;
 }

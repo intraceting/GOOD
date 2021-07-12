@@ -72,7 +72,7 @@ abcdk_buffer_t *abcdk_buffer_alloc2(size_t size);
  * 
  * @param dst 缓存指针的指针。函数返回前修改为NULL(0);
 */
-void abcdk_buffer_freep(abcdk_buffer_t **dst);
+void abcdk_buffer_free(abcdk_buffer_t **dst);
 
 /**
  * 复制。
@@ -114,9 +114,18 @@ ssize_t abcdk_buffer_write(abcdk_buffer_t *buf, const void *data, size_t size);
 /**
  * 读取数据。
  * 
- * @return 读取的长度(Bytes)，= 0 末尾，< 0 出错。
+ * @return > 0 读取的长度(Bytes)，= 0 末尾，< 0 出错。
 */
 ssize_t abcdk_buffer_read(abcdk_buffer_t *buf, void *data, size_t size);
+
+/**
+ * 读取一行数据。
+ * 
+ * @warning 当缓存不足时，行尾部分将被读取并丢弃。
+ * 
+ * @return > 0 读取的长度(Bytes)，= 0 末尾，< 0 出错。
+*/
+ssize_t abcdk_buffer_readline(abcdk_buffer_t *buf, void *data, size_t size);
 
 /**
  * 排出已读数据，未读数据移动到缓存首地址。

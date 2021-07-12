@@ -61,7 +61,7 @@ final_error:
     return NULL;
 }
 
-void abcdk_buffer_freep(abcdk_buffer_t **dst)
+void abcdk_buffer_free(abcdk_buffer_t **dst)
 {
     abcdk_buffer_t *buf_p = NULL;
 
@@ -72,7 +72,7 @@ void abcdk_buffer_freep(abcdk_buffer_t **dst)
 
     abcdk_allocator_unref(&buf_p->alloc);
 
-    abcdk_heap_freep((void **)dst);
+    abcdk_heap_free2((void **)dst);
 }
 
 abcdk_buffer_t *abcdk_buffer_copy(abcdk_buffer_t *src)
@@ -215,6 +215,36 @@ ssize_t abcdk_buffer_read(abcdk_buffer_t *buf, void *data, size_t size)
     rsize2 = ABCDK_MIN(buf->wsize - buf->rsize, size);
     memcpy(data, ABCDK_PTR2PTR(void, buf->data, buf->rsize), rsize2);
     buf->rsize += rsize2;
+
+    return rsize2;
+}
+
+ssize_t abcdk_buffer_readline(abcdk_buffer_t *buf, void *data, size_t size)
+{
+    ssize_t rsize2 = 0;
+    ssize_t rsize3 = 0;
+
+    assert(buf != NULL && data != NULL && size > 0);
+    assert(buf->data != NULL && buf->size > 0);
+
+    if (buf->rsize >= buf->wsize)
+        ABCDK_ERRNO_AND_RETURN1(ESPIPE, 0);
+
+    /*查找行尾标志。*/
+    for (size_t i = 0; i < (buf->wsize - buf->rsize); i++)
+    {
+        rsize3 += 1;
+        if (ABCDK_PTR2I8(buf->data, buf->rsize + i) == '\n')
+            break;
+    }
+
+    rsize2 = ABCDK_MIN(rsize3, size);
+    memcpy(data, ABCDK_PTR2VPTR(buf->data, buf->rsize), rsize2);
+    buf->rsize += rsize3;//累加行真实长度。
+
+    /*添加结束符。*/
+    if (rsize3 < size)
+        ABCDK_PTR2I8(data, rsize2) = '\0';
 
     return rsize2;
 }

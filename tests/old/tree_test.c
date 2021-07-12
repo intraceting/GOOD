@@ -28,7 +28,7 @@ void traversal(abcdk_tree_t *root)
 
     abcdk_tree_scan(root,&it);
 
- //   abcdk_heap_freep((void **)&it.stack);
+ //   abcdk_heap_free2((void **)&it.stack);
 
     printf("\n-------------------------------------\n");
 }
@@ -50,7 +50,7 @@ void traversal2(abcdk_tree_t *root)
 
     abcdk_tree_scan(root,&it);
 
- //   abcdk_heap_freep((void **)&it.stack);
+ //   abcdk_heap_free2((void **)&it.stack);
 
     printf("\n-------------------------------------\n");
 }

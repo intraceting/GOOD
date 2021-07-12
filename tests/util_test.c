@@ -17,6 +17,7 @@
 #include "abcdkutil/html.h"
 #include "abcdkutil/clock.h"
 #include "abcdkutil/crc32.h"
+#include "abcdkutil/robots.h"
 
 
 void test_log(abcdk_tree_t *args)
@@ -258,7 +259,7 @@ void test_html(abcdk_tree_t *args)
     abcdk_tree_free(&t);
 }
 
-void test_fnmatch()
+void test_fnmatch(abcdk_tree_t *args)
 {
     char str[]={"abcd?*Qcde"};
     char wd[]={"abc?\\?\\*q*e"};
@@ -267,7 +268,7 @@ void test_fnmatch()
     assert(chk==0);
 }
 
-void test_crc32()
+void test_crc32(abcdk_tree_t *args)
 {
 //    uint32_t sum = abcdk_crc32_sum("abc",3,0);
 //    printf("%u\n",sum);
@@ -278,6 +279,13 @@ void test_crc32()
         uint32_t sum2 = abcdk_crc32_sum("abc",3,0);
         assert(891568578 ==sum2);
     }
+}
+
+void test_robots(abcdk_tree_t *args)
+{
+    const char *file = abcdk_option_get(args,"--file",0,"");
+
+    abcdk_robots_parse_file(file,"*");
 }
 
 
@@ -318,6 +326,9 @@ int main(int argc, char **argv)
 
     if (abcdk_strcmp(func, "test_crc32", 0) == 0)
         test_crc32(args);
+
+    if (abcdk_strcmp(func, "test_robots", 0) == 0)
+        test_robots(args);
 
     abcdk_tree_free(&args);
     

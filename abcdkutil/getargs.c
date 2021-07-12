@@ -78,8 +78,8 @@ void abcdk_getargs_fp(abcdk_tree_t *opt, FILE *fp, uint8_t delim, char note,
 
         while (_abcdk_getargs_getline(fp, &line, &len, delim, note) != -1)
         {
-            /* 去掉字符串两端所有控制字符。 */
-            abcdk_strtrim(line, iscntrl, 2);
+            /* 去掉字符串两端所有空白字符。 */
+            abcdk_strtrim(line, isspace, 2);
 
             if (abcdk_strncmp(line, prefix, prefix_len, 1) != 0)
             {
@@ -88,7 +88,7 @@ void abcdk_getargs_fp(abcdk_tree_t *opt, FILE *fp, uint8_t delim, char note,
             else
             {
                 if (it_key != prefix)
-                    abcdk_heap_freep((void **)&it_key);
+                    abcdk_heap_free2((void **)&it_key);
 
                 it_key = abcdk_heap_clone(line, len + 1);
                 if (!it_key)
@@ -119,8 +119,8 @@ void abcdk_getargs_fp(abcdk_tree_t *opt, FILE *fp, uint8_t delim, char note,
                 abcdk_strtrim(val_p, _abcdk_getargs_valtrim, 2);
             }
 
-            /* 去掉key两端所有控制字符。 */
-            abcdk_strtrim(key_p, iscntrl, 2);
+            /* 去掉key两端所有空白字符。 */
+            abcdk_strtrim(key_p, isspace, 2);
 
             abcdk_option_set(opt, key_p, val_p);
         }
@@ -130,7 +130,7 @@ void abcdk_getargs_fp(abcdk_tree_t *opt, FILE *fp, uint8_t delim, char note,
     if (line)
         free(line);
     if (it_key != prefix)
-        abcdk_heap_freep((void **)&it_key);
+        abcdk_heap_free2((void **)&it_key);
 }
 
 void abcdk_getargs_file(abcdk_tree_t *opt, const char *file, uint8_t delim, char note,

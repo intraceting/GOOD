@@ -178,7 +178,7 @@ void test_ssl(abcdk_tree_t *opt)
 
     // abcdk_closep(&c);
 
-    abcdk_openssl_ssl_freep(&s);
+    abcdk_openssl_ssl_free(&s);
 
     SSL_CTX_free(ctx);
 }
