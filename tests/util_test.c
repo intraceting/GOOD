@@ -281,11 +281,34 @@ void test_crc32(abcdk_tree_t *args)
     }
 }
 
+static int _test_robots_dump_cb(size_t deep, abcdk_tree_t *node, void *opaque)
+{
+    if (deep == 0)
+    {
+        abcdk_tree_fprintf(stderr, deep, node, "%s\n", ".");
+    }
+    else
+    {
+        abcdk_tree_fprintf(stderr, deep, node, "%hhu: %s\n",
+                           ABCDK_PTR2U8(node->alloc->pptrs[ABCDK_ROBOTS_FLAG], 0),
+                           ABCDK_PTR2I8PTR(node->alloc->pptrs[ABCDK_ROBOTS_PATH], 0));
+    }
+
+    return 1;
+}
+
 void test_robots(abcdk_tree_t *args)
 {
     const char *file = abcdk_option_get(args,"--file",0,"");
 
-    abcdk_robots_parse_file(file,"*");
+    abcdk_tree_t *t = abcdk_robots_parse_file(file,"Baiduspider");
+
+    abcdk_tree_iterator_t it = {0,_test_robots_dump_cb,NULL};
+
+    abcdk_tree_scan(t,&it);
+
+
+    abcdk_tree_free(&t);
 }
 
 

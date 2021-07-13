@@ -18,10 +18,6 @@ __BEGIN_DECLS
 */
 enum _abcdk_robots_field
 {
-    /** PATH 字段索引。*/
-   ABCDK_ROBOTS_KEY = 0,
-#define ABCDK_ROBOTS_KEY  ABCDK_ROBOTS_KEY
-
     /** 
      * FLAG 字段索引。
      * 
@@ -29,8 +25,13 @@ enum _abcdk_robots_field
      * 2：拒绝。
      * 3：网站地图。
     */
-   ABCDK_ROBOTS_FLAG = 1,
+   ABCDK_ROBOTS_FLAG = 0,
 #define ABCDK_ROBOTS_FLAG    ABCDK_ROBOTS_FLAG
+
+    /** PATH 字段索引。*/
+   ABCDK_ROBOTS_PATH = 1
+#define ABCDK_ROBOTS_PATH  ABCDK_ROBOTS_PATH
+
 
 };
 

@@ -8,15 +8,19 @@
 
 int _abcdk_robots_check_agent(const char *line, const char *agent)
 {
-    int chk;
     const char *b = NULL;
+    int chk = -1;
+
+    chk = abcdk_strncmp(line,"User-agent",9,0);
+    if(chk!=0)
+        ABCDK_ERRNO_AND_GOTO1(EPERM, final);
 
     b = line;
 
     for (;b++;)
     {
         if (*b == '\0')
-            ABCDK_ERRNO_AND_RETURN1(EPERM, -1);
+            ABCDK_ERRNO_AND_GOTO1(EPERM, final);
 
         if (*b == ':')
             break;
@@ -28,7 +32,7 @@ int _abcdk_robots_check_agent(const char *line, const char *agent)
     for (;b++;)
     {
         if (*b == '\0')
-            ABCDK_ERRNO_AND_RETURN1(EPERM, -1);
+            ABCDK_ERRNO_AND_GOTO1(EPERM, final);
 
         if(!isspace(*b))
             break;
@@ -36,12 +40,70 @@ int _abcdk_robots_check_agent(const char *line, const char *agent)
 
     chk = abcdk_strcmp(b,agent,0);
 
+final:
+
     return chk;
 }
 
-abcdk_tree_t *_abcdk_robots_parse_rule(const char *text)
+abcdk_tree_t *_abcdk_robots_parse_rule(const char *line)
 {
     abcdk_tree_t *rule = NULL;
+    const char *b = NULL;
+    const char *e = NULL;
+    int flag = 0;
+
+    if (abcdk_strncmp(line, "Disallow", 8, 0) == 0)
+        flag = 2;
+    else if (abcdk_strncmp(line, "Allow", 5, 0) == 0)
+        flag = 1;
+    else if (abcdk_strncmp(line, "Sitemap", 7, 0) == 0)
+        flag = 3;
+
+    /*只支持这三种。*/
+    if (flag != 1 && flag != 2 && flag != 3)
+        ABCDK_ERRNO_AND_GOTO1(EPERM, final);
+
+    b = line;
+
+    for (;b++;)
+    {
+        if (*b == '\0')
+            ABCDK_ERRNO_AND_GOTO1(EPERM, final);
+
+        if (*b == ':')
+            break;
+    }
+
+    if (*b == ':')
+        b += 1;
+
+    for (;b++;)
+    {
+        if (*b == '\0')
+            ABCDK_ERRNO_AND_GOTO1(EPERM, final);
+
+        if(!isspace(*b))
+            break;
+    }
+
+    e = b + 1;
+
+    /*查找结束符。*/
+    for (; *e != '\0'; e++)
+    {
+        /*Nothing.*/;
+    }
+
+    size_t sizes[2] = {sizeof(uint8_t), (e - b) + 1};
+
+    rule = abcdk_tree_alloc2(sizes,2,0);
+    if(!rule)
+        goto final;
+
+    ABCDK_PTR2U8(rule->alloc->pptrs[ABCDK_ROBOTS_FLAG], 0) = flag;
+    strncpy((char *)rule->alloc->pptrs[ABCDK_ROBOTS_PATH], b, e - b);
+
+final:
 
     return rule;
 }
@@ -83,7 +145,7 @@ void _abcdk_robots_parse_real(abcdk_tree_t *root, const char *text, const char *
 
         if(!agent_ok)
         {
-            agent_ok = _abcdk_robots_check_agent(line,agent);
+            agent_ok = (_abcdk_robots_check_agent(line,agent)==0);
         }
         else 
         {
